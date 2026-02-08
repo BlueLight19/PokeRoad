@@ -92,10 +92,7 @@
         ]
       }
     ],
-    "unlockCondition": {
-      "type": "item",
-      "itemId": "hm01"
-    }
+    "unlockCondition": null
   },
   {
     "id": "celadon-gym",
@@ -132,10 +129,7 @@
         ]
       }
     ],
-    "unlockCondition": {
-      "type": "item",
-      "itemId": "hm01"
-    }
+    "unlockCondition": null
   },
   {
     "id": "fuchsia-gym",
@@ -279,8 +273,8 @@
       }
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "secret-key"
+      "type": "trainers",
+      "zones": ["pokemon-mansion"]
     }
   },
   {

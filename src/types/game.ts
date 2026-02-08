@@ -28,9 +28,12 @@ export interface CityData {
   region: string;
   generation: number;
   hasShop: boolean;
-  gymId: string | null;
+  hasCenter: boolean;
+  gymId?: string; // ID of the gym leader
+  trainers?: string[]; // IDs of trainers in the city (e.g. Rival)
+  wildEncounters?: WildEncounter[]; // Surfing/Fishing/Safari?
   connectedZones: string[];
-  unlockCondition: UnlockCondition | null;
+  unlockCondition?: UnlockCondition;
 }
 
 export interface GymData {
@@ -99,6 +102,12 @@ export interface ProgressData {
   caughtPokemon: number[];
   seenPokemon: number[];
   leagueProgress: number; // 0=None, 1=Lorelei, 2=Bruno, 3=Agatha, 4=Lance, 5=Champion
+  repelSteps: number;
+}
+
+export interface SafariState {
+  steps: number;
+  balls: number;
 }
 
 // ===== Game View =====

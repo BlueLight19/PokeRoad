@@ -11,6 +11,7 @@ import gen1Trainers from '../data/gen1/trainers.json';
 import gen1Gyms from '../data/gen1/gyms.json';
 import pokeballs from '../data/items/pokeballs.json';
 import potions from '../data/items/potions.json';
+import extraItems from '../data/items/items.json';
 import typeChartData from '../data/typeChart.json';
 
 // Type chart: attackType -> defenseType -> multiplier
@@ -70,6 +71,7 @@ export function initializeData(): void {
   registerGyms(gen1Gyms as GymData[]);
   registerItems(pokeballs as ItemData[]);
   registerItems(potions as ItemData[]);
+  registerItems(extraItems as ItemData[]);
   typeChart = typeChartData as TypeChart;
 }
 

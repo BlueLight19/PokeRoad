@@ -2,12 +2,61 @@ import { useGameStore } from '../../stores/gameStore';
 import { getAllZones, getGymData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 
+// Complete Kanto progression order
+const ZONE_ORDER = [
+  'bourg-palette',
+  'route-1',
+  'jadielle',
+  'route-22',
+  'route-2',
+  'foret-jade',
+  'argenta',
+  'route-3',
+  'mt-moon',
+  'route-4',
+  'azuria',
+  'route-24',
+  'route-25',
+  'route-5',
+  'route-6',
+  'carmin',
+  'route-11',
+  'cave-diglett',
+  'route-9',
+  'route-10',
+  'rock-tunnel',
+  'lavanville',
+  'route-8',
+  'safrania',
+  'route-7',
+  'celadopole',
+  'route-16',
+  'route-17',
+  'route-18',
+  'parmanie',
+  'route-15',
+  'route-14',
+  'route-13',
+  'route-12',
+  'route-19',
+  'route-20',
+  'seafoam-islands',
+  'cramois-ile',
+  'pokemon-mansion',
+  'route-21',
+  'power-plant',
+  'route-23',
+  'victory-road',
+  'plateau-indigo',
+  'league-hall',
+  'cerulean-cave',
+];
+
 export function WorldMap() {
   const { player, progress, selectZone, setView, team } = useGameStore();
 
   const zones = getAllZones();
-  const zoneOrder = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3', 'league-hall'];
-  const orderedZones = zoneOrder.map(id => zones.find(z => z.id === id)).filter(Boolean);
+  const orderedZones = ZONE_ORDER.map(id => zones.find(z => z.id === id)).filter(Boolean);
 
   return (
     <div style={{
@@ -109,6 +158,7 @@ export function WorldMap() {
           display: 'flex',
           gap: '8px',
           marginBottom: '16px',
+          flexWrap: 'wrap',
         }}>
           <Button variant="secondary" size="sm" onClick={() => setView('team')}>
             Equipe ({team.length})
@@ -148,7 +198,17 @@ export function WorldMap() {
               if (!zone) return null;
               const isUnlocked = progress.unlockedZones.includes(zone.id);
               const isCurrent = progress.currentZone === zone.id;
-              const isCity = (zone as any).type === 'city';
+              const zoneType = (zone as any).type;
+              const isCity = zoneType === 'city';
+              const isDungeon = zoneType === 'dungeon';
+
+              // Don't show locked zones that are far ahead
+              if (!isUnlocked) {
+                // Show the next couple of locked zones as hints
+                const prevZone = idx > 0 ? orderedZones[idx - 1] : null;
+                const prevUnlocked = prevZone && progress.unlockedZones.includes(prevZone.id);
+                if (!prevUnlocked) return null;
+              }
 
               const zoneTrainers: string[] = (zone as any).trainers || [];
               const defeatedCount = progress.defeatedTrainers.filter(t => zoneTrainers.includes(t)).length;
@@ -162,7 +222,8 @@ export function WorldMap() {
                 } catch { return false; }
               })();
 
-              const accentColor = isCity ? '#FFD600' : '#4CAF50';
+              const accentColor = isCity ? '#FFD600' : isDungeon ? '#9C27B0' : '#4CAF50';
+              const zoneIcon = isCity ? '\u2302' : isDungeon ? '\u2666' : '\u2022';
 
               return (
                 <div key={zone.id}>
@@ -170,7 +231,7 @@ export function WorldMap() {
                   {idx > 0 && (
                     <div style={{
                       width: '2px',
-                      height: '8px',
+                      height: '6px',
                       background: isUnlocked ? `${accentColor}44` : '#1a1a2e',
                       margin: '0 auto',
                     }} />
@@ -182,8 +243,8 @@ export function WorldMap() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '14px',
-                      padding: '14px 16px',
+                      gap: '12px',
+                      padding: '10px 14px',
                       width: '100%',
                       background: isCurrent
                         ? `linear-gradient(90deg, ${accentColor}22 0%, transparent 100%)`
@@ -193,14 +254,13 @@ export function WorldMap() {
                         : isUnlocked
                           ? `2px solid ${accentColor}33`
                           : '2px solid #151515',
-                      borderRadius: '12px',
+                      borderRadius: '10px',
                       cursor: isUnlocked ? 'pointer' : 'not-allowed',
                       opacity: isUnlocked ? 1 : 0.35,
                       transition: 'all 0.25s ease',
                       textAlign: 'left',
                       position: 'relative',
                       overflow: 'hidden',
-                      animation: isUnlocked ? `fadeIn 0.3s ease ${idx * 0.05}s both` : 'none',
                     }}
                   >
                     {/* Current zone pulse indicator */}
@@ -218,50 +278,47 @@ export function WorldMap() {
 
                     {/* Zone icon */}
                     <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: isCity ? '10px' : '50%',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: isCity ? '8px' : '50%',
                       background: isUnlocked
                         ? `linear-gradient(135deg, ${accentColor}, ${accentColor}88)`
                         : '#222',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       fontWeight: 'bold',
                       color: '#fff',
                       flexShrink: 0,
                       boxShadow: isCurrent ? `0 0 10px ${accentColor}44` : 'none',
                     }}>
-                      {isCity ? '\u2302' : '\u2022'}
+                      {zoneIcon}
                     </div>
 
                     {/* Zone info */}
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
                         color: isUnlocked ? '#fff' : '#555',
-                        fontSize: '10px',
+                        fontSize: '9px',
                         fontFamily: "'Press Start 2P', monospace",
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}>
                         {zone.name}
                       </div>
 
-                      <div style={{ display: 'flex', gap: '8px', marginTop: '4px', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '3px', alignItems: 'center', flexWrap: 'wrap' }}>
                         {/* Trainer progress */}
-                        {!isCity && zoneTrainers.length > 0 && (
-                          <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
+                        {zoneTrainers.length > 0 && (
+                          <span style={{
+                            color: allDefeated ? '#4CAF50' : '#666',
+                            fontSize: '7px',
+                            fontFamily: "'Press Start 2P', monospace",
                           }}>
-                            <span style={{
-                              color: allDefeated ? '#4CAF50' : '#666',
-                              fontSize: '7px',
-                              fontFamily: "'Press Start 2P', monospace",
-                            }}>
-                              {allDefeated ? '\u2713' : '\u2694'} {defeatedCount}/{zoneTrainers.length}
-                            </span>
-                          </div>
+                            {allDefeated ? '\u2713' : '\u2694'} {defeatedCount}/{zoneTrainers.length}
+                          </span>
                         )}
 
                         {/* Wild pokemon indicator */}
@@ -285,6 +342,17 @@ export function WorldMap() {
                             {gymBadgeEarned ? '\u2605 Arene' : '! Arene'}
                           </span>
                         )}
+
+                        {/* Dungeon indicator */}
+                        {isDungeon && !hasGym && (
+                          <span style={{
+                            color: '#9C27B088',
+                            fontSize: '7px',
+                            fontFamily: "'Press Start 2P', monospace",
+                          }}>
+                            Donjon
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -292,10 +360,11 @@ export function WorldMap() {
                     {isCurrent && (
                       <div style={{
                         color: accentColor,
-                        fontSize: '14px',
+                        fontSize: '12px',
                         animation: 'pulse 1.5s ease infinite',
+                        flexShrink: 0,
                       }}>
-                        \u25B6
+                        {'\u25B6'}
                       </div>
                     )}
                   </button>

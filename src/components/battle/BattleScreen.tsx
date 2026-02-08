@@ -5,8 +5,9 @@ import { PokemonDisplay } from './PokemonDisplay';
 import { MoveSelection } from './MoveSelection';
 import { BattleLog } from './BattleLog';
 import { Button } from '../ui/Button';
-import { getPokemonData, getItemData } from '../../utils/dataLoader';
+import { getPokemonData, getItemData, getZoneData } from '../../utils/dataLoader';
 import { soundManager } from '../../utils/SoundManager';
+import { WildEncounter } from '../../types/game';
 
 export function BattleScreen() {
   const gameStore = useGameStore();
@@ -62,7 +63,7 @@ export function BattleScreen() {
 
   if (!player || !enemy) return null;
 
-  const handleEndBattle = () => {
+  const handleEndBattle = (restart: boolean = false) => {
     // Apply XP gains
     for (const xp of battle.xpGained) {
       gameStore.grantXpAndProcess(xp.pokemonIndex, xp.defeatedId, xp.defeatedLevel, battle.type !== 'wild');
@@ -106,6 +107,16 @@ export function BattleScreen() {
     useGameStore.getState().healTeam();
 
     battle.clearBattle();
+
+    if (restart && gameStore.selectedZone) {
+      // Start new battle
+      const zone = getZoneData(gameStore.selectedZone);
+      if (zone && (zone.wildEncounters || []).length > 0) {
+        battle.startWildBattle(zone.wildEncounters || [], useGameStore.getState().team);
+        return;
+      }
+    }
+
     useGameStore.getState().setView('world_map');
     useGameStore.getState().saveGameState();
   };
@@ -177,9 +188,15 @@ export function BattleScreen() {
 
           <BattleLog logs={battle.logs} />
 
-          <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <Button variant="primary" onClick={handleEndBattle}>
-              Continuer
+          <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+            {battle.type === 'wild' && (
+              <Button variant="primary" onClick={() => handleEndBattle(true)}>
+                Combat Suivant
+              </Button>
+            )}
+
+            <Button variant={battle.type === 'wild' ? "ghost" : "primary"} onClick={() => handleEndBattle(false)}>
+              {battle.type === 'wild' ? 'Retour Carte' : 'Continuer'}
             </Button>
           </div>
         </div>
@@ -559,35 +576,75 @@ export function BattleScreen() {
         <div style={{ height: '10px' }} />
 
         {/* Action area */}
+        {/* Action area */}
         {battle.phase === 'choosing' && (
           <div style={{ animation: 'fadeIn 0.3s ease' }}>
-            {/* Move selection */}
-            <MoveSelection
-              pokemon={player}
-              onSelectMove={(index) => battle.selectMove(index)}
-            />
-
-            <div style={{ height: '10px' }} />
-
-            {/* Bottom actions */}
-            <div style={{
-              display: 'flex',
-              gap: '8px',
-              padding: '8px 0',
-              borderTop: '1px solid #222',
-            }}>
-              <Button variant="secondary" size="sm" onClick={() => setShowBag(true)}>
-                Sac
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => setShowTeam(true)}>
-                Pokemon
-              </Button>
-              {battle.type === 'wild' && (
-                <Button variant="danger" size="sm" onClick={() => battle.attemptFlee()}>
-                  Fuite
+            {battle.type === 'safari' ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <Button
+                  variant="primary"
+                  onClick={battle.throwSafariBall}
+                  style={{ background: '#4CAF50', borderColor: '#2E7D32', flexDirection: 'column', gap: '4px' }}
+                >
+                  <span>Safari Ball</span>
+                  <span style={{ fontSize: '9px', opacity: 0.8 }}>x{useGameStore.getState().safariState?.balls ?? 0}</span>
                 </Button>
-              )}
-            </div>
+                <Button
+                  variant="secondary"
+                  onClick={battle.throwRock}
+                  style={{ background: '#795548', borderColor: '#4E342E', flexDirection: 'column', gap: '4px' }}
+                >
+                  <span>Caillou</span>
+                  <span style={{ fontSize: '9px', opacity: 0.8 }}>Enrager</span>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={battle.throwBait}
+                  style={{ background: '#FFC107', borderColor: '#FFA000', color: '#000', flexDirection: 'column', gap: '4px' }}
+                >
+                  <span>Appât</span>
+                  <span style={{ fontSize: '9px', opacity: 0.8 }}>Manger</span>
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={battle.attemptFlee}
+                  style={{ flexDirection: 'column', gap: '4px' }}
+                >
+                  <span>Fuite</span>
+                  <span style={{ fontSize: '9px', opacity: 0.8 }}>Quitter</span>
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Move selection */}
+                <MoveSelection
+                  pokemon={player}
+                  onSelectMove={(index) => battle.selectMove(index)}
+                />
+
+                <div style={{ height: '10px' }} />
+
+                {/* Bottom actions */}
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  padding: '8px 0',
+                  borderTop: '1px solid #222',
+                }}>
+                  <Button variant="secondary" size="sm" onClick={() => setShowBag(true)}>
+                    Sac
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTeam(true)}>
+                    Pokemon
+                  </Button>
+                  {battle.type === 'wild' && (
+                    <Button variant="danger" size="sm" onClick={() => battle.attemptFlee()}>
+                      Fuite
+                    </Button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

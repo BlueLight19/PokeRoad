@@ -7,6 +7,7 @@ import {
   PlayerData,
   ProgressData,
   TrainerData,
+  SafariState,
 } from '../types/game';
 import { InventoryItem } from '../types/inventory';
 import { saveGame, loadGame, hasSave } from '../utils/saveManager';
@@ -16,6 +17,8 @@ import {
   getGymData,
   getMoveData,
   getItemData,
+  getAllZones,
+  getPokemonData,
 } from '../utils/dataLoader';
 import {
   createPokemonInstance,
@@ -42,18 +45,21 @@ export interface GameState {
   pc: PCStorage;
   inventory: InventoryItem[];
   progress: ProgressData;
+  safariState: SafariState | null;
   selectedZone: string | null;
   selectedPokemonIndex: number | null;
 
   // Pending actions
   pendingEvolution: { pokemonIndex: number; targetId: number } | null;
-  pendingMoveLearn: { pokemonIndex: number; moveId: number } | null;
+  pendingMoveLearn: { pokemonIndex: number; moveId: number; sourceItem?: string } | null;
 
   // Actions
   initGame: () => void;
   startNewGame: (playerName: string, starterId: number) => void;
   setView: (view: GameView) => void;
   selectZone: (zoneId: string) => void;
+  startSafari: () => void;
+  quitSafari: () => void;
 
   // Team management
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
@@ -80,6 +86,8 @@ export interface GameState {
   isZoneUnlocked: (zoneId: string) => boolean;
   isTrainerDefeated: (trainerId: string) => boolean;
   getTrainersForZone: (zoneId: string) => TrainerData[];
+  decrementRepelSteps: () => void;
+  setRepelSteps: (steps: number) => void;
 
   // Post-battle
   grantXpAndProcess: (
@@ -117,7 +125,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     caughtPokemon: [],
     seenPokemon: [],
     leagueProgress: 0,
+    repelSteps: 0,
   },
+  safariState: null,
   selectedZone: null,
   selectedPokemonIndex: null,
   pendingEvolution: null,
@@ -136,7 +146,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     const initialItems: InventoryItem[] = [
-      { itemId: 'pokeball', quantity: 5 },
+      { itemId: 'poke-ball', quantity: 5 },
       { itemId: 'potion', quantity: 3 },
     ];
 
@@ -159,6 +169,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         caughtPokemon: [starterId],
         seenPokemon: [starterId],
         leagueProgress: 0,
+        repelSteps: 0,
       },
       selectedZone: null,
       pendingEvolution: null,
@@ -299,8 +310,61 @@ export const useGameStore = create<GameState>((set, get) => ({
     const itemData = getItemData(itemId);
     if (!itemData) return { success: false, message: "Objet inconnu." };
 
+    // Field items
+    if (itemData.effect?.type === 'repel') {
+      get().setRepelSteps(itemData.effect.repelSteps || 100);
+      get().removeItem(itemId, 1);
+      return { success: true, message: "Les Pokémon sauvages seront repoussés." };
+    }
+
+    if (itemData.effect?.type === 'escape_rope') {
+      get().selectZone('bourg-palette'); // Teleport to home for now
+      get().removeItem(itemId, 1);
+      return { success: true, message: "Vous utilisez la Corde Sortie." };
+    }
+
+    if (itemData.effect?.type === 'teach' && itemData.effect.moveId) {
+      const idx = state.team.findIndex(p => p.uid === pokemonUid);
+      const pokemon = state.team[idx]; // Use team index via uid
+      if (!pokemon) return { success: false, message: "Utiliser sur qui ?" };
+
+      const moveId = itemData.effect.moveId;
+      const moveData = getMoveData(moveId);
+
+      // Check if already known
+      if (pokemon.moves.some(m => m.moveId === moveId)) {
+        return { success: false, message: `${pokemon.nickname || getPokemonData(pokemon.dataId).name} connait déjà ${moveData.name} !` };
+      }
+
+      // Check move count
+      if (pokemon.moves.length < 4) {
+        // Learn immediately
+        pokemon.moves.push({
+          moveId,
+          currentPp: moveData.pp,
+          maxPp: moveData.pp
+        });
+
+        const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+        get().removeItem(itemId, 1);
+        // Force update
+        set({ team: [...state.team] });
+        return { success: true, message: `${name} apprend ${moveData.name} !` };
+      } else {
+        // Needs to forget a move
+        set({
+          pendingMoveLearn: {
+            pokemonIndex: idx,
+            moveId,
+            sourceItem: itemId
+          }
+        });
+        return { success: true, message: "Voulez-vous oublier une capacité ?" };
+      }
+    }
+
     // If item requires a target
-    const requiresTarget = ['heal', 'status', 'revive', 'evolution'].includes(itemData.effect?.type || '');
+    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost'].includes(itemData.effect?.type || '');
 
     if (requiresTarget) {
       if (!pokemonUid) return { success: false, message: "Utiliser sur qui ?" };
@@ -352,12 +416,25 @@ export const useGameStore = create<GameState>((set, get) => ({
       defeatedTrainers: [...state.progress.defeatedTrainers, trainerId],
     };
 
-    // Check if this unlocks new zones
-    const allZones = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3'];
-    for (const zoneId of allZones) {
+    // Check if this unlocks new zones - iterate ALL zones
+    const allZones = getAllZones();
+    // We might need multiple passes if unlocking one zone unlocks another immediately (cascade)
+    // For now, simple pass. If cascade is needed, we'd loop until no changes.
+    // Actually, one pass is usually enough per action in this simple logic.
+
+    // Optimization: we can't just check neighbors of current zone because 
+    // "unlocking a zone" might happen ANYWHERE if conditions are met.
+    // BUT, we only want to unlock if it connects to something we HAVE.
+
+    for (const zone of allZones) {
+      const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
+
+      // connectivity check
+      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
+      if (!isConnected) continue;
+
       try {
-        const zone = getZoneData(zoneId);
         const condition = (zone as any).unlockCondition;
         if (!condition) {
           if (!newProgress.unlockedZones.includes(zoneId)) {
@@ -389,6 +466,12 @@ export const useGameStore = create<GameState>((set, get) => ({
             newProgress.unlockedZones.push(zoneId);
           }
         }
+
+        if (condition.type === 'badge' && condition.badge) {
+          if (state.player.badges.includes(condition.badge) && !newProgress.unlockedZones.includes(zoneId)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
       } catch {
         // Zone not found, skip
       }
@@ -410,17 +493,50 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ player: newPlayer });
     }
 
-    // Re-check zone unlocks
+    // Re-check zone unlocks for ALL zones
     const newProgress = { ...get().progress };
-    const allZones = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3'];
-    for (const zoneId of allZones) {
+    const allZonesData = getAllZones();
+
+    for (const zone of allZonesData) {
+      const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
+
+      // connectivity check
+      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
+      if (!isConnected) continue;
+
       try {
-        const zone = getZoneData(zoneId);
         const condition = (zone as any).unlockCondition;
-        if (!condition) continue;
-        if (condition.type === 'gym' && condition.gymId === gymId) {
+        if (!condition) {
           newProgress.unlockedZones.push(zoneId);
+          continue;
+        }
+        if (condition.type === 'gym' && condition.gymId) {
+          const condGym = getGymData(condition.gymId);
+          if (get().player.badges.includes(condGym.badge)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'badge' && condition.badge) {
+          if (get().player.badges.includes(condition.badge)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'trainers' && condition.zones) {
+          const allDefeated = condition.zones.every((z: string) => {
+            try {
+              const zoneData = getZoneData(z) as any;
+              const zoneTrainers: string[] = zoneData.trainers || [];
+              return zoneTrainers.every((t: string) =>
+                newProgress.defeatedTrainers.includes(t)
+              );
+            } catch {
+              return true;
+            }
+          });
+          if (allDefeated) {
+            newProgress.unlockedZones.push(zoneId);
+          }
         }
       } catch {
         // Skip
@@ -468,6 +584,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     } catch {
       return [];
     }
+  },
+
+  decrementRepelSteps: () => {
+    const { progress } = get();
+    if (progress.repelSteps > 0) {
+      set({
+        progress: { ...progress, repelSteps: progress.repelSteps - 1 }
+      });
+    }
+  },
+
+  setRepelSteps: (steps: number) => {
+    set({
+      progress: { ...get().progress, repelSteps: steps }
+    });
   },
 
   grantXpAndProcess: (pokemonIndex: number, defeatedId: number, defeatedLevel: number, isTrainer: boolean) => {
@@ -526,6 +657,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ team });
   },
 
+  startSafari: () => {
+    const state = get();
+    if (state.player.money < 500) return;
+    state.spendMoney(500);
+    set({
+      safariState: { steps: 30, balls: 30 }, // 30 "actions" or steps? Plan said 30 actions. 
+      // Steps usually 500. But for this text-based/click-based movement, maybe 30 actions (search) is better?
+      // "Search" action decrements steps.
+      selectedZone: 'parc-safari',
+      currentView: 'route_menu'
+    });
+  },
+
+  quitSafari: () => {
+    set({
+      safariState: null,
+      selectedZone: 'parmanie',
+      currentView: 'city_menu'
+    });
+  },
+
   confirmEvolution: (accept: boolean) => {
     const { pendingEvolution, team } = get();
     if (!pendingEvolution) return;
@@ -562,8 +714,23 @@ export const useGameStore = create<GameState>((set, get) => ({
         currentPp: moveData.pp,
         maxPp: moveData.pp,
       };
+
+      // Consume TM if applicable
+      if (pendingMoveLearn.sourceItem) {
+        const { inventory } = get();
+        const currentQty = inventory.find(i => i.itemId === pendingMoveLearn.sourceItem)?.quantity || 0;
+        if (currentQty > 0) {
+          // We need to decrease quantity. 
+          // NOTE: We can't call set() inside this function easily without recreating the inventory array properly.
+          // But we can reuse the logic or just map it.
+          const newInventory = inventory
+            .map(i => i.itemId === pendingMoveLearn.sourceItem ? { ...i, quantity: i.quantity - 1 } : i)
+            .filter(i => i.quantity > 0);
+          set({ inventory: newInventory });
+        }
+      }
     }
-    // If forgetIndex is null, the move is not learned
+    // If forgetIndex is null, the move is not learned (and TM is not consumed)
 
     set({ team: newTeam, pendingMoveLearn: null });
     get().saveGameState();

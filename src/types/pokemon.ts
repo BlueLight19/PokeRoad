@@ -67,12 +67,16 @@ export interface MoveData {
 }
 
 export interface MoveEffect {
-  type: 'status' | 'stat' | 'drain' | 'recoil' | 'flinch' | 'charge';
+
+  type: 'status' | 'stat' | 'drain' | 'recoil' | 'flinch' | 'charge' | 'multi' | 'disable' | 'mist' | 'ohko' | 'trap' | 'force_switch' | 'fixed_damage' | 'rampage' | 'recoil_crash' | 'money' | 'critical';
   status?: StatusCondition;
   chance?: number;
   stat?: StatName;
   stages?: number;
-  amount?: number;
+  amount?: number; // For drain/recoil/fixed_damage (percent or fixed value)
+  min?: number; // For multi-hit
+  max?: number; // For multi-hit
+  count?: number; // For fixed multi-hit
 }
 
 // ===== Instance (in-game Pokémon) =====
@@ -100,6 +104,7 @@ export interface VolatileStatus {
   flinch: boolean;
   leechSeed: boolean;
   bound: number; // For trapping moves like Wrap/Bind
+  charging?: number; // moveId being charged
 }
 
 export interface PokemonInstance {
