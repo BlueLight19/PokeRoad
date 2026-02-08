@@ -1,0 +1,32 @@
+[
+  {
+    "id": "poke-ball",
+    "name": "Poké Ball",
+    "category": "pokeball",
+    "price": 200,
+    "description": "Une Ball basique pour capturer des Pokémon.",
+    "effect": { "type": "catch", "catchMultiplier": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "super-ball",
+    "name": "Super Ball",
+    "category": "pokeball",
+    "price": 600,
+    "description": "Une Ball plus performante que la Poké Ball.",
+    "effect": { "type": "catch", "catchMultiplier": 1.5 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "hyper-ball",
+    "name": "Hyper Ball",
+    "category": "pokeball",
+    "price": 1200,
+    "description": "Une Ball de haute performance.",
+    "effect": { "type": "catch", "catchMultiplier": 2 },
+    "usableInBattle": true,
+    "usableOutside": false
+  }
+]

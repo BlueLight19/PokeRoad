@@ -1,0 +1,116 @@
+[
+  {
+    "id": "bourg-palette",
+    "type": "city",
+    "name": "Bourg Palette",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": false,
+    "gymId": null,
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": ["route-1"],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-1",
+    "type": "route",
+    "name": "Route 1",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      { "pokemonId": 16, "minLevel": 2, "maxLevel": 5, "rate": 45 },
+      { "pokemonId": 19, "minLevel": 2, "maxLevel": 4, "rate": 55 }
+    ],
+    "trainers": ["route1-youngster1", "route1-lass1"],
+    "connectedZones": ["bourg-palette", "jadielle"],
+    "unlockCondition": null
+  },
+  {
+    "id": "jadielle",
+    "type": "city",
+    "name": "Jadielle",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": null,
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": ["route-1", "route-2"],
+    "unlockCondition": {
+      "type": "trainers",
+      "zones": ["route-1"]
+    }
+  },
+  {
+    "id": "route-2",
+    "type": "route",
+    "name": "Route 2",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      { "pokemonId": 16, "minLevel": 3, "maxLevel": 5, "rate": 30 },
+      { "pokemonId": 19, "minLevel": 3, "maxLevel": 5, "rate": 40 },
+      { "pokemonId": 21, "minLevel": 3, "maxLevel": 5, "rate": 30 }
+    ],
+    "trainers": ["route2-bug1", "route2-youngster1"],
+    "connectedZones": ["jadielle", "foret-jade"],
+    "unlockCondition": {
+      "type": "trainers",
+      "zones": ["route-1"]
+    }
+  },
+  {
+    "id": "foret-jade",
+    "type": "route",
+    "name": "Forêt de Jade",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      { "pokemonId": 16, "minLevel": 4, "maxLevel": 6, "rate": 20 },
+      { "pokemonId": 19, "minLevel": 3, "maxLevel": 5, "rate": 25 },
+      { "pokemonId": 25, "minLevel": 3, "maxLevel": 5, "rate": 5 },
+      { "pokemonId": 21, "minLevel": 4, "maxLevel": 6, "rate": 50 }
+    ],
+    "trainers": ["foret-bug1", "foret-bug2", "foret-bug3"],
+    "connectedZones": ["route-2", "argenta"],
+    "unlockCondition": {
+      "type": "trainers",
+      "zones": ["route-2"]
+    }
+  },
+  {
+    "id": "argenta",
+    "type": "city",
+    "name": "Argenta",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "pewter-gym",
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": ["foret-jade", "route-3"],
+    "unlockCondition": {
+      "type": "trainers",
+      "zones": ["foret-jade"]
+    }
+  },
+  {
+    "id": "route-3",
+    "type": "route",
+    "name": "Route 3",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      { "pokemonId": 21, "minLevel": 6, "maxLevel": 8, "rate": 35 },
+      { "pokemonId": 19, "minLevel": 6, "maxLevel": 8, "rate": 35 },
+      { "pokemonId": 74, "minLevel": 7, "maxLevel": 10, "rate": 30 }
+    ],
+    "trainers": ["route3-youngster1", "route3-lass1", "route3-hiker1"],
+    "connectedZones": ["argenta"],
+    "unlockCondition": {
+      "type": "gym",
+      "gymId": "pewter-gym"
+    }
+  }
+]

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "category": "potion",
+    "price": 300,
+    "description": "Restaure 20 PV d'un Pokémon.",
+    "effect": { "type": "heal", "healAmount": 20 },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "super-potion",
+    "name": "Super Potion",
+    "category": "potion",
+    "price": 700,
+    "description": "Restaure 50 PV d'un Pokémon.",
+    "effect": { "type": "heal", "healAmount": 50 },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "hyper-potion",
+    "name": "Hyper Potion",
+    "category": "potion",
+    "price": 1200,
+    "description": "Restaure 200 PV d'un Pokémon.",
+    "effect": { "type": "heal", "healAmount": 200 },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "potion-max",
+    "name": "Potion Max",
+    "category": "potion",
+    "price": 2500,
+    "description": "Restaure tous les PV d'un Pokémon.",
+    "effect": { "type": "heal", "healFull": true },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "rappel",
+    "name": "Rappel",
+    "category": "revive",
+    "price": 1500,
+    "description": "Ranime un Pokémon K.O. avec la moitié de ses PV.",
+    "effect": { "type": "revive", "reviveHpPercent": 50 },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "antidote",
+    "name": "Antidote",
+    "category": "status_heal",
+    "price": 100,
+    "description": "Soigne un Pokémon empoisonné.",
+    "effect": { "type": "status_cure", "curesStatus": ["poison"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "anti-para",
+    "name": "Anti-Para",
+    "category": "status_heal",
+    "price": 100,
+    "description": "Soigne un Pokémon paralysé.",
+    "effect": { "type": "status_cure", "curesStatus": ["paralysis"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "reveil",
+    "name": "Réveil",
+    "category": "status_heal",
+    "price": 100,
+    "description": "Réveille un Pokémon endormi.",
+    "effect": { "type": "status_cure", "curesStatus": ["sleep"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "anti-brule",
+    "name": "Anti-Brûle",
+    "category": "status_heal",
+    "price": 100,
+    "description": "Soigne un Pokémon brûlé.",
+    "effect": { "type": "status_cure", "curesStatus": ["burn"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "antigel",
+    "name": "Antigel",
+    "category": "status_heal",
+    "price": 100,
+    "description": "Soigne un Pokémon gelé.",
+    "effect": { "type": "status_cure", "curesStatus": ["freeze"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  }
+]

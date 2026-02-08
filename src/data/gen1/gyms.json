@@ -1,0 +1,14 @@
+[
+  {
+    "id": "pewter-gym",
+    "city": "Argenta",
+    "leader": "Pierre",
+    "badge": "badge-roche",
+    "reward": 1386,
+    "team": [
+      { "pokemonId": 74, "level": 12, "moves": [33, 106, 88] },
+      { "pokemonId": 95, "level": 14, "moves": [33, 20, 99, 103] }
+    ],
+    "unlockCondition": null
+  }
+]

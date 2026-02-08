@@ -1,0 +1,107 @@
+[
+  {
+    "id": "route1-youngster1",
+    "name": "Ben",
+    "trainerClass": "Gamin",
+    "reward": 160,
+    "zone": "route-1",
+    "team": [
+      { "pokemonId": 19, "level": 4, "moves": [33, 39] }
+    ]
+  },
+  {
+    "id": "route1-lass1",
+    "name": "Emma",
+    "trainerClass": "Fillette",
+    "reward": 180,
+    "zone": "route-1",
+    "team": [
+      { "pokemonId": 16, "level": 4, "moves": [16, 28] },
+      { "pokemonId": 19, "level": 3, "moves": [33, 39] }
+    ]
+  },
+  {
+    "id": "route2-bug1",
+    "name": "Louis",
+    "trainerClass": "Chasseur",
+    "reward": 120,
+    "zone": "route-2",
+    "team": [
+      { "pokemonId": 19, "level": 5, "moves": [33, 39] },
+      { "pokemonId": 16, "level": 5, "moves": [16, 28] }
+    ]
+  },
+  {
+    "id": "route2-youngster1",
+    "name": "Marc",
+    "trainerClass": "Gamin",
+    "reward": 200,
+    "zone": "route-2",
+    "team": [
+      { "pokemonId": 19, "level": 6, "moves": [33, 39, 98] }
+    ]
+  },
+  {
+    "id": "foret-bug1",
+    "name": "Rémi",
+    "trainerClass": "Chasseur",
+    "reward": 140,
+    "zone": "foret-jade",
+    "team": [
+      { "pokemonId": 16, "level": 6, "moves": [16, 28] }
+    ]
+  },
+  {
+    "id": "foret-bug2",
+    "name": "Luc",
+    "trainerClass": "Chasseur",
+    "reward": 160,
+    "zone": "foret-jade",
+    "team": [
+      { "pokemonId": 21, "level": 5, "moves": [64, 45] },
+      { "pokemonId": 16, "level": 5, "moves": [16, 28] }
+    ]
+  },
+  {
+    "id": "foret-bug3",
+    "name": "Sophie",
+    "trainerClass": "Fillette",
+    "reward": 200,
+    "zone": "foret-jade",
+    "team": [
+      { "pokemonId": 19, "level": 7, "moves": [33, 39, 98] }
+    ]
+  },
+  {
+    "id": "route3-youngster1",
+    "name": "Paul",
+    "trainerClass": "Gamin",
+    "reward": 280,
+    "zone": "route-3",
+    "team": [
+      { "pokemonId": 19, "level": 9, "moves": [33, 39, 98] },
+      { "pokemonId": 21, "level": 8, "moves": [64, 45, 43] }
+    ]
+  },
+  {
+    "id": "route3-lass1",
+    "name": "Julie",
+    "trainerClass": "Fillette",
+    "reward": 300,
+    "zone": "route-3",
+    "team": [
+      { "pokemonId": 16, "level": 10, "moves": [16, 28, 98] }
+    ]
+  },
+  {
+    "id": "route3-hiker1",
+    "name": "Georges",
+    "trainerClass": "Montagnard",
+    "reward": 400,
+    "zone": "route-3",
+    "team": [
+      { "pokemonId": 74, "level": 10, "moves": [33, 106] },
+      { "pokemonId": 74, "level": 10, "moves": [33, 106] }
+    ]
+  }
+]

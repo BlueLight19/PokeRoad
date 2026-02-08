@@ -1,0 +1,354 @@
+[
+  {
+    "id": 1,
+    "name": "Bulbizarre",
+    "generation": 1,
+    "types": ["plante", "poison"],
+    "baseStats": { "hp": 45, "attack": 49, "defense": 49, "spAtk": 65, "spDef": 65, "speed": 45 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 45 },
+      { "level": 7, "moveId": 73 },
+      { "level": 13, "moveId": 22 },
+      { "level": 20, "moveId": 77 },
+      { "level": 27, "moveId": 75 }
+    ],
+    "evolutions": [{ "method": "level", "level": 16, "evolvesInto": 2 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 64,
+    "evYield": { "spAtk": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
+  },
+  {
+    "id": 2,
+    "name": "Herbizarre",
+    "generation": 1,
+    "types": ["plante", "poison"],
+    "baseStats": { "hp": 60, "attack": 62, "defense": 63, "spAtk": 80, "spDef": 80, "speed": 60 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 45 },
+      { "level": 1, "moveId": 73 },
+      { "level": 13, "moveId": 22 },
+      { "level": 22, "moveId": 77 },
+      { "level": 30, "moveId": 75 }
+    ],
+    "evolutions": [{ "method": "level", "level": 32, "evolvesInto": 3 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 142,
+    "evYield": { "spAtk": 1, "spDef": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"
+  },
+  {
+    "id": 3,
+    "name": "Florizarre",
+    "generation": 1,
+    "types": ["plante", "poison"],
+    "baseStats": { "hp": 80, "attack": 82, "defense": 83, "spAtk": 100, "spDef": 100, "speed": 80 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 45 },
+      { "level": 1, "moveId": 73 },
+      { "level": 1, "moveId": 22 },
+      { "level": 22, "moveId": 77 },
+      { "level": 32, "moveId": 75 },
+      { "level": 45, "moveId": 76 }
+    ],
+    "evolutions": [],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 236,
+    "evYield": { "spAtk": 2, "spDef": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png"
+  },
+  {
+    "id": 4,
+    "name": "Salamèche",
+    "generation": 1,
+    "types": ["feu"],
+    "baseStats": { "hp": 39, "attack": 52, "defense": 43, "spAtk": 60, "spDef": 50, "speed": 65 },
+    "learnset": [
+      { "level": 1, "moveId": 10 },
+      { "level": 1, "moveId": 45 },
+      { "level": 9, "moveId": 52 },
+      { "level": 15, "moveId": 99 },
+      { "level": 22, "moveId": 163 },
+      { "level": 30, "moveId": 53 }
+    ],
+    "evolutions": [{ "method": "level", "level": 16, "evolvesInto": 5 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 62,
+    "evYield": { "speed": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
+  },
+  {
+    "id": 5,
+    "name": "Reptincel",
+    "generation": 1,
+    "types": ["feu"],
+    "baseStats": { "hp": 58, "attack": 64, "defense": 58, "spAtk": 80, "spDef": 65, "speed": 80 },
+    "learnset": [
+      { "level": 1, "moveId": 10 },
+      { "level": 1, "moveId": 45 },
+      { "level": 1, "moveId": 52 },
+      { "level": 15, "moveId": 99 },
+      { "level": 24, "moveId": 163 },
+      { "level": 33, "moveId": 53 }
+    ],
+    "evolutions": [{ "method": "level", "level": 36, "evolvesInto": 6 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 142,
+    "evYield": { "speed": 1, "spAtk": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png"
+  },
+  {
+    "id": 6,
+    "name": "Dracaufeu",
+    "generation": 1,
+    "types": ["feu", "vol"],
+    "baseStats": { "hp": 78, "attack": 84, "defense": 78, "spAtk": 109, "spDef": 85, "speed": 100 },
+    "learnset": [
+      { "level": 1, "moveId": 10 },
+      { "level": 1, "moveId": 45 },
+      { "level": 1, "moveId": 52 },
+      { "level": 1, "moveId": 99 },
+      { "level": 24, "moveId": 163 },
+      { "level": 36, "moveId": 17 },
+      { "level": 46, "moveId": 53 }
+    ],
+    "evolutions": [],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 240,
+    "evYield": { "spAtk": 3 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png"
+  },
+  {
+    "id": 7,
+    "name": "Carapuce",
+    "generation": 1,
+    "types": ["eau"],
+    "baseStats": { "hp": 44, "attack": 48, "defense": 65, "spAtk": 50, "spDef": 64, "speed": 43 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 39 },
+      { "level": 7, "moveId": 145 },
+      { "level": 13, "moveId": 55 },
+      { "level": 18, "moveId": 44 },
+      { "level": 25, "moveId": 56 }
+    ],
+    "evolutions": [{ "method": "level", "level": 16, "evolvesInto": 8 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 63,
+    "evYield": { "defense": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
+  },
+  {
+    "id": 8,
+    "name": "Carabaffe",
+    "generation": 1,
+    "types": ["eau"],
+    "baseStats": { "hp": 59, "attack": 63, "defense": 80, "spAtk": 65, "spDef": 80, "speed": 58 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 39 },
+      { "level": 1, "moveId": 145 },
+      { "level": 13, "moveId": 55 },
+      { "level": 20, "moveId": 44 },
+      { "level": 28, "moveId": 56 }
+    ],
+    "evolutions": [{ "method": "level", "level": 36, "evolvesInto": 9 }],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 142,
+    "evYield": { "defense": 1, "spDef": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png"
+  },
+  {
+    "id": 9,
+    "name": "Tortank",
+    "generation": 1,
+    "types": ["eau"],
+    "baseStats": { "hp": 79, "attack": 83, "defense": 100, "spAtk": 85, "spDef": 105, "speed": 78 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 39 },
+      { "level": 1, "moveId": 145 },
+      { "level": 1, "moveId": 55 },
+      { "level": 20, "moveId": 44 },
+      { "level": 31, "moveId": 56 },
+      { "level": 42, "moveId": 57 }
+    ],
+    "evolutions": [],
+    "catchRate": 45,
+    "expGroup": "mediumSlow",
+    "baseExp": 239,
+    "evYield": { "spDef": 3 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png"
+  },
+  {
+    "id": 16,
+    "name": "Roucool",
+    "generation": 1,
+    "types": ["normal", "vol"],
+    "baseStats": { "hp": 40, "attack": 45, "defense": 40, "spAtk": 35, "spDef": 35, "speed": 56 },
+    "learnset": [
+      { "level": 1, "moveId": 16 },
+      { "level": 5, "moveId": 28 },
+      { "level": 12, "moveId": 98 },
+      { "level": 19, "moveId": 17 }
+    ],
+    "evolutions": [{ "method": "level", "level": 18, "evolvesInto": 17 }],
+    "catchRate": 255,
+    "expGroup": "mediumSlow",
+    "baseExp": 50,
+    "evYield": { "speed": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/16.png"
+  },
+  {
+    "id": 17,
+    "name": "Roucoups",
+    "generation": 1,
+    "types": ["normal", "vol"],
+    "baseStats": { "hp": 63, "attack": 60, "defense": 55, "spAtk": 50, "spDef": 50, "speed": 71 },
+    "learnset": [
+      { "level": 1, "moveId": 16 },
+      { "level": 1, "moveId": 28 },
+      { "level": 12, "moveId": 98 },
+      { "level": 21, "moveId": 17 },
+      { "level": 31, "moveId": 18 }
+    ],
+    "evolutions": [{ "method": "level", "level": 36, "evolvesInto": 18 }],
+    "catchRate": 120,
+    "expGroup": "mediumSlow",
+    "baseExp": 122,
+    "evYield": { "speed": 2 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/17.png"
+  },
+  {
+    "id": 19,
+    "name": "Rattata",
+    "generation": 1,
+    "types": ["normal"],
+    "baseStats": { "hp": 30, "attack": 56, "defense": 35, "spAtk": 25, "spDef": 35, "speed": 72 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 39 },
+      { "level": 7, "moveId": 98 },
+      { "level": 14, "moveId": 116 },
+      { "level": 23, "moveId": 162 }
+    ],
+    "evolutions": [{ "method": "level", "level": 20, "evolvesInto": 20 }],
+    "catchRate": 255,
+    "expGroup": "mediumFast",
+    "baseExp": 51,
+    "evYield": { "speed": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png"
+  },
+  {
+    "id": 20,
+    "name": "Rattatac",
+    "generation": 1,
+    "types": ["normal"],
+    "baseStats": { "hp": 55, "attack": 81, "defense": 60, "spAtk": 50, "spDef": 70, "speed": 97 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 39 },
+      { "level": 1, "moveId": 98 },
+      { "level": 14, "moveId": 116 },
+      { "level": 27, "moveId": 162 }
+    ],
+    "evolutions": [],
+    "catchRate": 127,
+    "expGroup": "mediumFast",
+    "baseExp": 145,
+    "evYield": { "speed": 2 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/20.png"
+  },
+  {
+    "id": 21,
+    "name": "Piafabec",
+    "generation": 1,
+    "types": ["normal", "vol"],
+    "baseStats": { "hp": 40, "attack": 60, "defense": 30, "spAtk": 31, "spDef": 31, "speed": 70 },
+    "learnset": [
+      { "level": 1, "moveId": 64 },
+      { "level": 1, "moveId": 45 },
+      { "level": 9, "moveId": 43 },
+      { "level": 15, "moveId": 31 },
+      { "level": 22, "moveId": 65 }
+    ],
+    "evolutions": [{ "method": "level", "level": 20, "evolvesInto": 22 }],
+    "catchRate": 255,
+    "expGroup": "mediumFast",
+    "baseExp": 52,
+    "evYield": { "speed": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/21.png"
+  },
+  {
+    "id": 25,
+    "name": "Pikachu",
+    "generation": 1,
+    "types": ["electrique"],
+    "baseStats": { "hp": 35, "attack": 55, "defense": 40, "spAtk": 50, "spDef": 50, "speed": 90 },
+    "learnset": [
+      { "level": 1, "moveId": 84 },
+      { "level": 1, "moveId": 45 },
+      { "level": 6, "moveId": 39 },
+      { "level": 8, "moveId": 86 },
+      { "level": 11, "moveId": 98 },
+      { "level": 16, "moveId": 85 },
+      { "level": 26, "moveId": 87 }
+    ],
+    "evolutions": [{ "method": "stone", "stone": "pierre-foudre", "evolvesInto": 26 }],
+    "catchRate": 190,
+    "expGroup": "mediumFast",
+    "baseExp": 112,
+    "evYield": { "speed": 2 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+  },
+  {
+    "id": 74,
+    "name": "Racaillou",
+    "generation": 1,
+    "types": ["roche", "sol"],
+    "baseStats": { "hp": 40, "attack": 80, "defense": 100, "spAtk": 30, "spDef": 30, "speed": 20 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 106 },
+      { "level": 11, "moveId": 88 },
+      { "level": 16, "moveId": 111 }
+    ],
+    "evolutions": [{ "method": "level", "level": 25, "evolvesInto": 75 }],
+    "catchRate": 255,
+    "expGroup": "mediumSlow",
+    "baseExp": 60,
+    "evYield": { "defense": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png"
+  },
+  {
+    "id": 95,
+    "name": "Onix",
+    "generation": 1,
+    "types": ["roche", "sol"],
+    "baseStats": { "hp": 35, "attack": 45, "defense": 160, "spAtk": 30, "spDef": 45, "speed": 70 },
+    "learnset": [
+      { "level": 1, "moveId": 33 },
+      { "level": 1, "moveId": 103 },
+      { "level": 9, "moveId": 20 },
+      { "level": 15, "moveId": 88 },
+      { "level": 25, "moveId": 99 }
+    ],
+    "evolutions": [],
+    "catchRate": 45,
+    "expGroup": "mediumFast",
+    "baseExp": 77,
+    "evYield": { "defense": 1 },
+    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png"
+  }
+]
