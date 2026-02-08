@@ -1,7 +1,7 @@
 export type ItemCategory = 'potion' | 'revive' | 'status_heal' | 'pokeball' | 'evolution' | 'key' | 'misc';
 
 export interface ItemEffect {
-    type: 'heal' | 'revive' | 'status_cure' | 'catch' | 'evolution' | 'boost';
+    type: 'heal' | 'revive' | 'status_cure' | 'catch' | 'evolution' | 'boost' | 'repel' | 'escape_rope' | 'teach';
     healAmount?: number;
     healFull?: boolean;
     reviveHpPercent?: number;
@@ -9,6 +9,8 @@ export interface ItemEffect {
     catchMultiplier?: number;
     stone?: string; // For evolution stone ID
     stat?: string; // For stat boost (X Attack etc)
+    repelSteps?: number;
+    moveId?: number; // For TMs
 }
 
 export interface ItemData {

@@ -1,6 +1,6 @@
 import { PokemonInstance, MoveData, StatusCondition } from './pokemon';
 
-export type BattleType = 'wild' | 'trainer' | 'gym';
+export type BattleType = 'wild' | 'trainer' | 'gym' | 'safari';
 
 export type BattlePhase =
   | 'intro'

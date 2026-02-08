@@ -218,11 +218,23 @@ export function executeMove(
   // Deduct PP
   moveInstance.currentPp = Math.max(0, moveInstance.currentPp - 1);
 
+  // Charge Check (Solar Beam etc)
+  if (move.effect?.type === 'charge') {
+    if (attacker.volatile.charging !== move.id) {
+      attacker.volatile.charging = move.id;
+      logs.push({ message: `${attackerName} accumule de l’énergie !`, type: 'info' });
+      return { logs, defenderFainted: false };
+    } else {
+      attacker.volatile.charging = undefined; // Unleash
+    }
+  }
+
   // Accuracy check
   if (move.accuracy !== null) {
     const roll = Math.random() * 100;
     if (roll >= move.accuracy) {
       logs.push({ message: `${attackerName} rate son attaque !`, type: 'info' });
+      attacker.volatile.charging = undefined; // Reset charge if miss? Usually yes.
       return { logs, defenderFainted: false };
     }
   }
@@ -238,48 +250,84 @@ export function executeMove(
       logs.push(...tryApplyStatChange(defender, move, false));
     }
   } else {
-    // Damaging move
-    const result = calculateDamage(attacker, defender, move);
+    // Damaging move (Single or Multi-hit)
+    let hits = 1;
+    if (move.effect?.type === 'multi') {
+      if (move.effect.count) {
+        hits = move.effect.count;
+      } else {
+        const min = move.effect.min ?? 2;
+        const max = move.effect.max ?? 5;
+        // Weighted distribution for 2-5
+        if (max === 5 && min === 2) {
+          const r = Math.random();
+          if (r < 0.375) hits = 2;
+          else if (r < 0.75) hits = 3;
+          else if (r < 0.875) hits = 4;
+          else hits = 5;
+        } else {
+          hits = Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+      }
+    }
 
-    defender.currentHp = Math.max(0, defender.currentHp - result.damage);
+    let totalDamage = 0;
+    let hitCount = 0;
 
-    if (result.effectiveness === 0) {
-      logs.push({ message: `Ça n'affecte pas ${defenderName}...`, type: 'effective' });
-    } else {
-      if (result.effectiveness > 1) {
-        logs.push({ message: `C'est super efficace !`, type: 'effective' });
-      } else if (result.effectiveness < 1 && result.effectiveness > 0) {
-        logs.push({ message: `Ce n'est pas très efficace...`, type: 'effective' });
+    for (let i = 0; i < hits; i++) {
+      const result = calculateDamage(attacker, defender, move);
+      defender.currentHp = Math.max(0, defender.currentHp - result.damage);
+      totalDamage += result.damage;
+      hitCount++;
+
+      // Only log effectiveness/crit once or per hit? 
+      // Usually, Gen 1 logs "Critical hit!" per hit, but effectiveness once.
+      // Simplified: Log damage per hit.
+
+      if (result.isCritical) logs.push({ message: `Coup critique !`, type: 'critical' });
+
+      // Show effectiveness only on first hit to reduce spam
+      if (i === 0) {
+        if (result.effectiveness > 1) logs.push({ message: `C'est super efficace !`, type: 'effective' });
+        if (result.effectiveness < 1 && result.effectiveness > 0) logs.push({ message: `Ce n'est pas très efficace...`, type: 'effective' });
+        if (result.effectiveness === 0) logs.push({ message: `Ça n'affecte pas ${defenderName}...`, type: 'effective' });
       }
 
-      if (result.isCritical) {
-        logs.push({ message: `Coup critique !`, type: 'critical' });
-      }
+      // logs.push({ message: `${defenderName} perd ${result.damage} PV !`, type: 'damage' });
 
-      logs.push({ message: `${defenderName} perd ${result.damage} PV !`, type: 'damage' });
+      if (defender.currentHp <= 0) break;
+    }
 
-      // Apply secondary status effect
+    logs.push({ message: `${defenderName} perd ${totalDamage} PV !`, type: 'damage' });
+
+    if (hits > 1) {
+      logs.push({ message: `Touché ${hitCount} fois !`, type: 'info' });
+    }
+
+    // Recoil
+    if (move.effect?.type === 'recoil' && move.effect.amount) {
+      const recoil = Math.max(1, Math.floor(totalDamage * move.effect.amount / 100));
+      attacker.currentHp = Math.max(0, attacker.currentHp - recoil);
+      logs.push({ message: `${attackerName} subit le contrecoup ! (-${recoil} PV)`, type: 'damage' });
+    }
+
+    // Drain
+    if (move.effect?.type === 'drain' && move.effect.amount) {
+      const healAmount = Math.max(1, Math.floor(totalDamage * move.effect.amount / 100));
+      attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + healAmount);
+      logs.push({ message: `${attackerName} récupère ${healAmount} PV !`, type: 'info' });
+    }
+
+    // Secondary Effects (Status/Flinch) - Only if not fainted? Usually trigger anyway.
+    if (defender.currentHp > 0) {
       if (move.effect?.type === 'status') {
         logs.push(...tryApplyStatus(defender, move));
       }
-
-      // Flinch effect
       if (move.effect?.type === 'flinch') {
         const chance = move.effect.chance ?? 30;
         if (Math.random() * 100 < chance) {
           defender.volatile.flinch = true;
-          // Note: Flinch only works if target hasn't moved yet. 
-          // Engine doesn't explicit check order here, but checkStatusBlock handles it on next turn execution?
-          // If defender moves second, checkStatusBlock is called BEFORE defender move.
-          // If defender moved first, flinch does nothing for THIS turn (correct).
         }
-      }
-
-      // Drain effect
-      if (move.effect?.type === 'drain' && move.effect.amount) {
-        const healAmount = Math.max(1, Math.floor(result.damage * move.effect.amount / 100));
-        attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + healAmount);
-        logs.push({ message: `${attackerName} récupère ${healAmount} PV !`, type: 'info' });
       }
     }
 

@@ -41,6 +41,10 @@ export interface BattleStore {
   moneyGained: number;
   encounterId?: string; // For one-time encounters
 
+  // Safari
+  safariCatchFactor?: number; // Modified by Rock/Bait
+  safariFleeFactor?: number; // Modified by Rock/Bait
+
   // Actions
   startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[], encounterId?: string) => void;
   startTrainerBattle: (trainer: TrainerData, playerTeam: PokemonInstance[]) => void;
@@ -51,6 +55,9 @@ export interface BattleStore {
   useItem: (itemId: string, targetIndex?: number) => void;
   attemptFlee: () => void;
   attemptCapture: (ballId: string) => void;
+  throwSafariBall: () => void;
+  throwRock: () => void;
+  throwBait: () => void;
 
   addLog: (message: string, type?: BattleLogEntry['type']) => void;
   clearBattle: () => void;
@@ -76,6 +83,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   xpGained: [],
   caughtPokemon: null,
   moneyGained: 0,
+  safariCatchFactor: 1,
+  safariFleeFactor: 1,
 
   startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[], encounterId?: string) => {
     // Pick random encounter based on rates
@@ -103,9 +112,13 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     // Find first non-fainted pokemon
     const activeIdx = playerTeam.findIndex(p => p.currentHp > 0);
 
+    // Check safari
+    const safariState = useGameStore.getState().safariState;
+    const isSafari = !!safariState;
+
     set({
       active: true,
-      type: 'wild',
+      type: isSafari ? 'safari' : 'wild',
       phase: 'choosing',
       playerTeam: playerTeam.map(p => ({ ...p })),
       activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
@@ -121,7 +134,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       xpGained: [],
       caughtPokemon: null,
       moneyGained: 0,
-      encounterId
+      encounterId,
+      safariCatchFactor: 1,
+      safariFleeFactor: 1
     });
   },
 
@@ -285,6 +300,11 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           useGameStore.getState().advanceLeagueProgress();
         }
 
+        // Static Encounter Defeat (Legendaries/Snorlax)
+        if (state.encounterId) {
+          useGameStore.getState().markTrainerDefeated(state.encounterId);
+        }
+
         newState.xpGained = [...state.xpGained, xpEntry];
         newState.moneyGained = state.trainerReward;
         newState.logs = [
@@ -311,7 +331,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       );
 
       if (nextPlayer >= 0) {
-        newState.activePlayerIndex = nextPlayer;
+        // Do NOT update activePlayerIndex here. 
+        // We want the user to click the next pokemon. 
+        // If we update it now, the UI sees it as "active" and disables the button.
         newState.phase = 'switching';
         const nextName = getPokemonData(state.playerTeam[nextPlayer].dataId).name;
         newState.logs = [
@@ -571,4 +593,147 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const state = get();
     return state.enemyTeam[state.activeEnemyIndex] ?? null;
   },
+  throwSafariBall: () => {
+    const state = get();
+    if (state.type !== 'safari') return;
+
+    // Decrement ball in gameStore? 
+    // We should probably sync or just track locally if we want... 
+    // uniqueness of data sources.
+    // gameStore has the master safariState.
+    const gameStore = useGameStore.getState();
+    if (!gameStore.safariState || gameStore.safariState.balls <= 0) {
+      set({ logs: [...state.logs, { message: "Vous n'avez plus de Safari Balls !", type: 'info' }] });
+      // Force quit? Or just show message. Usually auto-quit when 0.
+      return;
+    }
+
+    // Decrement
+    const newBalls = gameStore.safariState.balls - 1;
+    useGameStore.setState({ safariState: { ...gameStore.safariState, balls: newBalls } });
+
+    const enemy = state.enemyTeam[state.activeEnemyIndex];
+    if (!enemy) return;
+
+    const multiplier = 1.5 * (state.safariCatchFactor || 1); // Safari Ball ~1.5x + factors
+
+    const result = attemptCatch(enemy, multiplier);
+    const newLogs: BattleLogEntry[] = [{ message: 'Vous lancez une Safari Ball...', type: 'catch' }];
+
+    const shakeMsgs = ['...', '...', '...', '...'];
+    for (let i = 0; i < result.shakes && i < 4; i++) {
+      newLogs.push({ message: shakeMsgs[i], type: 'catch' });
+    }
+    newLogs.push(...result.messages.map(m => ({ message: m, type: 'catch' as const })));
+
+    if (result.success) {
+      const enemyName = getPokemonData(enemy.dataId).name;
+      newLogs.push({ message: `${enemyName} a été capturé !`, type: 'catch' });
+      set({
+        phase: 'caught',
+        logs: [...state.logs, ...newLogs],
+        caughtPokemon: enemy,
+      });
+      if (state.encounterId) {
+        useGameStore.getState().markTrainerDefeated(state.encounterId);
+      }
+    } else {
+      // Pokemon might flee
+      const fleeFactor = 1.0 * (state.safariFleeFactor || 1);
+      // Base flee chance ~ low for some, high for others. 
+      // For now, fixed 10% * fleeFactor? Or based on speed?
+      // Gen 1 safari mechanics are complex (speed based).
+      // Let's use simple speed check + factor.
+      const speed = enemy.stats.speed;
+      const fleeChance = (speed / 100) * 0.1 * fleeFactor; // purely arbitrary simple math
+      // Or flat 20% * factor?
+      // Let's go with flat 15% * factor
+      const actualFleeChance = 0.15 * fleeFactor;
+
+      if (Math.random() < actualFleeChance) {
+        newLogs.push({ message: `Le ${getPokemonData(enemy.dataId).name} s'enfuit !`, type: 'info' });
+        set({
+          phase: 'fled',
+          logs: [...state.logs, ...newLogs],
+        });
+      } else {
+        set({
+          logs: [...state.logs, ...newLogs, { message: `Le ${getPokemonData(enemy.dataId).name} vous observe attentivement.`, type: 'info' }],
+          turnNumber: state.turnNumber + 1
+        });
+      }
+    }
+
+    // Check balls if 0 -> End safari (handled by GameStore/UI usually, but BattleStore should signal it?)
+    // Logic: If balls 0, battle ends? Or wait for player to try acting?
+  },
+
+  throwRock: () => {
+    const state = get();
+    if (state.type !== 'safari') return;
+
+    const newLogs: BattleLogEntry[] = [{ message: "Vous lancez un caillou !", type: 'info' }];
+    const enemy = state.enemyTeam[state.activeEnemyIndex];
+    const enemyName = getPokemonData(enemy.dataId).name;
+
+    newLogs.push({ message: `${enemyName} est en colère !`, type: 'info' });
+
+    // Catch x2, Flee x2
+    const newCatchFactor = Math.min(4, (state.safariCatchFactor || 1) * 2);
+    const newFleeFactor = Math.min(4, (state.safariFleeFactor || 1) * 2);
+
+    // Chance to flee immediately? Usually at end of turn.
+    // We process flee check after action. same as ball miss.
+    const actualFleeChance = 0.15 * newFleeFactor;
+    if (Math.random() < actualFleeChance) {
+      newLogs.push({ message: `${enemyName} s'enfuit !`, type: 'info' });
+      set({
+        safariCatchFactor: newCatchFactor,
+        safariFleeFactor: newFleeFactor,
+        phase: 'fled',
+        logs: [...state.logs, ...newLogs],
+      });
+    } else {
+      set({
+        safariCatchFactor: newCatchFactor,
+        safariFleeFactor: newFleeFactor,
+        logs: [...state.logs, ...newLogs],
+        turnNumber: state.turnNumber + 1
+      });
+    }
+  },
+
+  throwBait: () => {
+    const state = get();
+    if (state.type !== 'safari') return;
+
+    const newLogs: BattleLogEntry[] = [{ message: "Vous lancez un appât !", type: 'info' }];
+    const enemy = state.enemyTeam[state.activeEnemyIndex];
+    const enemyName = getPokemonData(enemy.dataId).name;
+
+    newLogs.push({ message: `${enemyName} mange l'appât !`, type: 'info' });
+
+    // Catch / 2, Flee / 2
+    const newCatchFactor = Math.max(0.25, (state.safariCatchFactor || 1) / 2);
+    const newFleeFactor = Math.max(0.25, (state.safariFleeFactor || 1) / 2);
+
+    // Check flee
+    const actualFleeChance = 0.15 * newFleeFactor;
+    if (Math.random() < actualFleeChance) {
+      newLogs.push({ message: `${enemyName} s'enfuit !`, type: 'info' });
+      set({
+        safariCatchFactor: newCatchFactor,
+        safariFleeFactor: newFleeFactor,
+        phase: 'fled',
+        logs: [...state.logs, ...newLogs],
+      });
+    } else {
+      set({
+        safariCatchFactor: newCatchFactor,
+        safariFleeFactor: newFleeFactor,
+        logs: [...state.logs, ...newLogs],
+        turnNumber: state.turnNumber + 1
+      });
+    }
+  }
 }));

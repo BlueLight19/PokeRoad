@@ -1,11 +1,65 @@
 [
   {
+    "id": "repousse",
+    "name": "Repousse",
+    "category": "misc",
+    "price": 350,
+    "description": "Repousse les Pokémon sauvages faibles pendant 100 pas.",
+    "effect": {
+      "type": "repel",
+      "repelSteps": 100
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "super-repousse",
+    "name": "Super Repousse",
+    "category": "misc",
+    "price": 500,
+    "description": "Repousse les Pokémon sauvages faibles pendant 200 pas.",
+    "effect": {
+      "type": "repel",
+      "repelSteps": 200
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "max-repousse",
+    "name": "Max Repousse",
+    "category": "misc",
+    "price": 700,
+    "description": "Repousse les Pokémon sauvages faibles pendant 250 pas.",
+    "effect": {
+      "type": "repel",
+      "repelSteps": 250
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "corde-sortie",
+    "name": "Corde Sortie",
+    "category": "misc",
+    "price": 550,
+    "description": "Permet de sortir d'une grotte ou d'un donjon.",
+    "effect": {
+      "type": "escape_rope"
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
     "id": "master-ball",
     "name": "Master Ball",
     "category": "pokeball",
     "price": 0,
     "description": "La Ball ultime. Capture à coup sûr.",
-    "effect": { "type": "catch", "catchMultiplier": 255 },
+    "effect": {
+      "type": "catch",
+      "catchMultiplier": 255
+    },
     "usableInBattle": true,
     "usableOutside": false
   },
@@ -15,7 +69,17 @@
     "category": "status_heal",
     "price": 600,
     "description": "Soigne tous les problèmes de statut d'un Pokémon.",
-    "effect": { "type": "status_cure", "curesStatus": ["poison", "paralysis", "sleep", "burn", "freeze", "confusion"] },
+    "effect": {
+      "type": "status_cure",
+      "curesStatus": [
+        "poison",
+        "paralysis",
+        "sleep",
+        "burn",
+        "freeze",
+        "confusion"
+      ]
+    },
     "usableInBattle": true,
     "usableOutside": true
   },
@@ -25,7 +89,10 @@
     "category": "revive",
     "price": 4000,
     "description": "Ranime un Pokémon K.O. et restaure tous ses PV.",
-    "effect": { "type": "revive", "reviveHpPercent": 100 },
+    "effect": {
+      "type": "revive",
+      "reviveHpPercent": 100
+    },
     "usableInBattle": true,
     "usableOutside": true
   },
@@ -35,7 +102,10 @@
     "category": "evolution",
     "price": 2100,
     "description": "Fait évoluer certains Pokémon de type Feu.",
-    "effect": { "type": "evolution", "stone": "pierre-feu" },
+    "effect": {
+      "type": "evolution",
+      "stone": "pierre-feu"
+    },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -45,7 +115,10 @@
     "category": "evolution",
     "price": 2100,
     "description": "Fait évoluer certains Pokémon de type Eau.",
-    "effect": { "type": "evolution", "stone": "pierre-eau" },
+    "effect": {
+      "type": "evolution",
+      "stone": "pierre-eau"
+    },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -55,7 +128,10 @@
     "category": "evolution",
     "price": 2100,
     "description": "Fait évoluer certains Pokémon de type Électrik.",
-    "effect": { "type": "evolution", "stone": "pierre-foudre" },
+    "effect": {
+      "type": "evolution",
+      "stone": "pierre-foudre"
+    },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -65,7 +141,10 @@
     "category": "evolution",
     "price": 2100,
     "description": "Fait évoluer certains Pokémon de type Plante.",
-    "effect": { "type": "evolution", "stone": "pierre-plante" },
+    "effect": {
+      "type": "evolution",
+      "stone": "pierre-plante"
+    },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -75,7 +154,10 @@
     "category": "evolution",
     "price": 3000,
     "description": "Fait évoluer certains Pokémon liés à la Lune.",
-    "effect": { "type": "evolution", "stone": "pierre-lune" },
+    "effect": {
+      "type": "evolution",
+      "stone": "pierre-lune"
+    },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -85,7 +167,36 @@
     "category": "evolution",
     "price": 3000,
     "description": "Simule un échange. Fait évoluer certains Pokémon.",
-    "effect": { "type": "evolution", "stone": "link-cable" },
+    "effect": {
+      "type": "evolution",
+      "stone": "link-cable"
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "tm-28",
+    "name": "CT28 Tunnel",
+    "description": "Apprend Tunnel à un Pokémon.",
+    "category": "misc",
+    "price": 2000,
+    "effect": {
+      "type": "teach",
+      "moveId": 91
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "tm-24",
+    "name": "CT24 Tonnerre",
+    "description": "Apprend Tonnerre à un Pokémon.",
+    "category": "misc",
+    "price": 3000,
+    "effect": {
+      "type": "teach",
+      "moveId": 85
+    },
     "usableInBattle": false,
     "usableOutside": true
   }

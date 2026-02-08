@@ -238,6 +238,26 @@ export function CityMenu() {
           );
         })}
 
+        {/* Safari Zone */}
+        {zone.id === 'parmanie' && (
+          <button
+            onClick={useGameStore.getState().startSafari}
+            disabled={useGameStore.getState().player.money < 500}
+            className={`p-4 rounded-xl text-left transition-all border-b-4 flex items-center gap-3 shadow-lg group ${useGameStore.getState().player.money < 500
+                ? 'bg-gray-800 border-gray-900 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 border-green-800 text-white hover:scale-[1.02] active:scale-[0.98]'
+              }`}
+          >
+            <div className="bg-black/20 p-2 rounded-lg group-hover:bg-black/30 transition-colors">
+              <span className="text-xl">🦁</span>
+            </div>
+            <div>
+              <div className="font-bold font-press-start text-sm">Parc Safari</div>
+              <div className="text-xs opacity-75 mt-1 font-press-start">Coût: 500 $</div>
+            </div>
+          </button>
+        )}
+
         {/* Heal */}
         <button
           onClick={handleHeal}
