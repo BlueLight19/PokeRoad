@@ -232,6 +232,13 @@ export function createPokemonInstance(
     moves,
     status: null,
     statusTurns: 0,
+    volatile: {
+      confusion: 0,
+      flinch: false,
+      leechSeed: false,
+      bound: 0,
+    },
+    statStages: { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 },
     xp: xpCurrent,
     xpToNextLevel: xpNext,
     friendship: 70,

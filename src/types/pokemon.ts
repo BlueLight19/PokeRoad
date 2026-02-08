@@ -95,6 +95,32 @@ export interface PokemonInstance {
   friendship: number;
 }
 
+export interface VolatileStatus {
+  confusion: number; // 0 = not confused, >0 = turns remaining
+  flinch: boolean;
+  leechSeed: boolean;
+  bound: number; // For trapping moves like Wrap/Bind
+}
+
+export interface PokemonInstance {
+  uid: string;
+  dataId: number;
+  nickname: string | null;
+  level: number;
+  currentHp: number;
+  maxHp: number;
+  stats: BaseStats;
+  ivs: BaseStats;
+  moves: MoveInstance[];
+  status: StatusCondition;
+  statusTurns: number;
+  volatile: VolatileStatus;
+  statStages: BaseStats; // Representing stages -6 to +6
+  xp: number;
+  xpToNextLevel: number;
+  friendship: number;
+}
+
 export interface MoveInstance {
   moveId: number;
   currentPp: number;

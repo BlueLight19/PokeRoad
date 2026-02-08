@@ -9,7 +9,9 @@
     "gymId": null,
     "wildEncounters": [],
     "trainers": [],
-    "connectedZones": ["route-1"],
+    "connectedZones": [
+      "route-1"
+    ],
     "unlockCondition": null
   },
   {
@@ -19,11 +21,27 @@
     "region": "kanto",
     "generation": 1,
     "wildEncounters": [
-      { "pokemonId": 16, "minLevel": 2, "maxLevel": 5, "rate": 45 },
-      { "pokemonId": 19, "minLevel": 2, "maxLevel": 4, "rate": 55 }
+      {
+        "pokemonId": 16,
+        "minLevel": 2,
+        "maxLevel": 5,
+        "rate": 45
+      },
+      {
+        "pokemonId": 19,
+        "minLevel": 2,
+        "maxLevel": 4,
+        "rate": 55
+      }
     ],
-    "trainers": ["route1-youngster1", "route1-lass1"],
-    "connectedZones": ["bourg-palette", "jadielle"],
+    "trainers": [
+      "route1-youngster1",
+      "route1-lass1"
+    ],
+    "connectedZones": [
+      "bourg-palette",
+      "jadielle"
+    ],
     "unlockCondition": null
   },
   {
@@ -36,10 +54,15 @@
     "gymId": null,
     "wildEncounters": [],
     "trainers": [],
-    "connectedZones": ["route-1", "route-2"],
+    "connectedZones": [
+      "route-1",
+      "route-2"
+    ],
     "unlockCondition": {
       "type": "trainers",
-      "zones": ["route-1"]
+      "zones": [
+        "route-1"
+      ]
     }
   },
   {
@@ -49,15 +72,38 @@
     "region": "kanto",
     "generation": 1,
     "wildEncounters": [
-      { "pokemonId": 16, "minLevel": 3, "maxLevel": 5, "rate": 30 },
-      { "pokemonId": 19, "minLevel": 3, "maxLevel": 5, "rate": 40 },
-      { "pokemonId": 21, "minLevel": 3, "maxLevel": 5, "rate": 30 }
+      {
+        "pokemonId": 16,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 30
+      },
+      {
+        "pokemonId": 19,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 40
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 30
+      }
     ],
-    "trainers": ["route2-bug1", "route2-youngster1"],
-    "connectedZones": ["jadielle", "foret-jade"],
+    "trainers": [
+      "route2-bug1",
+      "route2-youngster1"
+    ],
+    "connectedZones": [
+      "jadielle",
+      "foret-jade"
+    ],
     "unlockCondition": {
       "type": "trainers",
-      "zones": ["route-1"]
+      "zones": [
+        "route-1"
+      ]
     }
   },
   {
@@ -67,16 +113,45 @@
     "region": "kanto",
     "generation": 1,
     "wildEncounters": [
-      { "pokemonId": 16, "minLevel": 4, "maxLevel": 6, "rate": 20 },
-      { "pokemonId": 19, "minLevel": 3, "maxLevel": 5, "rate": 25 },
-      { "pokemonId": 25, "minLevel": 3, "maxLevel": 5, "rate": 5 },
-      { "pokemonId": 21, "minLevel": 4, "maxLevel": 6, "rate": 50 }
+      {
+        "pokemonId": 16,
+        "minLevel": 4,
+        "maxLevel": 6,
+        "rate": 20
+      },
+      {
+        "pokemonId": 19,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 25
+      },
+      {
+        "pokemonId": 25,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 5
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 4,
+        "maxLevel": 6,
+        "rate": 50
+      }
     ],
-    "trainers": ["foret-bug1", "foret-bug2", "foret-bug3"],
-    "connectedZones": ["route-2", "argenta"],
+    "trainers": [
+      "foret-bug1",
+      "foret-bug2",
+      "foret-bug3"
+    ],
+    "connectedZones": [
+      "route-2",
+      "argenta"
+    ],
     "unlockCondition": {
       "type": "trainers",
-      "zones": ["route-2"]
+      "zones": [
+        "route-2"
+      ]
     }
   },
   {
@@ -89,10 +164,15 @@
     "gymId": "pewter-gym",
     "wildEncounters": [],
     "trainers": [],
-    "connectedZones": ["foret-jade", "route-3"],
+    "connectedZones": [
+      "foret-jade",
+      "route-3"
+    ],
     "unlockCondition": {
       "type": "trainers",
-      "zones": ["foret-jade"]
+      "zones": [
+        "foret-jade"
+      ]
     }
   },
   {
@@ -102,15 +182,1423 @@
     "region": "kanto",
     "generation": 1,
     "wildEncounters": [
-      { "pokemonId": 21, "minLevel": 6, "maxLevel": 8, "rate": 35 },
-      { "pokemonId": 19, "minLevel": 6, "maxLevel": 8, "rate": 35 },
-      { "pokemonId": 74, "minLevel": 7, "maxLevel": 10, "rate": 30 }
+      {
+        "pokemonId": 21,
+        "minLevel": 6,
+        "maxLevel": 8,
+        "rate": 35
+      },
+      {
+        "pokemonId": 19,
+        "minLevel": 6,
+        "maxLevel": 8,
+        "rate": 35
+      },
+      {
+        "pokemonId": 74,
+        "minLevel": 7,
+        "maxLevel": 10,
+        "rate": 30
+      }
     ],
-    "trainers": ["route3-youngster1", "route3-lass1", "route3-hiker1"],
-    "connectedZones": ["argenta"],
+    "trainers": [
+      "route3-youngster1",
+      "route3-lass1",
+      "route3-hiker1"
+    ],
+    "connectedZones": [
+      "argenta"
+    ],
     "unlockCondition": {
       "type": "gym",
       "gymId": "pewter-gym"
     }
+  },
+  {
+    "id": "mt-moon",
+    "type": "dungeon",
+    "name": "Mont Sélénite",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 41,
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rate": 60
+      },
+      {
+        "pokemonId": 74,
+        "minLevel": 8,
+        "maxLevel": 10,
+        "rate": 25
+      },
+      {
+        "pokemonId": 35,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 10
+      },
+      {
+        "pokemonId": 46,
+        "minLevel": 8,
+        "maxLevel": 10,
+        "rate": 5
+      }
+    ],
+    "trainers": [
+      "mtmoon-rocket1",
+      "mtmoon-rocket2",
+      "mtmoon-hiker1",
+      "mtmoon-supernerd1"
+    ],
+    "connectedZones": [
+      "route-3",
+      "route-4"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-4",
+    "type": "route",
+    "name": "Route 4",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 19,
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rate": 35
+      },
+      {
+        "pokemonId": 23,
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rate": 35
+      },
+      {
+        "pokemonId": 27,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 30
+      }
+    ],
+    "trainers": [
+      "route4-lass1"
+    ],
+    "connectedZones": [
+      "mt-moon",
+      "azuria"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "azuria",
+    "type": "city",
+    "name": "Azuria",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "cerulean-gym",
+    "wildEncounters": [],
+    "trainers": [
+      "azuria-rival1"
+    ],
+    "connectedZones": [
+      "route-4",
+      "route-24",
+      "route-5",
+      "route-9"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-24",
+    "type": "route",
+    "name": "Route 24 (Pont Pépite)",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 25
+      },
+      {
+        "pokemonId": 10,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 20
+      },
+      {
+        "pokemonId": 13,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 20
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 15
+      },
+      {
+        "pokemonId": 63,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 20
+      }
+    ],
+    "trainers": [
+      "route24-rival1",
+      "route24-nugget1",
+      "route24-nugget2",
+      "route24-nugget3",
+      "route24-nugget4",
+      "route24-nugget5"
+    ],
+    "connectedZones": [
+      "azuria",
+      "route-25"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-25",
+    "type": "route",
+    "name": "Route 25",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 20
+      },
+      {
+        "pokemonId": 10,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 15
+      },
+      {
+        "pokemonId": 13,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 15
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 10
+      },
+      {
+        "pokemonId": 63,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 15
+      },
+      {
+        "pokemonId": 98,
+        "minLevel": 12,
+        "maxLevel": 14,
+        "rate": 25
+      }
+    ],
+    "trainers": [
+      "route25-youngster1",
+      "route25-hiker1",
+      "route25-lass1"
+    ],
+    "connectedZones": [
+      "route-24"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-5",
+    "type": "route",
+    "name": "Route 5",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 30
+      },
+      {
+        "pokemonId": 52,
+        "minLevel": 10,
+        "maxLevel": 16,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 20
+      },
+      {
+        "pokemonId": 39,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 20
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "azuria",
+      "route-6"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "badge-cascade"
+    }
+  },
+  {
+    "id": "route-6",
+    "type": "route",
+    "name": "Route 6",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 30
+      },
+      {
+        "pokemonId": 52,
+        "minLevel": 10,
+        "maxLevel": 16,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 20
+      },
+      {
+        "pokemonId": 39,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 20
+      }
+    ],
+    "trainers": [
+      "route6-jr1",
+      "route6-jr2"
+    ],
+    "connectedZones": [
+      "route-5",
+      "carmin"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "carmin",
+    "type": "city",
+    "name": "Carmin sur Mer",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "vermilion-gym",
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": [
+      "route-6",
+      "route-11",
+      "cave-diglett"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-11",
+    "type": "route",
+    "name": "Route 11",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 23,
+        "minLevel": 14,
+        "maxLevel": 17,
+        "rate": 25
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 25
+      },
+      {
+        "pokemonId": 96,
+        "minLevel": 13,
+        "maxLevel": 16,
+        "rate": 25
+      },
+      {
+        "pokemonId": 27,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 25
+      }
+    ],
+    "trainers": [
+      "route11-gambler1",
+      "route11-engineer1",
+      "route11-youngster1"
+    ],
+    "connectedZones": [
+      "carmin"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "cave-diglett",
+    "type": "dungeon",
+    "name": "Cave Taupiqueur",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 50,
+        "minLevel": 15,
+        "maxLevel": 22,
+        "rate": 95
+      },
+      {
+        "pokemonId": 51,
+        "minLevel": 25,
+        "maxLevel": 31,
+        "rate": 5
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "carmin",
+      "route-2"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-9",
+    "type": "route",
+    "name": "Route 9",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 19,
+        "minLevel": 14,
+        "maxLevel": 17,
+        "rate": 30
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 14,
+        "maxLevel": 17,
+        "rate": 30
+      },
+      {
+        "pokemonId": 100,
+        "minLevel": 14,
+        "maxLevel": 16,
+        "rate": 15
+      },
+      {
+        "pokemonId": 23,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 25
+      }
+    ],
+    "trainers": [
+      "route9-picnicker1",
+      "route9-hiker1"
+    ],
+    "connectedZones": [
+      "azuria",
+      "route-10"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-10",
+    "type": "route",
+    "name": "Route 10",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 100,
+        "minLevel": 14,
+        "maxLevel": 17,
+        "rate": 35
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 14,
+        "maxLevel": 17,
+        "rate": 35
+      },
+      {
+        "pokemonId": 23,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 30
+      }
+    ],
+    "trainers": [
+      "route10-picnicker1"
+    ],
+    "connectedZones": [
+      "route-9",
+      "rock-tunnel"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "rock-tunnel",
+    "type": "dungeon",
+    "name": "Grotte Sombre",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 41,
+        "minLevel": 15,
+        "maxLevel": 18,
+        "rate": 40
+      },
+      {
+        "pokemonId": 74,
+        "minLevel": 15,
+        "maxLevel": 17,
+        "rate": 30
+      },
+      {
+        "pokemonId": 66,
+        "minLevel": 15,
+        "maxLevel": 17,
+        "rate": 20
+      },
+      {
+        "pokemonId": 95,
+        "minLevel": 13,
+        "maxLevel": 15,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "rocktunnel-pokemaniac1",
+      "rocktunnel-hiker1",
+      "rocktunnel-hiker2"
+    ],
+    "connectedZones": [
+      "route-10",
+      "lavanville"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "lavanville",
+    "type": "city",
+    "name": "Lavanville",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": null,
+    "wildEncounters": [],
+    "trainers": [
+      "lavender-rival1"
+    ],
+    "connectedZones": [
+      "rock-tunnel",
+      "route-8",
+      "route-12"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-8",
+    "type": "route",
+    "name": "Route 8",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 18,
+        "maxLevel": 20,
+        "rate": 30
+      },
+      {
+        "pokemonId": 52,
+        "minLevel": 17,
+        "maxLevel": 19,
+        "rate": 30
+      },
+      {
+        "pokemonId": 37,
+        "minLevel": 17,
+        "maxLevel": 19,
+        "rate": 20
+      },
+      {
+        "pokemonId": 63,
+        "minLevel": 15,
+        "maxLevel": 17,
+        "rate": 20
+      }
+    ],
+    "trainers": [
+      "route8-gambler1",
+      "route8-supernerd1",
+      "route8-lass1",
+      "route8-lass2"
+    ],
+    "connectedZones": [
+      "lavanville",
+      "safrania"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "safrania",
+    "type": "city",
+    "name": "Safrania",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "saffron-gym",
+    "wildEncounters": [],
+    "trainers": [
+      "silph-rival1"
+    ],
+    "connectedZones": [
+      "route-8",
+      "route-7",
+      "route-6",
+      "route-5"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "tea"
+    }
+  },
+  {
+    "id": "route-7",
+    "type": "route",
+    "name": "Route 7",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 16,
+        "minLevel": 19,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 37,
+        "minLevel": 19,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 52,
+        "minLevel": 17,
+        "maxLevel": 20,
+        "rate": 20
+      },
+      {
+        "pokemonId": 58,
+        "minLevel": 18,
+        "maxLevel": 20,
+        "rate": 20
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "safrania",
+      "celadopole"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "celadopole",
+    "type": "city",
+    "name": "Céladopole",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "celadon-gym",
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": [
+      "route-7",
+      "route-16"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-16",
+    "type": "route",
+    "name": "Route 16",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 19,
+        "minLevel": 18,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 18,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 84,
+        "minLevel": 18,
+        "maxLevel": 20,
+        "rate": 25
+      },
+      {
+        "pokemonId": 143,
+        "minLevel": 30,
+        "maxLevel": 30,
+        "rate": 1
+      }
+    ],
+    "trainers": [
+      "route16-biker1",
+      "route16-biker2"
+    ],
+    "connectedZones": [
+      "celadopole",
+      "route-17"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "pokeflute"
+    }
+  },
+  {
+    "id": "route-17",
+    "type": "route",
+    "name": "Route 17 (Piste Cyclable)",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 21,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 23,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 84,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 77,
+        "minLevel": 24,
+        "maxLevel": 26,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "route17-biker1",
+      "route17-biker2",
+      "route17-cueball1"
+    ],
+    "connectedZones": [
+      "route-16",
+      "route-18"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "bicycle"
+    }
+  },
+  {
+    "id": "route-18",
+    "type": "route",
+    "name": "Route 18",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 21,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 23,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 84,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 30
+      },
+      {
+        "pokemonId": 114,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "route18-birdkeeper1"
+    ],
+    "connectedZones": [
+      "route-17",
+      "parmanie"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "parmanie",
+    "type": "city",
+    "name": "Parmanie",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "fuchsia-gym",
+    "wildEncounters": [
+      {
+        "pokemonId": 118,
+        "minLevel": 15,
+        "maxLevel": 25,
+        "rate": 100
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "route-18",
+      "route-15",
+      "route-19"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-15",
+    "type": "route",
+    "name": "Route 15",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 69,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 10
+      },
+      {
+        "pokemonId": 48,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 20
+      }
+    ],
+    "trainers": [
+      "route15-beauty1",
+      "route15-biker1"
+    ],
+    "connectedZones": [
+      "parmanie",
+      "route-14"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-14",
+    "type": "route",
+    "name": "Route 14",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 69,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 10
+      },
+      {
+        "pokemonId": 48,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 20
+      }
+    ],
+    "trainers": [
+      "route14-birdkeeper1",
+      "route14-biker1"
+    ],
+    "connectedZones": [
+      "route-15",
+      "route-13"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-13",
+    "type": "route",
+    "name": "Route 13",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 69,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 10
+      },
+      {
+        "pokemonId": 83,
+        "minLevel": 24,
+        "maxLevel": 26,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "route13-beauty1",
+      "route13-birdkeeper1"
+    ],
+    "connectedZones": [
+      "route-14",
+      "route-12"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-12",
+    "type": "route",
+    "name": "Route 12",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 69,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 43,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 30
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 22,
+        "maxLevel": 24,
+        "rate": 10
+      },
+      {
+        "pokemonId": 143,
+        "minLevel": 30,
+        "maxLevel": 30,
+        "rate": 1
+      }
+    ],
+    "trainers": [
+      "route12-fisherman1",
+      "route12-rocker1"
+    ],
+    "connectedZones": [
+      "route-13",
+      "lavanville"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "pokeflute"
+    }
+  },
+  {
+    "id": "route-19",
+    "type": "route",
+    "name": "Route 19",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 72,
+        "minLevel": 20,
+        "maxLevel": 30,
+        "rate": 100
+      }
+    ],
+    "trainers": [
+      "route19-swimmer1",
+      "route19-swimmer2"
+    ],
+    "connectedZones": [
+      "parmanie",
+      "route-20"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-20",
+    "type": "route",
+    "name": "Route 20",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 72,
+        "minLevel": 20,
+        "maxLevel": 30,
+        "rate": 100
+      }
+    ],
+    "trainers": [
+      "route20-swimmer1"
+    ],
+    "connectedZones": [
+      "route-19",
+      "seafoam-islands"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "seafoam-islands",
+    "type": "dungeon",
+    "name": "Iles Ecume",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 86,
+        "minLevel": 28,
+        "maxLevel": 30,
+        "rate": 35
+      },
+      {
+        "pokemonId": 79,
+        "minLevel": 28,
+        "maxLevel": 30,
+        "rate": 35
+      },
+      {
+        "pokemonId": 42,
+        "minLevel": 28,
+        "maxLevel": 30,
+        "rate": 10
+      },
+      {
+        "pokemonId": 124,
+        "minLevel": 28,
+        "maxLevel": 30,
+        "rate": 10
+      },
+      {
+        "pokemonId": 144,
+        "minLevel": 50,
+        "maxLevel": 50,
+        "rate": 1
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "route-20",
+      "cramois-ile"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "cramois-ile",
+    "type": "city",
+    "name": "Cramois'Ile",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "cinnabar-gym",
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": [
+      "seafoam-islands",
+      "route-21",
+      "pokemon-mansion"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "pokemon-mansion",
+    "type": "dungeon",
+    "name": "Manoir Pokémon",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 88,
+        "minLevel": 28,
+        "maxLevel": 32,
+        "rate": 30
+      },
+      {
+        "pokemonId": 109,
+        "minLevel": 28,
+        "maxLevel": 32,
+        "rate": 30
+      },
+      {
+        "pokemonId": 58,
+        "minLevel": 30,
+        "maxLevel": 32,
+        "rate": 20
+      },
+      {
+        "pokemonId": 37,
+        "minLevel": 30,
+        "maxLevel": 32,
+        "rate": 10
+      },
+      {
+        "pokemonId": 126,
+        "minLevel": 30,
+        "maxLevel": 34,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "mansion-burglar1",
+      "mansion-scientist1"
+    ],
+    "connectedZones": [
+      "cramois-ile"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-21",
+    "type": "route",
+    "name": "Route 21",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 114,
+        "minLevel": 25,
+        "maxLevel": 30,
+        "rate": 40
+      },
+      {
+        "pokemonId": 72,
+        "minLevel": 20,
+        "maxLevel": 30,
+        "rate": 60
+      }
+    ],
+    "trainers": [
+      "route21-fisherman1"
+    ],
+    "connectedZones": [
+      "cramois-ile",
+      "bourg-palette"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-22",
+    "type": "route",
+    "name": "Route 22",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 19,
+        "minLevel": 2,
+        "maxLevel": 5,
+        "rate": 45
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 2,
+        "maxLevel": 5,
+        "rate": 45
+      },
+      {
+        "pokemonId": 56,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 10
+      }
+    ],
+    "trainers": [
+      "route22-rival1",
+      "route22-rival2"
+    ],
+    "connectedZones": [
+      "jadielle",
+      "route-23"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "route-23",
+    "type": "route",
+    "name": "Route 23",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 23,
+        "minLevel": 35,
+        "maxLevel": 40,
+        "rate": 30
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 35,
+        "maxLevel": 40,
+        "rate": 30
+      },
+      {
+        "pokemonId": 57,
+        "minLevel": 35,
+        "maxLevel": 40,
+        "rate": 20
+      },
+      {
+        "pokemonId": 22,
+        "minLevel": 35,
+        "maxLevel": 40,
+        "rate": 20
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "route-22",
+      "victory-road"
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "badge-earth"
+    }
+  },
+  {
+    "id": "victory-road",
+    "type": "dungeon",
+    "name": "Route Victoire",
+    "region": "kanto",
+    "generation": 1,
+    "wildEncounters": [
+      {
+        "pokemonId": 95,
+        "minLevel": 40,
+        "maxLevel": 45,
+        "rate": 30
+      },
+      {
+        "pokemonId": 67,
+        "minLevel": 40,
+        "maxLevel": 45,
+        "rate": 30
+      },
+      {
+        "pokemonId": 75,
+        "minLevel": 40,
+        "maxLevel": 45,
+        "rate": 30
+      },
+      {
+        "pokemonId": 146,
+        "minLevel": 50,
+        "maxLevel": 50,
+        "rate": 1
+      }
+    ],
+    "trainers": [
+      "victory-tamer1",
+      "victory-juggler1"
+    ],
+    "connectedZones": [
+      "route-23",
+      "plateau-indigo"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "plateau-indigo",
+    "type": "city",
+    "name": "Plateau Indigo",
+    "region": "kanto",
+    "generation": 1,
+    "hasShop": true,
+    "gymId": "elite-four",
+    "wildEncounters": [],
+    "trainers": [],
+    "connectedZones": [
+      "victory-road"
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "league-hall",
+    "name": "Plateau Indigo",
+    "region": "kanto",
+    "generation": 1,
+    "type": "city",
+    "hasShop": true,
+    "gymId": null,
+    "connectedZones": [
+      "victory-road"
+    ],
+    "unlockCondition": {
+      "type": "badge",
+      "badge": "Terre"
+    },
+    "description": "Le défi ultime pour les dresseurs."
+  },
+  {
+    "id": "power-plant",
+    "name": "Centrale",
+    "region": "kanto",
+    "generation": 1,
+    "type": "dungeon",
+    "unlockCondition": null,
+    "wildEncounters": [
+      {
+        "pokemonId": 25,
+        "minLevel": 22,
+        "maxLevel": 26,
+        "rate": 20
+      },
+      {
+        "pokemonId": 81,
+        "minLevel": 22,
+        "maxLevel": 26,
+        "rate": 20
+      },
+      {
+        "pokemonId": 100,
+        "minLevel": 22,
+        "maxLevel": 26,
+        "rate": 20
+      },
+      {
+        "pokemonId": 125,
+        "minLevel": 30,
+        "maxLevel": 36,
+        "rate": 10
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "route-10"
+    ],
+    "description": "Une centrale abandonnée."
+  },
+  {
+    "id": "cerulean-cave",
+    "name": "Grotte Azurée",
+    "region": "kanto",
+    "generation": 1,
+    "type": "dungeon",
+    "unlockCondition": {
+      "type": "badge",
+      "badge": "Terre"
+    },
+    "wildEncounters": [
+      {
+        "pokemonId": 64,
+        "minLevel": 50,
+        "maxLevel": 60,
+        "rate": 20
+      },
+      {
+        "pokemonId": 93,
+        "minLevel": 50,
+        "maxLevel": 60,
+        "rate": 20
+      },
+      {
+        "pokemonId": 42,
+        "minLevel": 50,
+        "maxLevel": 60,
+        "rate": 20
+      },
+      {
+        "pokemonId": 112,
+        "minLevel": 50,
+        "maxLevel": 60,
+        "rate": 10
+      },
+      {
+        "pokemonId": 113,
+        "minLevel": 50,
+        "maxLevel": 60,
+        "rate": 5
+      }
+    ],
+    "trainers": [],
+    "connectedZones": [
+      "azuria"
+    ],
+    "description": "Une grotte mystérieuse réservée aux maîtres."
   }
 ]

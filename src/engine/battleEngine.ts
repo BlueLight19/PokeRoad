@@ -33,6 +33,26 @@ export function checkStatusBlock(pokemon: PokemonInstance): { blocked: boolean; 
   const logs: BattleLogEntry[] = [];
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
 
+  // Flinch (Peur)
+  if (pokemon.volatile.flinch) {
+    pokemon.volatile.flinch = false; // Consumed
+    logs.push({ message: `${name} a peur !`, type: 'status' });
+    return { blocked: true, logs };
+  }
+
+  // Confusion
+  if (pokemon.volatile.confusion > 0) {
+    pokemon.volatile.confusion--;
+    logs.push({ message: `${name} est confus !`, type: 'status' });
+    if (Math.random() < 0.5) {
+      // Hurt self: Power 40 physical hit
+      const damage = Math.floor((((2 * pokemon.level / 5 + 2) * 40 * pokemon.stats.attack / pokemon.stats.defense) / 50) + 2);
+      pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
+      logs.push({ message: `Il se blesse dans sa confusion !`, type: 'damage' });
+      return { blocked: true, logs };
+    }
+  }
+
   if (pokemon.status === 'paralysis') {
     if (Math.random() < 0.25) {
       logs.push({ message: `${name} est paralysé ! Il ne peut pas attaquer !`, type: 'status' });
@@ -80,11 +100,23 @@ export function tryApplyStatus(
   if (move.effect.type !== 'status') return logs;
   if (!move.effect.status) return logs;
 
-  // Already has a status
-  if (target.status !== null) return logs;
-
   const chance = move.effect.chance ?? 100;
   if (Math.random() * 100 >= chance) return logs;
+
+  // Handle Confusion (Volatile)
+  // Cast to specific comparison because string might be 'confusion' coming from JSON
+  if ((move.effect.status as string) === 'confusion') {
+    if (target.volatile.confusion > 0) {
+      logs.push({ message: `${name} est déjà confus !`, type: 'info' });
+      return logs;
+    }
+    target.volatile.confusion = 2 + Math.floor(Math.random() * 4); // 2-5 turns
+    logs.push({ message: `${name} devient confus !`, type: 'status' });
+    return logs;
+  }
+
+  // Already has a persistent status
+  if (target.status !== null) return logs;
 
   target.status = move.effect.status;
 
@@ -123,22 +155,27 @@ export function tryApplyStatChange(
   const chance = move.effect.chance ?? 100;
   if (Math.random() * 100 >= chance) return logs;
 
-  // For MVP, stat stages are simplified: directly modify the stat
-  // A proper implementation would track stages (-6 to +6) separately
+  // Stat Stage Modification
   const stat = move.effect.stat;
   const stages = move.effect.stages ?? 0;
   if (!stat || stages === 0) return logs;
 
   const targetName = target.nickname || getPokemonData(target.dataId).name;
 
-  // Apply a multiplier: each stage = ~50% change
-  const multiplier = stages > 0 ? 1 + 0.5 * stages : 1 / (1 + 0.5 * Math.abs(stages));
+  // Apply stage
+  const currentStage = target.statStages[stat];
+  const newStage = Math.max(-6, Math.min(6, currentStage + stages));
 
-  const statKey = stat as keyof typeof target.stats;
-  const oldValue = target.stats[statKey];
-  target.stats[statKey] = Math.max(1, Math.floor(oldValue * multiplier));
+  if (currentStage === newStage) {
+    logs.push({ message: `Les stats de ${targetName} ne peuvent pas aller plus loin !`, type: 'info' });
+    return logs;
+  }
+
+  target.statStages[stat] = newStage;
 
   const direction = stages > 0 ? 'monte' : 'baisse';
+  const intensity = Math.abs(stages) > 1 ? 'beaucoup' : '';
+
   const statNames: Record<string, string> = {
     attack: 'Attaque',
     defense: 'Défense',
@@ -149,7 +186,7 @@ export function tryApplyStatChange(
   };
 
   logs.push({
-    message: `${statNames[stat] || stat} de ${targetName} ${direction} !`,
+    message: `${statNames[stat] || stat} de ${targetName} ${direction} ${intensity} !`,
     type: 'info',
   });
 
@@ -224,6 +261,18 @@ export function executeMove(
       // Apply secondary status effect
       if (move.effect?.type === 'status') {
         logs.push(...tryApplyStatus(defender, move));
+      }
+
+      // Flinch effect
+      if (move.effect?.type === 'flinch') {
+        const chance = move.effect.chance ?? 30;
+        if (Math.random() * 100 < chance) {
+          defender.volatile.flinch = true;
+          // Note: Flinch only works if target hasn't moved yet. 
+          // Engine doesn't explicit check order here, but checkStatusBlock handles it on next turn execution?
+          // If defender moves second, checkStatusBlock is called BEFORE defender move.
+          // If defender moved first, flinch does nothing for THIS turn (correct).
+        }
       }
 
       // Drain effect

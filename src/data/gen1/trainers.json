@@ -6,7 +6,14 @@
     "reward": 160,
     "zone": "route-1",
     "team": [
-      { "pokemonId": 19, "level": 4, "moves": [33, 39] }
+      {
+        "pokemonId": 19,
+        "level": 4,
+        "moves": [
+          33,
+          39
+        ]
+      }
     ]
   },
   {
@@ -16,8 +23,22 @@
     "reward": 180,
     "zone": "route-1",
     "team": [
-      { "pokemonId": 16, "level": 4, "moves": [16, 28] },
-      { "pokemonId": 19, "level": 3, "moves": [33, 39] }
+      {
+        "pokemonId": 16,
+        "level": 4,
+        "moves": [
+          16,
+          28
+        ]
+      },
+      {
+        "pokemonId": 19,
+        "level": 3,
+        "moves": [
+          33,
+          39
+        ]
+      }
     ]
   },
   {
@@ -27,8 +48,22 @@
     "reward": 120,
     "zone": "route-2",
     "team": [
-      { "pokemonId": 19, "level": 5, "moves": [33, 39] },
-      { "pokemonId": 16, "level": 5, "moves": [16, 28] }
+      {
+        "pokemonId": 19,
+        "level": 5,
+        "moves": [
+          33,
+          39
+        ]
+      },
+      {
+        "pokemonId": 16,
+        "level": 5,
+        "moves": [
+          16,
+          28
+        ]
+      }
     ]
   },
   {
@@ -38,7 +73,15 @@
     "reward": 200,
     "zone": "route-2",
     "team": [
-      { "pokemonId": 19, "level": 6, "moves": [33, 39, 98] }
+      {
+        "pokemonId": 19,
+        "level": 6,
+        "moves": [
+          33,
+          39,
+          98
+        ]
+      }
     ]
   },
   {
@@ -48,7 +91,14 @@
     "reward": 140,
     "zone": "foret-jade",
     "team": [
-      { "pokemonId": 16, "level": 6, "moves": [16, 28] }
+      {
+        "pokemonId": 16,
+        "level": 6,
+        "moves": [
+          16,
+          28
+        ]
+      }
     ]
   },
   {
@@ -58,8 +108,22 @@
     "reward": 160,
     "zone": "foret-jade",
     "team": [
-      { "pokemonId": 21, "level": 5, "moves": [64, 45] },
-      { "pokemonId": 16, "level": 5, "moves": [16, 28] }
+      {
+        "pokemonId": 21,
+        "level": 5,
+        "moves": [
+          64,
+          45
+        ]
+      },
+      {
+        "pokemonId": 16,
+        "level": 5,
+        "moves": [
+          16,
+          28
+        ]
+      }
     ]
   },
   {
@@ -69,7 +133,15 @@
     "reward": 200,
     "zone": "foret-jade",
     "team": [
-      { "pokemonId": 19, "level": 7, "moves": [33, 39, 98] }
+      {
+        "pokemonId": 19,
+        "level": 7,
+        "moves": [
+          33,
+          39,
+          98
+        ]
+      }
     ]
   },
   {
@@ -79,8 +151,24 @@
     "reward": 280,
     "zone": "route-3",
     "team": [
-      { "pokemonId": 19, "level": 9, "moves": [33, 39, 98] },
-      { "pokemonId": 21, "level": 8, "moves": [64, 45, 43] }
+      {
+        "pokemonId": 19,
+        "level": 9,
+        "moves": [
+          33,
+          39,
+          98
+        ]
+      },
+      {
+        "pokemonId": 21,
+        "level": 8,
+        "moves": [
+          64,
+          45,
+          43
+        ]
+      }
     ]
   },
   {
@@ -90,7 +178,15 @@
     "reward": 300,
     "zone": "route-3",
     "team": [
-      { "pokemonId": 16, "level": 10, "moves": [16, 28, 98] }
+      {
+        "pokemonId": 16,
+        "level": 10,
+        "moves": [
+          16,
+          28,
+          98
+        ]
+      }
     ]
   },
   {
@@ -100,8 +196,1754 @@
     "reward": 400,
     "zone": "route-3",
     "team": [
-      { "pokemonId": 74, "level": 10, "moves": [33, 106] },
-      { "pokemonId": 74, "level": 10, "moves": [33, 106] }
+      {
+        "pokemonId": 74,
+        "level": 10,
+        "moves": [
+          33,
+          106
+        ]
+      },
+      {
+        "pokemonId": 74,
+        "level": 10,
+        "moves": [
+          33,
+          106
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mtmoon-rocket1",
+    "name": "Sbire Rocket",
+    "trainerClass": "Rocket",
+    "reward": 300,
+    "zone": "mt-moon",
+    "team": [
+      {
+        "pokemonId": 19,
+        "level": 11,
+        "moves": [
+          33,
+          39,
+          98
+        ]
+      },
+      {
+        "pokemonId": 41,
+        "level": 11,
+        "moves": [
+          71,
+          48
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mtmoon-rocket2",
+    "name": "Sbire Rocket",
+    "trainerClass": "Rocket",
+    "reward": 330,
+    "zone": "mt-moon",
+    "team": [
+      {
+        "pokemonId": 88,
+        "level": 12,
+        "moves": [
+          33,
+          124
+        ]
+      },
+      {
+        "pokemonId": 23,
+        "level": 12,
+        "moves": [
+          33,
+          20
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mtmoon-hiker1",
+    "name": "Marcos",
+    "trainerClass": "Montagnard",
+    "reward": 420,
+    "zone": "mt-moon",
+    "team": [
+      {
+        "pokemonId": 74,
+        "level": 10,
+        "moves": [
+          33,
+          106
+        ]
+      },
+      {
+        "pokemonId": 95,
+        "level": 10,
+        "moves": [
+          33,
+          106
+        ]
+      },
+      {
+        "pokemonId": 27,
+        "level": 10,
+        "moves": [
+          10,
+          28
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mtmoon-supernerd1",
+    "name": "Jovan",
+    "trainerClass": "Intello",
+    "reward": 350,
+    "zone": "mt-moon",
+    "team": [
+      {
+        "pokemonId": 88,
+        "level": 11,
+        "moves": [
+          33,
+          124
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 11,
+        "moves": [
+          33,
+          108
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route4-lass1",
+    "name": "Alice",
+    "trainerClass": "Fillette",
+    "reward": 240,
+    "zone": "route-4",
+    "team": [
+      {
+        "pokemonId": 43,
+        "level": 12,
+        "moves": [
+          71,
+          79
+        ]
+      },
+      {
+        "pokemonId": 39,
+        "level": 12,
+        "moves": [
+          1,
+          47
+        ]
+      }
+    ]
+  },
+  {
+    "id": "azuria-rival1",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 500,
+    "zone": "azuria",
+    "team": [
+      {
+        "pokemonId": 17,
+        "level": 18,
+        "moves": [
+          16,
+          98
+        ]
+      },
+      {
+        "pokemonId": 63,
+        "level": 15,
+        "moves": [
+          93
+        ]
+      },
+      {
+        "pokemonId": 19,
+        "level": 15,
+        "moves": [
+          98,
+          39
+        ]
+      },
+      {
+        "pokemonId": 2,
+        "level": 17,
+        "moves": [
+          33,
+          73,
+          79
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-rival1",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 600,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 17,
+        "level": 18,
+        "moves": [
+          16,
+          98
+        ]
+      },
+      {
+        "pokemonId": 63,
+        "level": 15,
+        "moves": [
+          93
+        ]
+      },
+      {
+        "pokemonId": 19,
+        "level": 15,
+        "moves": [
+          98,
+          39
+        ]
+      },
+      {
+        "pokemonId": 2,
+        "level": 17,
+        "moves": [
+          33,
+          73,
+          79
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-nugget1",
+    "name": "Cale",
+    "trainerClass": "Scout",
+    "reward": 200,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 10,
+        "level": 14,
+        "moves": [
+          33,
+          81
+        ]
+      },
+      {
+        "pokemonId": 13,
+        "level": 14,
+        "moves": [
+          33,
+          40
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-nugget2",
+    "name": "Ali",
+    "trainerClass": "Fillette",
+    "reward": 210,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 16,
+        "level": 14,
+        "moves": [
+          16,
+          98
+        ]
+      },
+      {
+        "pokemonId": 29,
+        "level": 14,
+        "moves": [
+          33,
+          39
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-nugget3",
+    "name": "Tim",
+    "trainerClass": "Gamin",
+    "reward": 220,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 27,
+        "level": 14,
+        "moves": [
+          28,
+          10
+        ]
+      },
+      {
+        "pokemonId": 56,
+        "level": 14,
+        "moves": [
+          33,
+          43
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-nugget4",
+    "name": "Lian",
+    "trainerClass": "Fillette",
+    "reward": 230,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 43,
+        "level": 14,
+        "moves": [
+          71,
+          79
+        ]
+      },
+      {
+        "pokemonId": 69,
+        "level": 14,
+        "moves": [
+          35,
+          22
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route24-nugget5",
+    "name": "Rocket",
+    "trainerClass": "Rocket",
+    "reward": 5000,
+    "zone": "route-24",
+    "team": [
+      {
+        "pokemonId": 23,
+        "level": 15,
+        "moves": [
+          33,
+          20
+        ]
+      },
+      {
+        "pokemonId": 41,
+        "level": 15,
+        "moves": [
+          71,
+          48
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route25-youngster1",
+    "name": "Joey",
+    "trainerClass": "Gamin",
+    "reward": 240,
+    "zone": "route-25",
+    "team": [
+      {
+        "pokemonId": 19,
+        "level": 15,
+        "moves": [
+          98,
+          39
+        ]
+      },
+      {
+        "pokemonId": 21,
+        "level": 15,
+        "moves": [
+          64,
+          45
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route25-hiker1",
+    "name": "Dan",
+    "trainerClass": "Montagnard",
+    "reward": 480,
+    "zone": "route-25",
+    "team": [
+      {
+        "pokemonId": 95,
+        "level": 15,
+        "moves": [
+          33,
+          106
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route25-lass1",
+    "name": "Haley",
+    "trainerClass": "Fillette",
+    "reward": 240,
+    "zone": "route-25",
+    "team": [
+      {
+        "pokemonId": 43,
+        "level": 15,
+        "moves": [
+          71,
+          79
+        ]
+      },
+      {
+        "pokemonId": 16,
+        "level": 15,
+        "moves": [
+          16,
+          98
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route6-jr1",
+    "name": "Timmy",
+    "trainerClass": "Scout",
+    "reward": 260,
+    "zone": "route-6",
+    "team": [
+      {
+        "pokemonId": 7,
+        "level": 16,
+        "moves": [
+          33,
+          110
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route6-jr2",
+    "name": "Tommy",
+    "trainerClass": "Gamin",
+    "reward": 260,
+    "zone": "route-6",
+    "team": [
+      {
+        "pokemonId": 21,
+        "level": 16,
+        "moves": [
+          64,
+          45
+        ]
+      },
+      {
+        "pokemonId": 19,
+        "level": 16,
+        "moves": [
+          98,
+          39
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route11-gambler1",
+    "name": "Hugo",
+    "trainerClass": "Parieur",
+    "reward": 1000,
+    "zone": "route-11",
+    "team": [
+      {
+        "pokemonId": 60,
+        "level": 18,
+        "moves": [
+          55,
+          10
+        ]
+      },
+      {
+        "pokemonId": 58,
+        "level": 18,
+        "moves": [
+          52,
+          43
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route11-engineer1",
+    "name": "Bravo",
+    "trainerClass": "Mécano",
+    "reward": 800,
+    "zone": "route-11",
+    "team": [
+      {
+        "pokemonId": 81,
+        "level": 18,
+        "moves": [
+          84,
+          104
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route11-youngster1",
+    "name": "Yvan",
+    "trainerClass": "Gamin",
+    "reward": 280,
+    "zone": "route-11",
+    "team": [
+      {
+        "pokemonId": 23,
+        "level": 21,
+        "moves": [
+          33,
+          20
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route9-picnicker1",
+    "name": "Alicia",
+    "trainerClass": "Picnicker",
+    "reward": 300,
+    "zone": "route-9",
+    "team": [
+      {
+        "pokemonId": 43,
+        "level": 18,
+        "moves": [
+          71,
+          79
+        ]
+      },
+      {
+        "pokemonId": 1,
+        "level": 18,
+        "moves": [
+          33,
+          73
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route9-hiker1",
+    "name": "Brice",
+    "trainerClass": "Montagnard",
+    "reward": 600,
+    "zone": "route-9",
+    "team": [
+      {
+        "pokemonId": 74,
+        "level": 20,
+        "moves": [
+          106
+        ]
+      },
+      {
+        "pokemonId": 95,
+        "level": 20,
+        "moves": [
+          106
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route10-picnicker1",
+    "name": "Heidi",
+    "trainerClass": "Picnicker",
+    "reward": 320,
+    "zone": "route-10",
+    "team": [
+      {
+        "pokemonId": 25,
+        "level": 20,
+        "moves": [
+          84,
+          45,
+          98
+        ]
+      },
+      {
+        "pokemonId": 35,
+        "level": 20,
+        "moves": [
+          118,
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rocktunnel-pokemaniac1",
+    "name": "Ashton",
+    "trainerClass": "Pokémaniac",
+    "reward": 800,
+    "zone": "rock-tunnel",
+    "team": [
+      {
+        "pokemonId": 104,
+        "level": 23,
+        "moves": [
+          128,
+          17
+        ]
+      },
+      {
+        "pokemonId": 80,
+        "level": 23,
+        "moves": [
+          93,
+          122
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rocktunnel-hiker1",
+    "name": "Winston",
+    "trainerClass": "Montagnard",
+    "reward": 660,
+    "zone": "rock-tunnel",
+    "team": [
+      {
+        "pokemonId": 66,
+        "level": 22,
+        "moves": [
+          66,
+          17
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rocktunnel-hiker2",
+    "name": "Eric",
+    "trainerClass": "Montagnard",
+    "reward": 660,
+    "zone": "rock-tunnel",
+    "team": [
+      {
+        "pokemonId": 74,
+        "level": 20,
+        "moves": [
+          106
+        ]
+      },
+      {
+        "pokemonId": 95,
+        "level": 20,
+        "moves": [
+          106
+        ]
+      },
+      {
+        "pokemonId": 75,
+        "level": 20,
+        "moves": [
+          106
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lavender-rival1",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 900,
+    "zone": "lavanville",
+    "team": [
+      {
+        "pokemonId": 17,
+        "level": 25,
+        "moves": [
+          16,
+          98
+        ]
+      },
+      {
+        "pokemonId": 130,
+        "level": 23,
+        "moves": [
+          44,
+          82
+        ]
+      },
+      {
+        "pokemonId": 102,
+        "level": 22,
+        "moves": [
+          93,
+          115
+        ]
+      },
+      {
+        "pokemonId": 64,
+        "level": 22,
+        "moves": [
+          93,
+          105
+        ]
+      },
+      {
+        "pokemonId": 2,
+        "level": 25,
+        "moves": [
+          75,
+          73,
+          79
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route8-gambler1",
+    "name": "Rich",
+    "trainerClass": "Parieur",
+    "reward": 1400,
+    "zone": "route-8",
+    "team": [
+      {
+        "pokemonId": 58,
+        "level": 22,
+        "moves": [
+          52,
+          43
+        ]
+      },
+      {
+        "pokemonId": 59,
+        "level": 22,
+        "moves": [
+          83,
+          36
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route8-supernerd1",
+    "name": "Glenn",
+    "trainerClass": "Intello",
+    "reward": 500,
+    "zone": "route-8",
+    "team": [
+      {
+        "pokemonId": 88,
+        "level": 22,
+        "moves": [
+          124,
+          33
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 22,
+        "moves": [
+          109,
+          33
+        ]
+      },
+      {
+        "pokemonId": 88,
+        "level": 22,
+        "moves": [
+          124,
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route8-lass1",
+    "name": "Paige",
+    "trainerClass": "Fillette",
+    "reward": 340,
+    "zone": "route-8",
+    "team": [
+      {
+        "pokemonId": 35,
+        "level": 22,
+        "moves": [
+          118,
+          1,
+          3
+        ]
+      },
+      {
+        "pokemonId": 36,
+        "level": 22,
+        "moves": [
+          118,
+          1,
+          3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route8-lass2",
+    "name": "Andrea",
+    "trainerClass": "Fillette",
+    "reward": 340,
+    "zone": "route-8",
+    "team": [
+      {
+        "pokemonId": 52,
+        "level": 24,
+        "moves": [
+          20,
+          10
+        ]
+      }
+    ]
+  },
+  {
+    "id": "silph-rival1",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 1300,
+    "zone": "safrania",
+    "team": [
+      {
+        "pokemonId": 18,
+        "level": 37,
+        "moves": [
+          16,
+          98
+        ]
+      },
+      {
+        "pokemonId": 59,
+        "level": 38,
+        "moves": [
+          83
+        ]
+      },
+      {
+        "pokemonId": 102,
+        "level": 35,
+        "moves": [
+          93
+        ]
+      },
+      {
+        "pokemonId": 65,
+        "level": 35,
+        "moves": [
+          93
+        ]
+      },
+      {
+        "pokemonId": 3,
+        "level": 40,
+        "moves": [
+          75,
+          73,
+          79
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route16-biker1",
+    "name": "Lao",
+    "trainerClass": "Motard",
+    "reward": 500,
+    "zone": "route-16",
+    "team": [
+      {
+        "pokemonId": 88,
+        "level": 23,
+        "moves": [
+          124,
+          33
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 23,
+        "moves": [
+          109,
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route16-biker2",
+    "name": "Hideo",
+    "trainerClass": "Motard",
+    "reward": 500,
+    "zone": "route-16",
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 25,
+        "moves": [
+          109,
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route17-biker1",
+    "name": "Billy",
+    "trainerClass": "Motard",
+    "reward": 500,
+    "zone": "route-17",
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 25,
+        "moves": [
+          109,
+          33
+        ]
+      },
+      {
+        "pokemonId": 110,
+        "level": 25,
+        "moves": [
+          109,
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route17-biker2",
+    "name": "Nik",
+    "trainerClass": "Motard",
+    "reward": 500,
+    "zone": "route-17",
+    "team": [
+      {
+        "pokemonId": 88,
+        "level": 28,
+        "moves": [
+          124,
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route17-cueball1",
+    "name": "Raoul",
+    "trainerClass": "Loubard",
+    "reward": 600,
+    "zone": "route-17",
+    "team": [
+      {
+        "pokemonId": 67,
+        "level": 28,
+        "moves": [
+          66,
+          17
+        ]
+      },
+      {
+        "pokemonId": 67,
+        "level": 28,
+        "moves": [
+          66,
+          17
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route18-birdkeeper1",
+    "name": "Wilton",
+    "trainerClass": "Ornithologue",
+    "reward": 600,
+    "zone": "route-18",
+    "team": [
+      {
+        "pokemonId": 21,
+        "level": 26,
+        "moves": [
+          64,
+          45
+        ]
+      },
+      {
+        "pokemonId": 22,
+        "level": 26,
+        "moves": [
+          64,
+          45
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route15-beauty1",
+    "name": "Grace",
+    "trainerClass": "Canon",
+    "reward": 1500,
+    "zone": "route-15",
+    "team": [
+      {
+        "pokemonId": 1,
+        "level": 29,
+        "moves": [
+          73
+        ]
+      },
+      {
+        "pokemonId": 2,
+        "level": 29,
+        "moves": [
+          73
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route15-biker1",
+    "name": "Ernest",
+    "trainerClass": "Motard",
+    "reward": 500,
+    "zone": "route-15",
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 25,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 25,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 110,
+        "level": 25,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 25,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 88,
+        "level": 25,
+        "moves": [
+          124
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route14-birdkeeper1",
+    "name": "Mitch",
+    "trainerClass": "Ornithologue",
+    "reward": 700,
+    "zone": "route-14",
+    "team": [
+      {
+        "pokemonId": 16,
+        "level": 28,
+        "moves": [
+          16
+        ]
+      },
+      {
+        "pokemonId": 84,
+        "level": 28,
+        "moves": [
+          64
+        ]
+      },
+      {
+        "pokemonId": 17,
+        "level": 28,
+        "moves": [
+          16
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route14-biker1",
+    "name": "Isaac",
+    "trainerClass": "Motard",
+    "reward": 600,
+    "zone": "route-14",
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 29,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 89,
+        "level": 29,
+        "moves": [
+          124
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route13-beauty1",
+    "name": "Lola",
+    "trainerClass": "Canon",
+    "reward": 1500,
+    "zone": "route-13",
+    "team": [
+      {
+        "pokemonId": 19,
+        "level": 27,
+        "moves": [
+          98
+        ]
+      },
+      {
+        "pokemonId": 25,
+        "level": 27,
+        "moves": [
+          84
+        ]
+      },
+      {
+        "pokemonId": 19,
+        "level": 27,
+        "moves": [
+          98
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route13-birdkeeper1",
+    "name": "Perry",
+    "trainerClass": "Ornithologue",
+    "reward": 700,
+    "zone": "route-13",
+    "team": [
+      {
+        "pokemonId": 83,
+        "level": 29,
+        "moves": [
+          64
+        ]
+      },
+      {
+        "pokemonId": 17,
+        "level": 29,
+        "moves": [
+          16
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route12-fisherman1",
+    "name": "Kyle",
+    "trainerClass": "Pêcheur",
+    "reward": 700,
+    "zone": "route-12",
+    "team": [
+      {
+        "pokemonId": 118,
+        "level": 24,
+        "moves": [
+          64
+        ]
+      },
+      {
+        "pokemonId": 60,
+        "level": 24,
+        "moves": [
+          55
+        ]
+      },
+      {
+        "pokemonId": 118,
+        "level": 24,
+        "moves": [
+          64
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route12-rocker1",
+    "name": "Luca",
+    "trainerClass": "Rocker",
+    "reward": 600,
+    "zone": "route-12",
+    "team": [
+      {
+        "pokemonId": 100,
+        "level": 29,
+        "moves": [
+          84
+        ]
+      },
+      {
+        "pokemonId": 101,
+        "level": 29,
+        "moves": [
+          84
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route19-swimmer1",
+    "name": "Richard",
+    "trainerClass": "Nageur",
+    "reward": 150,
+    "zone": "route-19",
+    "team": [
+      {
+        "pokemonId": 72,
+        "level": 30,
+        "moves": [
+          44
+        ]
+      },
+      {
+        "pokemonId": 90,
+        "level": 30,
+        "moves": [
+          55
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route19-swimmer2",
+    "name": "Reece",
+    "trainerClass": "Nageur",
+    "reward": 150,
+    "zone": "route-19",
+    "team": [
+      {
+        "pokemonId": 118,
+        "level": 30,
+        "moves": [
+          64
+        ]
+      },
+      {
+        "pokemonId": 116,
+        "level": 30,
+        "moves": [
+          55
+        ]
+      },
+      {
+        "pokemonId": 120,
+        "level": 30,
+        "moves": [
+          55
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route20-swimmer1",
+    "name": "Frank",
+    "trainerClass": "Nageur",
+    "reward": 150,
+    "zone": "route-20",
+    "team": [
+      {
+        "pokemonId": 120,
+        "level": 31,
+        "moves": [
+          55
+        ]
+      },
+      {
+        "pokemonId": 91,
+        "level": 31,
+        "moves": [
+          127
+        ]
+      },
+      {
+        "pokemonId": 130,
+        "level": 31,
+        "moves": [
+          44
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mansion-burglar1",
+    "name": "Arnie",
+    "trainerClass": "Pillard",
+    "reward": 2000,
+    "zone": "pokemon-mansion",
+    "team": [
+      {
+        "pokemonId": 4,
+        "level": 34,
+        "moves": [
+          52
+        ]
+      },
+      {
+        "pokemonId": 5,
+        "level": 34,
+        "moves": [
+          52
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mansion-scientist1",
+    "name": "Ted",
+    "trainerClass": "Scientifique",
+    "reward": 1200,
+    "zone": "pokemon-mansion",
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 33,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 110,
+        "level": 33,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 81,
+        "level": 33,
+        "moves": [
+          84
+        ]
+      },
+      {
+        "pokemonId": 82,
+        "level": 33,
+        "moves": [
+          84
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route21-fisherman1",
+    "name": "Ronald",
+    "trainerClass": "Pêcheur",
+    "reward": 800,
+    "zone": "route-21",
+    "team": [
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      },
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      },
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      },
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      },
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      },
+      {
+        "pokemonId": 129,
+        "level": 27,
+        "moves": [
+          150
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route22-rival1",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 300,
+    "zone": "route-22",
+    "team": [
+      {
+        "pokemonId": 16,
+        "level": 9,
+        "moves": [
+          16
+        ]
+      },
+      {
+        "pokemonId": 1,
+        "level": 9,
+        "moves": [
+          33
+        ]
+      }
+    ]
+  },
+  {
+    "id": "route22-rival2",
+    "name": "Blue",
+    "trainerClass": "Rival",
+    "reward": 1800,
+    "zone": "route-22",
+    "team": [
+      {
+        "pokemonId": 18,
+        "level": 47,
+        "moves": [
+          16
+        ]
+      },
+      {
+        "pokemonId": 112,
+        "level": 45,
+        "moves": [
+          24
+        ]
+      },
+      {
+        "pokemonId": 59,
+        "level": 45,
+        "moves": [
+          83
+        ]
+      },
+      {
+        "pokemonId": 65,
+        "level": 47,
+        "moves": [
+          93
+        ]
+      },
+      {
+        "pokemonId": 103,
+        "level": 47,
+        "moves": [
+          121
+        ]
+      },
+      {
+        "pokemonId": 3,
+        "level": 53,
+        "moves": [
+          75
+        ]
+      }
+    ]
+  },
+  {
+    "id": "victory-tamer1",
+    "name": "Vincent",
+    "trainerClass": "Dompteur",
+    "reward": 1500,
+    "zone": "victory-road",
+    "team": [
+      {
+        "pokemonId": 57,
+        "level": 44,
+        "moves": [
+          23
+        ]
+      },
+      {
+        "pokemonId": 112,
+        "level": 44,
+        "moves": [
+          24
+        ]
+      },
+      {
+        "pokemonId": 42,
+        "level": 44,
+        "moves": [
+          109
+        ]
+      },
+      {
+        "pokemonId": 34,
+        "level": 44,
+        "moves": [
+          23
+        ]
+      }
+    ]
+  },
+  {
+    "id": "victory-juggler1",
+    "name": "Nelson",
+    "trainerClass": "Jongleur",
+    "reward": 1200,
+    "zone": "victory-road",
+    "team": [
+      {
+        "pokemonId": 96,
+        "level": 41,
+        "moves": [
+          95
+        ]
+      },
+      {
+        "pokemonId": 97,
+        "level": 41,
+        "moves": [
+          95
+        ]
+      },
+      {
+        "pokemonId": 96,
+        "level": 41,
+        "moves": [
+          95
+        ]
+      },
+      {
+        "pokemonId": 97,
+        "level": 41,
+        "moves": [
+          95
+        ]
+      }
+    ]
+  },
+  {
+    "id": "league-lorelei",
+    "name": "Olga",
+    "trainerClass": "Conseil 4",
+    "reward": 5544,
+    "zone": "league-hall",
+    "team": [
+      {
+        "pokemonId": 87,
+        "level": 54,
+        "moves": []
+      },
+      {
+        "pokemonId": 91,
+        "level": 53,
+        "moves": []
+      },
+      {
+        "pokemonId": 80,
+        "level": 54,
+        "moves": []
+      },
+      {
+        "pokemonId": 124,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 131,
+        "level": 56,
+        "moves": []
+      }
+    ]
+  },
+  {
+    "id": "league-bruno",
+    "name": "Aldo",
+    "trainerClass": "Conseil 4",
+    "reward": 5742,
+    "zone": "league-hall",
+    "team": [
+      {
+        "pokemonId": 95,
+        "level": 53,
+        "moves": []
+      },
+      {
+        "pokemonId": 107,
+        "level": 55,
+        "moves": []
+      },
+      {
+        "pokemonId": 106,
+        "level": 55,
+        "moves": []
+      },
+      {
+        "pokemonId": 95,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 68,
+        "level": 58,
+        "moves": []
+      }
+    ]
+  },
+  {
+    "id": "league-agatha",
+    "name": "Agatha",
+    "trainerClass": "Conseil 4",
+    "reward": 5940,
+    "zone": "league-hall",
+    "team": [
+      {
+        "pokemonId": 94,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 42,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 93,
+        "level": 55,
+        "moves": []
+      },
+      {
+        "pokemonId": 24,
+        "level": 58,
+        "moves": []
+      },
+      {
+        "pokemonId": 94,
+        "level": 60,
+        "moves": []
+      }
+    ]
+  },
+  {
+    "id": "league-lance",
+    "name": "Peter",
+    "trainerClass": "Conseil 4",
+    "reward": 6138,
+    "zone": "league-hall",
+    "team": [
+      {
+        "pokemonId": 130,
+        "level": 58,
+        "moves": []
+      },
+      {
+        "pokemonId": 148,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 148,
+        "level": 56,
+        "moves": []
+      },
+      {
+        "pokemonId": 142,
+        "level": 60,
+        "moves": []
+      },
+      {
+        "pokemonId": 149,
+        "level": 62,
+        "moves": []
+      }
+    ]
+  },
+  {
+    "id": "league-champion",
+    "name": "Blue",
+    "trainerClass": "Maître",
+    "reward": 9900,
+    "zone": "league-hall",
+    "team": [
+      {
+        "pokemonId": 18,
+        "level": 61,
+        "moves": []
+      },
+      {
+        "pokemonId": 65,
+        "level": 59,
+        "moves": []
+      },
+      {
+        "pokemonId": 112,
+        "level": 61,
+        "moves": []
+      },
+      {
+        "pokemonId": 103,
+        "level": 61,
+        "moves": []
+      },
+      {
+        "pokemonId": 130,
+        "level": 63,
+        "moves": []
+      },
+      {
+        "pokemonId": 6,
+        "level": 65,
+        "moves": []
+      }
     ]
   }
 ]

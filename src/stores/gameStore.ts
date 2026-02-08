@@ -1,16 +1,14 @@
 import { create } from 'zustand';
 import {
   PokemonInstance,
-  MoveInstance,
 } from '../types/pokemon';
 import {
   GameView,
-  InventoryItem,
   PlayerData,
   ProgressData,
   TrainerData,
-  GymData,
 } from '../types/game';
+import { InventoryItem } from '../types/inventory';
 import { saveGame, loadGame, hasSave } from '../utils/saveManager';
 import {
   getZoneData,
@@ -24,11 +22,16 @@ import {
   processLevelUp,
   calculateXpGain,
   applyEvGains,
-  recalculateStats,
-  xpForLevel,
 } from '../engine/experienceCalculator';
-import { getPokemonData } from '../utils/dataLoader';
+import {
+  createPCStorage,
+  depositPokemon,
+  withdrawPokemon,
+  findPokemonInPC,
+  PCStorage,
+} from '../engine/pcStorage';
 import { evolvePokemon } from '../engine/evolutionEngine';
+import { useItem } from '../engine/itemLogic';
 import { fullHealTeam } from '../engine/battleEngine';
 
 export interface GameState {
@@ -36,7 +39,7 @@ export interface GameState {
   currentView: GameView;
   player: PlayerData;
   team: PokemonInstance[];
-  pc: PokemonInstance[];
+  pc: PCStorage;
   inventory: InventoryItem[];
   progress: ProgressData;
   selectedZone: string | null;
@@ -63,6 +66,7 @@ export interface GameState {
   addItem: (itemId: string, qty: number) => void;
   removeItem: (itemId: string, qty: number) => void;
   getItemQuantity: (itemId: string) => number;
+  useItemAction: (itemId: string, pokemonUid?: string) => { success: boolean; message: string };
 
   // Money
   addMoney: (amount: number) => void;
@@ -71,6 +75,8 @@ export interface GameState {
   // Progress
   markTrainerDefeated: (trainerId: string) => void;
   markGymDefeated: (gymId: string) => void;
+  advanceLeagueProgress: () => void;
+  resetLeagueProgress: () => void;
   isZoneUnlocked: (zoneId: string) => boolean;
   isTrainerDefeated: (trainerId: string) => boolean;
   getTrainersForZone: (zoneId: string) => TrainerData[];
@@ -102,7 +108,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     starter: null,
   },
   team: [],
-  pc: [],
+  pc: createPCStorage(),
   inventory: [],
   progress: {
     defeatedTrainers: [],
@@ -110,6 +116,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     currentZone: 'bourg-palette',
     caughtPokemon: [],
     seenPokemon: [],
+    leagueProgress: 0,
   },
   selectedZone: null,
   selectedPokemonIndex: null,
@@ -117,7 +124,6 @@ export const useGameStore = create<GameState>((set, get) => ({
   pendingMoveLearn: null,
 
   initGame: () => {
-    // Just go to title
     set({ currentView: 'title' });
   },
 
@@ -130,7 +136,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     const initialItems: InventoryItem[] = [
-      { itemId: 'poke-ball', quantity: 5 },
+      { itemId: 'pokeball', quantity: 5 },
       { itemId: 'potion', quantity: 3 },
     ];
 
@@ -144,7 +150,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         starter: starterId,
       },
       team: [starter],
-      pc: [],
+      pc: createPCStorage(),
       inventory: initialItems,
       progress: {
         defeatedTrainers: [],
@@ -152,6 +158,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         currentZone: 'bourg-palette',
         caughtPokemon: [starterId],
         seenPokemon: [starterId],
+        leagueProgress: 0,
       },
       selectedZone: null,
       pendingEvolution: null,
@@ -165,15 +172,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   selectZone: (zoneId: string) => {
     const zone = getZoneData(zoneId);
-    const zoneType = 'wildEncounters' in zone && (zone as any).wildEncounters?.length > 0
-      ? 'route_menu'
-      : 'trainers' in zone && (zone as any).trainers?.length > 0
-        ? 'route_menu'
-        : 'city_menu';
-
     // Determine view based on zone type field
     const zoneData = zone as any;
-    const view: GameView = zoneData.type === 'city' ? 'city_menu' : 'route_menu';
+    let view: GameView = zoneData.type === 'city' ? 'city_menu' : 'route_menu';
+
+    if (zoneId === 'league-hall') {
+      view = 'league';
+    }
 
     set({
       selectedZone: zoneId,
@@ -187,7 +192,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.team.length < 6) {
       set({ team: [...state.team, pokemon] });
     } else {
-      set({ pc: [...state.pc, pokemon] });
+      const success = depositPokemon(state.pc, pokemon);
+      if (success) {
+        set({ pc: { ...state.pc } }); // Trigger update
+      }
     }
 
     // Track caught
@@ -212,12 +220,20 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   releasePokemon: (uid: string) => {
     const state = get();
-    // Can't release last Pokémon
-    if (state.team.length <= 1 && state.team.find(p => p.uid === uid)) return;
-    set({
-      team: state.team.filter(p => p.uid !== uid),
-      pc: state.pc.filter(p => p.uid !== uid),
-    });
+    // Check team
+    const inTeam = state.team.find(p => p.uid === uid);
+    if (inTeam) {
+      if (state.team.length <= 1) return;
+      set({ team: state.team.filter(p => p.uid !== uid) });
+      return;
+    }
+
+    // Check PC
+    const found = findPokemonInPC(state.pc, uid);
+    if (found) {
+      withdrawPokemon(state.pc, found.boxId, found.slotId); // Remove from box (returns pokemon, but we ignore it)
+      set({ pc: { ...state.pc } });
+    }
   },
 
   moveToPc: (uid: string) => {
@@ -225,21 +241,30 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.team.length <= 1) return;
     const pokemon = state.team.find(p => p.uid === uid);
     if (!pokemon) return;
-    set({
-      team: state.team.filter(p => p.uid !== uid),
-      pc: [...state.pc, pokemon],
-    });
+
+    const success = depositPokemon(state.pc, pokemon);
+    if (success) {
+      set({
+        team: state.team.filter(p => p.uid !== uid),
+        pc: { ...state.pc }
+      });
+    }
   },
 
   moveFromPc: (uid: string) => {
     const state = get();
     if (state.team.length >= 6) return;
-    const pokemon = state.pc.find(p => p.uid === uid);
-    if (!pokemon) return;
-    set({
-      team: [...state.team, pokemon],
-      pc: state.pc.filter(p => p.uid !== uid),
-    });
+
+    const found = findPokemonInPC(state.pc, uid);
+    if (!found) return;
+
+    const pokemon = withdrawPokemon(state.pc, found.boxId, found.slotId);
+    if (pokemon) {
+      set({
+        team: [...state.team, pokemon],
+        pc: { ...state.pc }
+      });
+    }
   },
 
   addItem: (itemId: string, qty: number) => {
@@ -263,6 +288,43 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else {
       set({ inventory });
     }
+  },
+
+  useItemAction: (itemId: string, pokemonUid?: string) => {
+    const state = get();
+    // Check quantity
+    const qty = get().getItemQuantity(itemId);
+    if (qty <= 0) return { success: false, message: "Vous n'en avez pas !" };
+
+    const itemData = getItemData(itemId);
+    if (!itemData) return { success: false, message: "Objet inconnu." };
+
+    // If item requires a target
+    const requiresTarget = ['heal', 'status', 'revive', 'evolution'].includes(itemData.effect?.type || '');
+
+    if (requiresTarget) {
+      if (!pokemonUid) return { success: false, message: "Utiliser sur qui ?" };
+      const pokemon = state.team.find(p => p.uid === pokemonUid);
+      if (!pokemon) return { success: false, message: "Pokémon introuvable." };
+
+      // Use logic
+      const result = useItem(itemData, pokemon);
+      if (result.success && result.consumed) {
+        get().removeItem(itemId, 1);
+        set({ team: [...state.team] }); // Update UI
+
+        // Check evolution
+        if (result.newPokemonId) {
+          // Evolution handled inside useItem? 
+          // evolvePokemon updates the instance.
+          // But we might want to show a modal or animation.
+          // For now, straightforward update.
+        }
+      }
+      return { success: result.success, message: result.message };
+    }
+
+    return { success: false, message: "Impossible d'utiliser ça pour le moment." };
   },
 
   getItemQuantity: (itemId: string) => {
@@ -375,6 +437,27 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   isTrainerDefeated: (trainerId: string) => {
     return get().progress.defeatedTrainers.includes(trainerId);
+  },
+
+  advanceLeagueProgress: () => {
+    const state = get();
+    // 0 -> 1 (defeated Lorelei) -> 2 (Bruno) -> 3 (Agatha) -> 4 (Lance) -> 5 (Champion)
+    const newProgress = {
+      ...state.progress,
+      leagueProgress: state.progress.leagueProgress + 1
+    };
+    set({ progress: newProgress });
+    get().saveGameState();
+  },
+
+  resetLeagueProgress: () => {
+    const state = get();
+    const newProgress = {
+      ...state.progress,
+      leagueProgress: 0
+    };
+    set({ progress: newProgress });
+    get().saveGameState();
   },
 
   getTrainersForZone: (zoneId: string) => {
@@ -501,11 +584,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     const data = loadGame();
     if (!data) return false;
 
+    // Migration for legacy PC (array)
+    let pc: PCStorage = createPCStorage();
+    if (Array.isArray(data.pc)) {
+      (data.pc as any[]).forEach(p => {
+        depositPokemon(pc, p);
+      });
+    } else {
+      pc = data.pc;
+    }
+
     set({
       currentView: 'world_map',
       player: data.player,
       team: data.team,
-      pc: data.pc,
+      pc,
       inventory: data.inventory,
       progress: data.progress,
       selectedZone: null,

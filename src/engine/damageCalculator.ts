@@ -1,6 +1,7 @@
 import { PokemonInstance, MoveData, PokemonType } from '../types/pokemon';
 import { DamageResult } from '../types/battle';
 import { getPokemonData, getTypeEffectiveness } from '../utils/dataLoader';
+import { getEffectiveStat } from './statCalculator';
 
 /**
  * Pokémon damage formula (Gen III+):
@@ -22,8 +23,13 @@ export function calculateDamage(
   const defenderData = getPokemonData(defender.dataId);
 
   // Physical vs Special split
-  const atk = move.category === 'physical' ? attacker.stats.attack : attacker.stats.spAtk;
-  const def = move.category === 'physical' ? defender.stats.defense : defender.stats.spDef;
+  const atk = move.category === 'physical'
+    ? getEffectiveStat(attacker, 'attack')
+    : getEffectiveStat(attacker, 'spAtk');
+
+  const def = move.category === 'physical'
+    ? getEffectiveStat(defender, 'defense')
+    : getEffectiveStat(defender, 'spDef');
 
   // Base damage
   const levelFactor = ((2 * attacker.level) / 5 + 2);

@@ -6,6 +6,7 @@ import { MoveSelection } from './MoveSelection';
 import { BattleLog } from './BattleLog';
 import { Button } from '../ui/Button';
 import { getPokemonData, getItemData } from '../../utils/dataLoader';
+import { soundManager } from '../../utils/SoundManager';
 
 export function BattleScreen() {
   const gameStore = useGameStore();
@@ -26,6 +27,7 @@ export function BattleScreen() {
       const newLogs = battle.logs.slice(prevLogsLen.current);
       for (const log of newLogs) {
         if (log.type === 'damage' && log.message.includes('perd')) {
+          soundManager.playDamage();
           // Determine who got hit
           const enemyName = enemy ? (getPokemonData(enemy.dataId).name) : '';
           if (log.message.includes(enemyName)) {
@@ -48,6 +50,15 @@ export function BattleScreen() {
     }
     prevLogsLen.current = battle.logs.length;
   }, [battle.logs.length]);
+
+  // Sound effects for phase changes
+  useEffect(() => {
+    if (battle.phase === 'victory' || battle.phase === 'caught') {
+      soundManager.playVictory();
+    } else if (battle.phase === 'defeat') {
+      soundManager.playFaint();
+    }
+  }, [battle.phase]);
 
   if (!player || !enemy) return null;
 
@@ -351,7 +362,7 @@ export function BattleScreen() {
         <button
           key={item.itemId}
           onClick={() => {
-            if (itemData.effect.type === 'catch') {
+            if (itemData.effect?.type === 'catch') {
               gameStore.removeItem(item.itemId, 1);
               battle.attemptCapture(item.itemId);
               setShowBag(false);

@@ -1,5 +1,6 @@
 import { PokemonData, MoveData } from '../types/pokemon';
-import { RouteData, CityData, GymData, TrainerData, ItemData } from '../types/game';
+import { RouteData, CityData, GymData, TrainerData } from '../types/game';
+import { ItemData } from '../types/inventory';
 import { PokemonType } from '../types/pokemon';
 
 // Import all JSON data statically for Vite bundling
@@ -111,6 +112,10 @@ export function getItemData(id: string): ItemData {
 
 export function getTypeChart(): TypeChart {
   return typeChart;
+}
+
+export function getAllPokemon(): PokemonData[] {
+  return Array.from(pokemonRegistry.values());
 }
 
 export function getAllZones(): Array<RouteData | CityData> {

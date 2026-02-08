@@ -6,9 +6,343 @@
     "badge": "badge-roche",
     "reward": 1386,
     "team": [
-      { "pokemonId": 74, "level": 12, "moves": [33, 106, 88] },
-      { "pokemonId": 95, "level": 14, "moves": [33, 20, 99, 103] }
+      {
+        "pokemonId": 74,
+        "level": 12,
+        "moves": [
+          33,
+          106,
+          88
+        ]
+      },
+      {
+        "pokemonId": 95,
+        "level": 14,
+        "moves": [
+          33,
+          20,
+          99,
+          103
+        ]
+      }
     ],
     "unlockCondition": null
+  },
+  {
+    "id": "cerulean-gym",
+    "city": "Azuria",
+    "leader": "Ondine",
+    "badge": "badge-cascade",
+    "reward": 2079,
+    "team": [
+      {
+        "pokemonId": 120,
+        "level": 18,
+        "moves": [
+          33,
+          55
+        ]
+      },
+      {
+        "pokemonId": 121,
+        "level": 21,
+        "moves": [
+          33,
+          55,
+          105,
+          61
+        ]
+      }
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "vermilion-gym",
+    "city": "Carmin sur Mer",
+    "leader": "Major Bob",
+    "badge": "badge-foudre",
+    "reward": 2376,
+    "team": [
+      {
+        "pokemonId": 100,
+        "level": 21,
+        "moves": [
+          33,
+          103,
+          85
+        ]
+      },
+      {
+        "pokemonId": 25,
+        "level": 18,
+        "moves": [
+          85,
+          45,
+          98
+        ]
+      },
+      {
+        "pokemonId": 26,
+        "level": 24,
+        "moves": [
+          85,
+          45,
+          98,
+          84
+        ]
+      }
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "hm01"
+    }
+  },
+  {
+    "id": "celadon-gym",
+    "city": "Céladopole",
+    "leader": "Erika",
+    "badge": "badge-prisme",
+    "reward": 2871,
+    "team": [
+      {
+        "pokemonId": 70,
+        "level": 29,
+        "moves": [
+          20,
+          77,
+          22
+        ]
+      },
+      {
+        "pokemonId": 114,
+        "level": 24,
+        "moves": [
+          22,
+          20
+        ]
+      },
+      {
+        "pokemonId": 45,
+        "level": 29,
+        "moves": [
+          22,
+          79,
+          74,
+          15
+        ]
+      }
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "hm01"
+    }
+  },
+  {
+    "id": "fuchsia-gym",
+    "city": "Parmanie",
+    "leader": "Koga",
+    "badge": "badge-ame",
+    "reward": 4257,
+    "team": [
+      {
+        "pokemonId": 109,
+        "level": 37,
+        "moves": [
+          33,
+          108,
+          124
+        ]
+      },
+      {
+        "pokemonId": 89,
+        "level": 39,
+        "moves": [
+          124,
+          107,
+          34
+        ]
+      },
+      {
+        "pokemonId": 109,
+        "level": 37,
+        "moves": [
+          33,
+          108,
+          124
+        ]
+      },
+      {
+        "pokemonId": 110,
+        "level": 43,
+        "moves": [
+          124,
+          33,
+          153,
+          147
+        ]
+      }
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "saffron-gym",
+    "city": "Safrania",
+    "leader": "Morgane",
+    "badge": "badge-marais",
+    "reward": 4257,
+    "team": [
+      {
+        "pokemonId": 64,
+        "level": 38,
+        "moves": [
+          93,
+          105,
+          94
+        ]
+      },
+      {
+        "pokemonId": 122,
+        "level": 37,
+        "moves": [
+          93,
+          114,
+          96
+        ]
+      },
+      {
+        "pokemonId": 49,
+        "level": 38,
+        "moves": [
+          93,
+          79,
+          106,
+          94
+        ]
+      },
+      {
+        "pokemonId": 65,
+        "level": 43,
+        "moves": [
+          94,
+          105,
+          114,
+          96
+        ]
+      }
+    ],
+    "unlockCondition": null
+  },
+  {
+    "id": "cinnabar-gym",
+    "city": "Cramois'Ile",
+    "leader": "Auguste",
+    "badge": "badge-volcan",
+    "reward": 4653,
+    "team": [
+      {
+        "pokemonId": 58,
+        "level": 42,
+        "moves": [
+          52,
+          43,
+          36
+        ]
+      },
+      {
+        "pokemonId": 77,
+        "level": 40,
+        "moves": [
+          52,
+          40,
+          83
+        ]
+      },
+      {
+        "pokemonId": 78,
+        "level": 42,
+        "moves": [
+          52,
+          40,
+          83,
+          33
+        ]
+      },
+      {
+        "pokemonId": 59,
+        "level": 47,
+        "moves": [
+          83,
+          36,
+          126,
+          53
+        ]
+      }
+    ],
+    "unlockCondition": {
+      "type": "item",
+      "itemId": "secret-key"
+    }
+  },
+  {
+    "id": "viridian-gym",
+    "city": "Jadielle",
+    "leader": "Giovanni",
+    "badge": "badge-terre",
+    "reward": 4950,
+    "team": [
+      {
+        "pokemonId": 111,
+        "level": 45,
+        "moves": [
+          24,
+          89,
+          23
+        ]
+      },
+      {
+        "pokemonId": 51,
+        "level": 42,
+        "moves": [
+          89,
+          71,
+          10,
+          28
+        ]
+      },
+      {
+        "pokemonId": 31,
+        "level": 44,
+        "moves": [
+          24,
+          71,
+          34,
+          40
+        ]
+      },
+      {
+        "pokemonId": 34,
+        "level": 45,
+        "moves": [
+          24,
+          40,
+          80,
+          23
+        ]
+      },
+      {
+        "pokemonId": 112,
+        "level": 50,
+        "moves": [
+          89,
+          29,
+          90,
+          24
+        ]
+      }
+    ],
+    "unlockCondition": {
+      "type": "gym",
+      "gymId": "cinnabar-gym"
+    }
   }
 ]
