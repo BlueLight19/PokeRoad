@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getItemData } from '../../utils/dataLoader';
+import { getItemData, getPokemonData } from '../../utils/dataLoader';
 import { Button } from './Button';
 
 export function InventoryScreen() {
@@ -18,7 +18,7 @@ export function InventoryScreen() {
         const item = getItemData(itemId);
         if (!item) return;
 
-        const requiresTarget = ['heal', 'status', 'revive', 'evolution'].includes(item.effect?.type || '');
+        const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution'].includes(item.effect?.type || '');
         if (requiresTarget) {
             setSelectedItemId(itemId);
             setTargetMode(true);
@@ -126,7 +126,7 @@ export function InventoryScreen() {
                                 }}
                             >
                                 <div style={{ fontSize: '10px', fontFamily: "'Press Start 2P', monospace" }}>
-                                    {pokemon.nickname || 'Pokemon'} Nv.{pokemon.level}
+                                    {pokemon.nickname || getPokemonData(pokemon.dataId).name} Nv.{pokemon.level}
                                 </div>
                                 <div style={{ flex: 1, height: '4px', background: '#333', borderRadius: '2px' }}>
                                     <div style={{

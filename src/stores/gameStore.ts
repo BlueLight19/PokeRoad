@@ -16,6 +16,7 @@ import {
   getGymData,
   getMoveData,
   getItemData,
+  getAllZones,
 } from '../utils/dataLoader';
 import {
   createPokemonInstance,
@@ -136,7 +137,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     const initialItems: InventoryItem[] = [
-      { itemId: 'pokeball', quantity: 5 },
+      { itemId: 'poke-ball', quantity: 5 },
       { itemId: 'potion', quantity: 3 },
     ];
 
@@ -300,7 +301,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (!itemData) return { success: false, message: "Objet inconnu." };
 
     // If item requires a target
-    const requiresTarget = ['heal', 'status', 'revive', 'evolution'].includes(itemData.effect?.type || '');
+    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution'].includes(itemData.effect?.type || '');
 
     if (requiresTarget) {
       if (!pokemonUid) return { success: false, message: "Utiliser sur qui ?" };
@@ -352,12 +353,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       defeatedTrainers: [...state.progress.defeatedTrainers, trainerId],
     };
 
-    // Check if this unlocks new zones
-    const allZones = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3'];
-    for (const zoneId of allZones) {
+    // Check if this unlocks new zones - iterate ALL zones
+    const allZones = getAllZones();
+    for (const zone of allZones) {
+      const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
       try {
-        const zone = getZoneData(zoneId);
         const condition = (zone as any).unlockCondition;
         if (!condition) {
           if (!newProgress.unlockedZones.includes(zoneId)) {
@@ -389,6 +390,12 @@ export const useGameStore = create<GameState>((set, get) => ({
             newProgress.unlockedZones.push(zoneId);
           }
         }
+
+        if (condition.type === 'badge' && condition.badge) {
+          if (state.player.badges.includes(condition.badge) && !newProgress.unlockedZones.includes(zoneId)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
       } catch {
         // Zone not found, skip
       }
@@ -410,17 +417,44 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ player: newPlayer });
     }
 
-    // Re-check zone unlocks
+    // Re-check zone unlocks for ALL zones
     const newProgress = { ...get().progress };
-    const allZones = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3'];
-    for (const zoneId of allZones) {
+    const allZonesData = getAllZones();
+    for (const zone of allZonesData) {
+      const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
       try {
-        const zone = getZoneData(zoneId);
         const condition = (zone as any).unlockCondition;
-        if (!condition) continue;
-        if (condition.type === 'gym' && condition.gymId === gymId) {
+        if (!condition) {
           newProgress.unlockedZones.push(zoneId);
+          continue;
+        }
+        if (condition.type === 'gym' && condition.gymId) {
+          const condGym = getGymData(condition.gymId);
+          if (get().player.badges.includes(condGym.badge)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'badge' && condition.badge) {
+          if (get().player.badges.includes(condition.badge)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'trainers' && condition.zones) {
+          const allDefeated = condition.zones.every((z: string) => {
+            try {
+              const zoneData = getZoneData(z) as any;
+              const zoneTrainers: string[] = zoneData.trainers || [];
+              return zoneTrainers.every((t: string) =>
+                newProgress.defeatedTrainers.includes(t)
+              );
+            } catch {
+              return true;
+            }
+          });
+          if (allDefeated) {
+            newProgress.unlockedZones.push(zoneId);
+          }
         }
       } catch {
         // Skip

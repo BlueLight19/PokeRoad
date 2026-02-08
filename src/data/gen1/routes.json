@@ -51,7 +51,7 @@
     "region": "kanto",
     "generation": 1,
     "hasShop": true,
-    "gymId": null,
+    "gymId": "viridian-gym",
     "wildEncounters": [],
     "trainers": [],
     "connectedZones": [
@@ -207,7 +207,8 @@
       "route3-hiker1"
     ],
     "connectedZones": [
-      "argenta"
+      "argenta",
+      "mt-moon"
     ],
     "unlockCondition": {
       "type": "gym",
@@ -457,8 +458,8 @@
       "route-6"
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "badge-cascade"
+      "type": "gym",
+      "gymId": "cerulean-gym"
     }
   },
   {
@@ -791,8 +792,8 @@
       "route-5"
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "tea"
+      "type": "gym",
+      "gymId": "vermilion-gym"
     }
   },
   {
@@ -891,8 +892,8 @@
       "route-17"
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "pokeflute"
+      "type": "gym",
+      "gymId": "celadon-gym"
     }
   },
   {
@@ -936,10 +937,7 @@
       "route-16",
       "route-18"
     ],
-    "unlockCondition": {
-      "type": "item",
-      "itemId": "bicycle"
-    }
+    "unlockCondition": null
   },
   {
     "id": "route-18",
@@ -1173,8 +1171,8 @@
       "lavanville"
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "pokeflute"
+      "type": "gym",
+      "gymId": "celadon-gym"
     }
   },
   {
@@ -1436,8 +1434,8 @@
       "victory-road"
     ],
     "unlockCondition": {
-      "type": "item",
-      "itemId": "badge-earth"
+      "type": "gym",
+      "gymId": "viridian-gym"
     }
   },
   {

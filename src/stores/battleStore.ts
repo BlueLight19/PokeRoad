@@ -330,11 +330,6 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         if (state.trainerId?.startsWith('league-')) {
           useGameStore.getState().resetLeagueProgress();
         }
-
-        // League Reset
-        if (state.trainerId?.startsWith('league-')) {
-          useGameStore.getState().resetLeagueProgress();
-        }
       }
     } else {
       newState.phase = 'choosing';
@@ -360,6 +355,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   useItem: (itemId: string, targetIndex?: number) => {
     const state = get();
     const item = getItemData(itemId);
+    if (!item.effect) return;
 
     if (item.effect.type === 'heal') {
       const idx = targetIndex ?? state.activePlayerIndex;
@@ -481,7 +477,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (!enemy) return;
 
     const ball = getItemData(ballId);
-    const multiplier = ball.effect.catchMultiplier ?? 1;
+    const multiplier = ball.effect?.catchMultiplier ?? 1;
 
     const result = attemptCatch(enemy, multiplier);
     const newLogs: BattleLogEntry[] = [];

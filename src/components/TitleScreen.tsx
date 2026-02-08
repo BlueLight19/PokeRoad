@@ -305,7 +305,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        v0.5 - Kanto Core
+        v1.0 - Kanto
       </div>
     </div>
   );

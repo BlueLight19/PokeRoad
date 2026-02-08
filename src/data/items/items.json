@@ -1,266 +1,92 @@
 [
-    {
-        "id": "potion",
-        "name": "Potion",
-        "description": "Rend 20 PV à un Pokémon.",
-        "category": "healing",
-        "effect": {
-            "type": "heal",
-            "amount": 20
-        },
-        "price": 300,
-        "sprite": "potion"
-    },
-    {
-        "id": "super-potion",
-        "name": "Super Potion",
-        "description": "Rend 50 PV à un Pokémon.",
-        "category": "healing",
-        "effect": {
-            "type": "heal",
-            "amount": 50
-        },
-        "price": 700,
-        "sprite": "super-potion"
-    },
-    {
-        "id": "hyper-potion",
-        "name": "Hyper Potion",
-        "description": "Rend 200 PV à un Pokémon.",
-        "category": "healing",
-        "effect": {
-            "type": "heal",
-            "amount": 200
-        },
-        "price": 1200,
-        "sprite": "hyper-potion"
-    },
-    {
-        "id": "max-potion",
-        "name": "Max Potion",
-        "description": "Rend tous ses PV à un Pokémon.",
-        "category": "healing",
-        "effect": {
-            "type": "heal",
-            "amount": 9999
-        },
-        "price": 2500,
-        "sprite": "max-potion"
-    },
-    {
-        "id": "rappel",
-        "name": "Rappel",
-        "description": "Ravive un Pokémon K.O. et lui rend la moitié de ses PV.",
-        "category": "revive",
-        "effect": {
-            "type": "revive",
-            "percent": 50
-        },
-        "price": 1500,
-        "sprite": "revive"
-    },
-    {
-        "id": "rappel-max",
-        "name": "Rappel Max",
-        "description": "Ravive un Pokémon K.O. et lui rend tous ses PV.",
-        "category": "revive",
-        "effect": {
-            "type": "revive",
-            "percent": 100
-        },
-        "price": 4000,
-        "sprite": "max-revive"
-    },
-    {
-        "id": "anti-para",
-        "name": "Anti-Para",
-        "description": "Soigne la paralysie.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "paralysis"
-        },
-        "price": 200,
-        "sprite": "paralyze-heal"
-    },
-    {
-        "id": "antidote",
-        "name": "Antidote",
-        "description": "Soigne le poison.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "poison"
-        },
-        "price": 100,
-        "sprite": "antidote"
-    },
-    {
-        "id": "anti-brule",
-        "name": "Anti-Brûle",
-        "description": "Soigne les brûlures.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "burn"
-        },
-        "price": 250,
-        "sprite": "burn-heal"
-    },
-    {
-        "id": "reveil",
-        "name": "Réveil",
-        "description": "Réveille un Pokémon endormi.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "sleep"
-        },
-        "price": 250,
-        "sprite": "awakening"
-    },
-    {
-        "id": "antigel",
-        "name": "Antigel",
-        "description": "Dégèle un Pokémon.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "freeze"
-        },
-        "price": 250,
-        "sprite": "ice-heal"
-    },
-    {
-        "id": "total-soin",
-        "name": "Total Soin",
-        "description": "Soigne tous les problèmes de statut.",
-        "category": "status",
-        "effect": {
-            "type": "status",
-            "status": "all"
-        },
-        "price": 600,
-        "sprite": "full-heal"
-    },
-    {
-        "id": "pokeball",
-        "name": "Poké Ball",
-        "description": "Permet de capturer des Pokémon sauvages.",
-        "category": "pokeball",
-        "effect": {
-            "type": "capture",
-            "rate": 1
-        },
-        "price": 200,
-        "sprite": "pokeball"
-    },
-    {
-        "id": "superball",
-        "name": "Super Ball",
-        "description": "Plus efficace qu'une Poké Ball.",
-        "category": "pokeball",
-        "effect": {
-            "type": "capture",
-            "rate": 1.5
-        },
-        "price": 600,
-        "sprite": "greatball"
-    },
-    {
-        "id": "hyperball",
-        "name": "Hyper Ball",
-        "description": "Bien plus efficace qu'une Super Ball.",
-        "category": "pokeball",
-        "effect": {
-            "type": "capture",
-            "rate": 2
-        },
-        "price": 1200,
-        "sprite": "ultra-ball"
-    },
-    {
-        "id": "masterball",
-        "name": "Master Ball",
-        "description": "Capture n'importe quel Pokémon à coup sûr.",
-        "category": "pokeball",
-        "effect": {
-            "type": "capture",
-            "rate": 255
-        },
-        "price": 0,
-        "sprite": "master-ball"
-    },
-    {
-        "id": "pierre-feu",
-        "name": "Pierre Feu",
-        "description": "Fait évoluer certains Pokémon de type Feu.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "pierre-feu"
-        },
-        "price": 2100,
-        "sprite": "fire-stone"
-    },
-    {
-        "id": "pierre-eau",
-        "name": "Pierre Eau",
-        "description": "Fait évoluer certains Pokémon de type Eau.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "pierre-eau"
-        },
-        "price": 2100,
-        "sprite": "water-stone"
-    },
-    {
-        "id": "pierre-foudre",
-        "name": "Pierre Foudre",
-        "description": "Fait évoluer certains Pokémon de type Électrik.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "pierre-foudre"
-        },
-        "price": 2100,
-        "sprite": "thunder-stone"
-    },
-    {
-        "id": "pierre-plante",
-        "name": "Pierre Plante",
-        "description": "Fait évoluer certains Pokémon de type Plante.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "pierre-plante"
-        },
-        "price": 2100,
-        "sprite": "leaf-stone"
-    },
-    {
-        "id": "pierre-lune",
-        "name": "Pierre Lune",
-        "description": "Fait évoluer certains Pokémon.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "pierre-lune"
-        },
-        "price": 0,
-        "sprite": "moon-stone"
-    },
-    {
-        "id": "link-cable",
-        "name": "Câble Link",
-        "description": "Simule un échange. Permet de faire évoluer certains Pokémon.",
-        "category": "evolution",
-        "effect": {
-            "type": "evolution",
-            "stone": "link-cable"
-        },
-        "price": 3000,
-        "sprite": "link-cable"
-    }
+  {
+    "id": "master-ball",
+    "name": "Master Ball",
+    "category": "pokeball",
+    "price": 0,
+    "description": "La Ball ultime. Capture à coup sûr.",
+    "effect": { "type": "catch", "catchMultiplier": 255 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "total-soin",
+    "name": "Total Soin",
+    "category": "status_heal",
+    "price": 600,
+    "description": "Soigne tous les problèmes de statut d'un Pokémon.",
+    "effect": { "type": "status_cure", "curesStatus": ["poison", "paralysis", "sleep", "burn", "freeze", "confusion"] },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "rappel-max",
+    "name": "Rappel Max",
+    "category": "revive",
+    "price": 4000,
+    "description": "Ranime un Pokémon K.O. et restaure tous ses PV.",
+    "effect": { "type": "revive", "reviveHpPercent": 100 },
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "pierre-feu",
+    "name": "Pierre Feu",
+    "category": "evolution",
+    "price": 2100,
+    "description": "Fait évoluer certains Pokémon de type Feu.",
+    "effect": { "type": "evolution", "stone": "pierre-feu" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pierre-eau",
+    "name": "Pierre Eau",
+    "category": "evolution",
+    "price": 2100,
+    "description": "Fait évoluer certains Pokémon de type Eau.",
+    "effect": { "type": "evolution", "stone": "pierre-eau" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pierre-foudre",
+    "name": "Pierre Foudre",
+    "category": "evolution",
+    "price": 2100,
+    "description": "Fait évoluer certains Pokémon de type Électrik.",
+    "effect": { "type": "evolution", "stone": "pierre-foudre" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pierre-plante",
+    "name": "Pierre Plante",
+    "category": "evolution",
+    "price": 2100,
+    "description": "Fait évoluer certains Pokémon de type Plante.",
+    "effect": { "type": "evolution", "stone": "pierre-plante" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pierre-lune",
+    "name": "Pierre Lune",
+    "category": "evolution",
+    "price": 3000,
+    "description": "Fait évoluer certains Pokémon liés à la Lune.",
+    "effect": { "type": "evolution", "stone": "pierre-lune" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "link-cable",
+    "name": "Câble Link",
+    "category": "evolution",
+    "price": 3000,
+    "description": "Simule un échange. Fait évoluer certains Pokémon.",
+    "effect": { "type": "evolution", "stone": "link-cable" },
+    "usableInBattle": false,
+    "usableOutside": true
+  }
 ]

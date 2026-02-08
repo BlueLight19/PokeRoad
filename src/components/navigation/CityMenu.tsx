@@ -1,30 +1,79 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
-import { getZoneData, getGymData } from '../../utils/dataLoader';
+import { getZoneData, getGymData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 
 export function CityMenu() {
-  const { selectedZone, team, player, setView } = useGameStore();
+  const { selectedZone, team, player, progress, setView } = useGameStore();
   const { startGymBattle } = useBattleStore();
+  const [healMessage, setHealMessage] = useState('');
 
   if (!selectedZone) return null;
 
   const zone = getZoneData(selectedZone) as any;
   const hasShop = zone.hasShop;
   const gymId = zone.gymId;
+  const trainers: string[] = zone.trainers || [];
 
-  let gym = null;
+  let gym: any = null;
   let gymDefeated = false;
+  let gymLocked = false;
+  let gymLockReason = '';
   if (gymId) {
-    gym = getGymData(gymId);
-    gymDefeated = player.badges.includes(gym.badge);
+    try {
+      gym = getGymData(gymId);
+      gymDefeated = player.badges.includes(gym.badge);
+
+      // Check gym unlock condition
+      const condition = gym.unlockCondition;
+      if (condition && !gymDefeated) {
+        if (condition.type === 'gym' && condition.gymId) {
+          const reqGym = getGymData(condition.gymId);
+          if (!player.badges.includes(reqGym.badge)) {
+            gymLocked = true;
+            gymLockReason = `Battez ${reqGym.leader} d'abord`;
+          }
+        }
+        if (condition.type === 'trainers' && condition.zones) {
+          const allDefeated = condition.zones.every((z: string) => {
+            try {
+              const zoneData = getZoneData(z) as any;
+              const zoneTrainers: string[] = zoneData.trainers || [];
+              return zoneTrainers.every((t: string) =>
+                progress.defeatedTrainers.includes(t)
+              );
+            } catch {
+              return true;
+            }
+          });
+          if (!allDefeated) {
+            gymLocked = true;
+            gymLockReason = 'Explorez les zones environnantes';
+          }
+        }
+        if (condition.type === 'badge' && condition.badge) {
+          if (!player.badges.includes(condition.badge)) {
+            gymLocked = true;
+            gymLockReason = 'Badge requis manquant';
+          }
+        }
+      }
+    } catch {
+      gym = null;
+    }
   }
 
   const handleGymBattle = () => {
-    if (!gym || gymDefeated) return;
+    if (!gym || gymDefeated || gymLocked) return;
     startGymBattle(gym, team);
     setView('battle');
+  };
+
+  const handleHeal = () => {
+    useGameStore.getState().healTeam();
+    setHealMessage('Votre equipe est soignee !');
+    setTimeout(() => setHealMessage(''), 2000);
   };
 
   return (
@@ -87,27 +136,27 @@ export function CityMenu() {
         {gym && (
           <button
             onClick={handleGymBattle}
-            disabled={gymDefeated}
+            disabled={gymDefeated || gymLocked}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
               padding: '14px 16px',
-              background: gymDefeated ? '#1a1a1a' : '#2e1a1a',
-              border: gymDefeated ? '2px solid #333' : '2px solid #e94560',
+              background: gymDefeated ? '#1a1a1a' : gymLocked ? '#1a1a1a' : '#2e1a1a',
+              border: gymDefeated ? '2px solid #333' : gymLocked ? '2px solid #555' : '2px solid #e94560',
               borderRadius: '8px',
-              cursor: gymDefeated ? 'default' : 'pointer',
-              opacity: gymDefeated ? 0.6 : 1,
+              cursor: gymDefeated || gymLocked ? 'default' : 'pointer',
+              opacity: gymDefeated ? 0.6 : gymLocked ? 0.5 : 1,
               textAlign: 'left',
             }}
           >
             <span style={{ fontSize: '20px' }}>
-              {gymDefeated ? '★' : '!'}
+              {gymDefeated ? '\u2605' : gymLocked ? '\u{1F512}' : '!'}
             </span>
             <div>
               <div
                 style={{
-                  color: gymDefeated ? '#FFD600' : '#e94560',
+                  color: gymDefeated ? '#FFD600' : gymLocked ? '#888' : '#e94560',
                   fontSize: '11px',
                   fontFamily: "'Press Start 2P', monospace",
                 }}
@@ -122,17 +171,76 @@ export function CityMenu() {
                   marginTop: '4px',
                 }}
               >
-                {gymDefeated ? 'Badge obtenu !' : `${gym.team.length} Pokemon`}
+                {gymDefeated ? 'Badge obtenu !' : gymLocked ? gymLockReason : `${gym.team.length} Pokemon`}
               </div>
             </div>
           </button>
         )}
 
+        {/* Zone trainers (for cities with trainers like Rival battles) */}
+        {trainers.length > 0 && trainers.map(trainerId => {
+          const defeated = progress.defeatedTrainers.includes(trainerId);
+          let trainer;
+          try {
+            trainer = getTrainerData(trainerId);
+          } catch {
+            return null;
+          }
+          if (!trainer) return null;
+
+          return (
+            <button
+              key={trainerId}
+              onClick={() => {
+                if (defeated) return;
+                const { startTrainerBattle } = useBattleStore.getState();
+                startTrainerBattle(trainer, team);
+                setView('battle');
+              }}
+              disabled={defeated}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: defeated ? '#1a1a1a' : '#1a1a2e',
+                border: defeated ? '2px solid #333' : '2px solid #e94560',
+                borderRadius: '8px',
+                cursor: defeated ? 'default' : 'pointer',
+                opacity: defeated ? 0.5 : 1,
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>{defeated ? 'x' : '!'}</span>
+              <div>
+                <div
+                  style={{
+                    color: defeated ? '#666' : '#e94560',
+                    fontSize: '11px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    textDecoration: defeated ? 'line-through' : 'none',
+                  }}
+                >
+                  {trainer.trainerClass} {trainer.name}
+                </div>
+                <div
+                  style={{
+                    color: '#888',
+                    fontSize: '8px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    marginTop: '4px',
+                  }}
+                >
+                  {defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
         {/* Heal */}
         <button
-          onClick={() => {
-            useGameStore.getState().healTeam();
-          }}
+          onClick={handleHeal}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -158,13 +266,13 @@ export function CityMenu() {
             </div>
             <div
               style={{
-                color: '#888',
+                color: healMessage ? '#4CAF50' : '#888',
                 fontSize: '8px',
                 fontFamily: "'Press Start 2P', monospace",
                 marginTop: '4px',
               }}
             >
-              Soigner votre equipe
+              {healMessage || 'Soigner votre equipe'}
             </div>
           </div>
         </button>
