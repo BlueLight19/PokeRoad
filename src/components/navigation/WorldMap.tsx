@@ -6,7 +6,7 @@ export function WorldMap() {
   const { player, progress, selectZone, setView, team } = useGameStore();
 
   const zones = getAllZones();
-  const zoneOrder = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3'];
+  const zoneOrder = ['bourg-palette', 'route-1', 'jadielle', 'route-2', 'foret-jade', 'argenta', 'route-3', 'league-hall'];
   const orderedZones = zoneOrder.map(id => zones.find(z => z.id === id)).filter(Boolean);
 
   return (
@@ -115,6 +115,12 @@ export function WorldMap() {
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setView('pc')}>
             PC
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setView('inventory')}>
+            Sac
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setView('pokedex')}>
+            Pokedex
           </Button>
         </div>
 

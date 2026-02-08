@@ -9,6 +9,9 @@ import { BattleScreen } from './components/battle/BattleScreen';
 import { TeamView } from './components/team/TeamView';
 import { PCStorage } from './components/team/PCStorage';
 import { ShopMenu } from './components/shop/ShopMenu';
+import { InventoryScreen } from './components/ui/InventoryScreen';
+import { PokedexScreen } from './components/ui/PokedexScreen';
+import { LeagueMenu } from './components/ui/LeagueMenu';
 import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 
 // Initialize game data on load
@@ -37,6 +40,12 @@ function App() {
         return <PCStorage />;
       case 'shop':
         return <ShopMenu />;
+      case 'inventory':
+        return <InventoryScreen />;
+      case 'pokedex':
+        return <PokedexScreen />;
+      case 'league':
+        return <LeagueMenu />;
       default:
         return <TitleScreen />;
     }

@@ -73,16 +73,19 @@ export function TeamView() {
         {/* Stats */}
         <div style={{ marginTop: '16px' }}>
           <h4 style={{ color: '#e94560', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
-            Statistiques
+            Statistiques (IV / EV)
           </h4>
           {(['hp', 'attack', 'defense', 'spAtk', 'spDef', 'speed'] as const).map(stat => (
             <div key={stat} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
               <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
                 {statNames[stat]}
               </span>
-              <span style={{ color: '#fff', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
-                {pokemon.stats[stat]}
-              </span>
+              <div style={{ display: 'flex', gap: '8px', color: '#fff', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+                <span>{pokemon.stats[stat]}</span>
+                <span style={{ color: '#666', fontSize: '7px' }}>
+                  ({pokemon.ivs[stat]} / {pokemon.evs[stat]})
+                </span>
+              </div>
             </div>
           ))}
         </div>

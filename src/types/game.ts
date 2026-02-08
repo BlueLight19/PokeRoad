@@ -1,4 +1,6 @@
 import { PokemonInstance } from './pokemon';
+import { PCStorage } from '../engine/pcStorage';
+import { InventoryItem } from './inventory';
 
 // ===== World / Navigation =====
 
@@ -70,35 +72,6 @@ export interface UnlockCondition {
   zones?: string[];
 }
 
-// ===== Items =====
-
-export interface ItemData {
-  id: string;
-  name: string;
-  category: 'pokeball' | 'potion' | 'status_heal' | 'revive' | 'evolution_stone' | 'misc';
-  price: number;
-  description: string;
-  effect: ItemEffect;
-  usableInBattle: boolean;
-  usableOutside: boolean;
-}
-
-export interface ItemEffect {
-  type: 'heal' | 'catch' | 'status_cure' | 'revive' | 'evolve' | 'pp_restore';
-  healAmount?: number;
-  healFull?: boolean;
-  catchMultiplier?: number;
-  curesStatus?: string[];
-  reviveHpPercent?: number;
-  stone?: string;
-  ppAmount?: number;
-}
-
-export interface InventoryItem {
-  itemId: string;
-  quantity: number;
-}
-
 // ===== Save Data =====
 
 export interface SaveData {
@@ -106,7 +79,7 @@ export interface SaveData {
   timestamp: number;
   player: PlayerData;
   team: PokemonInstance[];
-  pc: PokemonInstance[];
+  pc: PCStorage;
   inventory: InventoryItem[];
   progress: ProgressData;
 }
@@ -125,6 +98,7 @@ export interface ProgressData {
   currentZone: string;
   caughtPokemon: number[];
   seenPokemon: number[];
+  leagueProgress: number; // 0=None, 1=Lorelei, 2=Bruno, 3=Agatha, 4=Lance, 5=Champion
 }
 
 // ===== Game View =====
@@ -139,8 +113,11 @@ export type GameView =
   | 'team'
   | 'pc'
   | 'shop'
+  | 'inventory'
+  | 'pokedex'
   | 'summary'
-  | 'move_learn';
+  | 'move_learn'
+  | 'league';
 
 export interface GameContext {
   currentView: GameView;

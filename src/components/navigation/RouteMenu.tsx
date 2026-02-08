@@ -90,6 +90,55 @@ export function RouteMenu() {
           </button>
         )}
 
+        {/* Special Encounters (Legendaries/Snorlax) */}
+        {(() => {
+          const specialEncounters: Record<string, { id: string, name: string, description: string, pokemonId: number, level: number }> = {
+            'victory-road': { id: 'legendary-moltres', name: 'Oiseau de Feu', description: 'Une créature légendaire brûle dans l\'ombre.', pokemonId: 146, level: 50 },
+            'power-plant': { id: 'legendary-zapdos', name: 'Oiseau de Foudre', description: 'L\'air crépite d\'électricité...', pokemonId: 145, level: 50 },
+            'seafoam-islands': { id: 'legendary-articuno', name: 'Oiseau de Glace', description: 'Un froid surnaturel émane du fond.', pokemonId: 144, level: 50 },
+            'cerulean-cave': { id: 'legendary-mewtwo', name: '???', description: 'Une pression psychique écrasante...', pokemonId: 150, level: 70 },
+            'route-12': { id: 'snorlax-12', name: 'Ronflex', description: 'Un gros Pokémon bloque le chemin.', pokemonId: 143, level: 30 },
+            'route-16': { id: 'snorlax-16', name: 'Ronflex', description: 'Un gros Pokémon dort paisiblement.', pokemonId: 143, level: 30 },
+          };
+
+          const encounter = specialEncounters[selectedZone];
+          if (!encounter) return null;
+
+          // Check if already defeated
+          if (isTrainerDefeated(encounter.id)) return null;
+
+          return (
+            <button
+              onClick={() => {
+                startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
+                setView('battle');
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                border: '2px solid #FFD700',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>★</span>
+              <div>
+                <div style={{ color: '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+                  {encounter.name}
+                </div>
+                <div style={{ color: '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                  {encounter.description}
+                </div>
+              </div>
+            </button>
+          );
+        })()}
+
         {/* Trainers */}
         {trainerIds.map(trainerId => {
           const trainer = getTrainerData(trainerId);
@@ -147,6 +196,6 @@ export function RouteMenu() {
           </Button>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

@@ -16,6 +16,7 @@ import { attemptCatch } from '../engine/catchCalculator';
 import { createPokemonInstance } from '../engine/experienceCalculator';
 import { getMoveData, getPokemonData, getItemData } from '../utils/dataLoader';
 import { WildEncounter, TrainerData, GymData } from '../types/game';
+import { useGameStore } from './gameStore';
 
 export interface BattleStore {
   // State
@@ -38,9 +39,10 @@ export interface BattleStore {
   xpGained: { pokemonIndex: number; defeatedId: number; defeatedLevel: number }[];
   caughtPokemon: PokemonInstance | null;
   moneyGained: number;
+  encounterId?: string; // For one-time encounters
 
   // Actions
-  startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[]) => void;
+  startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[], encounterId?: string) => void;
   startTrainerBattle: (trainer: TrainerData, playerTeam: PokemonInstance[]) => void;
   startGymBattle: (gym: GymData, playerTeam: PokemonInstance[]) => void;
 
@@ -75,7 +77,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   caughtPokemon: null,
   moneyGained: 0,
 
-  startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[]) => {
+  startWildBattle: (encounters: WildEncounter[], playerTeam: PokemonInstance[], encounterId?: string) => {
     // Pick random encounter based on rates
     const totalRate = encounters.reduce((sum, e) => sum + e.rate, 0);
     let roll = Math.random() * totalRate;
@@ -119,6 +121,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       xpGained: [],
       caughtPokemon: null,
       moneyGained: 0,
+      encounterId
     });
   },
 
@@ -276,6 +279,12 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       } else {
         // Victory!
         newState.phase = 'victory';
+
+        // League Progression
+        if (state.trainerId?.startsWith('league-')) {
+          useGameStore.getState().advanceLeagueProgress();
+        }
+
         newState.xpGained = [...state.xpGained, xpEntry];
         newState.moneyGained = state.trainerReward;
         newState.logs = [
@@ -316,6 +325,16 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           ...allLogs,
           { message: 'Tous vos Pokémon sont K.O...', type: 'info' },
         ];
+
+        // League Reset
+        if (state.trainerId?.startsWith('league-')) {
+          useGameStore.getState().resetLeagueProgress();
+        }
+
+        // League Reset
+        if (state.trainerId?.startsWith('league-')) {
+          useGameStore.getState().resetLeagueProgress();
+        }
       }
     } else {
       newState.phase = 'choosing';
@@ -482,6 +501,10 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         logs: [...state.logs, ...newLogs],
         caughtPokemon: enemy,
       });
+
+      if (state.encounterId) {
+        useGameStore.getState().markTrainerDefeated(state.encounterId);
+      }
     } else {
       // Enemy attacks after failed capture
       const player = state.playerTeam[state.activePlayerIndex];

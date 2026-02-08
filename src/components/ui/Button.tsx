@@ -1,4 +1,5 @@
 import React from 'react';
+import { soundManager } from '../../utils/SoundManager';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -59,6 +60,10 @@ export function Button({
       style={{ ...baseStyle, ...variantStyles[variant] }}
       disabled={disabled}
       {...props}
+      onClick={(e) => {
+        if (!disabled) soundManager.playClick();
+        props.onClick?.(e);
+      }}
     >
       {children}
     </button>
