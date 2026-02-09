@@ -79,7 +79,7 @@ export function applyEvGains(pokemon: PokemonInstance, defeatedId: number): Base
   const evYield = defeated.evYield;
   const newEvs = { ...pokemon.evs };
 
-  const currentTotal = Object.values(newEvs).reduce((sum, v) => sum + v, 0);
+  let currentTotal = Object.values(newEvs).reduce((sum, v) => sum + v, 0);
   const MAX_TOTAL = 510;
   const MAX_PER_STAT = 255;
 
@@ -87,7 +87,9 @@ export function applyEvGains(pokemon: PokemonInstance, defeatedId: number): Base
     if (gain === undefined) continue;
     const key = stat as keyof BaseStats;
     const remaining = Math.min(MAX_TOTAL - currentTotal, MAX_PER_STAT - newEvs[key]);
-    newEvs[key] += Math.min(gain, remaining);
+    const actualGain = Math.min(gain, remaining);
+    newEvs[key] += actualGain;
+    currentTotal += actualGain;
   }
 
   return newEvs;

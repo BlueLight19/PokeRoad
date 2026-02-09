@@ -81,24 +81,6 @@ export interface MoveEffect {
 
 // ===== Instance (in-game Pokémon) =====
 
-export interface PokemonInstance {
-  uid: string;
-  dataId: number;
-  nickname: string | null;
-  level: number;
-  currentHp: number;
-  maxHp: number;
-  stats: BaseStats;
-  ivs: BaseStats;
-  evs: BaseStats;
-  moves: MoveInstance[];
-  status: StatusCondition;
-  statusTurns: number;
-  xp: number;
-  xpToNextLevel: number;
-  friendship: number;
-}
-
 export interface VolatileStatus {
   confusion: number; // 0 = not confused, >0 = turns remaining
   flinch: boolean;
@@ -116,6 +98,7 @@ export interface PokemonInstance {
   maxHp: number;
   stats: BaseStats;
   ivs: BaseStats;
+  evs: BaseStats;
   moves: MoveInstance[];
   status: StatusCondition;
   statusTurns: number;

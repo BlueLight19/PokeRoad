@@ -65,6 +65,19 @@ export interface BattleStore {
   getActiveEnemy: () => PokemonInstance | null;
 }
 
+/** Deep copy a PokemonInstance so battle mutations don't leak to game store */
+function deepCopyPokemon(p: PokemonInstance): PokemonInstance {
+  return {
+    ...p,
+    moves: p.moves.map(m => ({ ...m })),
+    volatile: { ...p.volatile },
+    statStages: { ...p.statStages },
+    stats: { ...p.stats },
+    ivs: { ...p.ivs },
+    evs: { ...p.evs },
+  };
+}
+
 export const useBattleStore = create<BattleStore>((set, get) => ({
   active: false,
   type: 'wild',
@@ -120,7 +133,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       active: true,
       type: isSafari ? 'safari' : 'wild',
       phase: 'choosing',
-      playerTeam: playerTeam.map(p => ({ ...p })),
+      playerTeam: playerTeam.map(deepCopyPokemon),
       activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
       enemyTeam: [wildPokemon],
       activeEnemyIndex: 0,
@@ -156,7 +169,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       active: true,
       type: 'trainer',
       phase: 'choosing',
-      playerTeam: playerTeam.map(p => ({ ...p })),
+      playerTeam: playerTeam.map(deepCopyPokemon),
       activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
       enemyTeam,
       activeEnemyIndex: 0,
@@ -189,7 +202,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       active: true,
       type: 'gym',
       phase: 'choosing',
-      playerTeam: playerTeam.map(p => ({ ...p })),
+      playerTeam: playerTeam.map(deepCopyPokemon),
       activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
       enemyTeam,
       activeEnemyIndex: 0,
@@ -366,11 +379,35 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (!target || target.currentHp <= 0) return;
 
     const targetName = target.nickname || getPokemonData(target.dataId).name;
+    const newLogs: BattleLogEntry[] = [{ message: `Go ! ${targetName} !`, type: 'info' }];
+
+    // Reset volatile status for the switched-in Pokemon
+    target.volatile = { confusion: 0, flinch: false, leechSeed: false, bound: 0 };
+    target.statStages = { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 };
+
+    // Enemy gets a free attack when switching (except during forced switch after fainting)
+    if (state.phase !== 'switching') {
+      const enemy = state.enemyTeam[state.activeEnemyIndex];
+      if (enemy && enemy.currentHp > 0) {
+        const enemyMoveIdx = chooseEnemyMove(enemy);
+        const enemyMove = enemy.moves[enemyMoveIdx];
+        if (enemyMove) {
+          const blocked = checkStatusBlock(enemy);
+          newLogs.push(...blocked.logs);
+          if (!blocked.blocked) {
+            const result = executeMove(enemy, target, enemyMove);
+            newLogs.push(...result.logs);
+          }
+          newLogs.push(...applyStatusDamage(enemy));
+        }
+      }
+    }
 
     set({
       activePlayerIndex: teamIndex,
       phase: 'choosing',
-      logs: [...state.logs, { message: `Go ! ${targetName} !`, type: 'info' }],
+      logs: [...state.logs, ...newLogs],
+      turnNumber: state.phase !== 'switching' ? state.turnNumber + 1 : state.turnNumber,
     });
   },
 
@@ -408,6 +445,27 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
               const player = state.playerTeam[state.activePlayerIndex];
               const result = executeMove(enemy, player, enemyMove);
               newLogs.push(...result.logs);
+
+              // Check if player fainted after enemy attack
+              if (player.currentHp <= 0) {
+                const nextPlayer = state.playerTeam.findIndex(
+                  (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+                );
+                if (nextPlayer < 0) {
+                  set({
+                    phase: 'defeat',
+                    logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+                  });
+                  return;
+                } else {
+                  set({
+                    phase: 'switching',
+                    logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                    turnNumber: state.turnNumber + 1,
+                  });
+                  return;
+                }
+              }
             }
             set({ logs: [...get().logs, ...newLogs] });
           }
@@ -449,8 +507,17 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
   attemptFlee: () => {
     const state = get();
-    if (state.type !== 'wild') {
+    if (state.type !== 'wild' && state.type !== 'safari') {
       set({ logs: [...state.logs, { message: 'Impossible de fuir un combat de dresseur !', type: 'info' }] });
+      return;
+    }
+
+    // Safari flee always succeeds (player runs away)
+    if (state.type === 'safari') {
+      set({
+        phase: 'fled',
+        logs: [...state.logs, { message: 'Vous avez pris la fuite !', type: 'info' }],
+      });
       return;
     }
 
@@ -478,6 +545,27 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         if (!blocked.blocked) {
           const result = executeMove(enemy, player, enemyMove);
           newLogs.push(...result.logs);
+
+          // Check if player fainted
+          if (player.currentHp <= 0) {
+            const nextPlayer = state.playerTeam.findIndex(
+              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+            );
+            if (nextPlayer < 0) {
+              set({
+                phase: 'defeat',
+                logs: [...state.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              });
+              return;
+            } else {
+              set({
+                phase: 'switching',
+                logs: [...state.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                turnNumber: state.turnNumber + 1,
+              });
+              return;
+            }
+          }
         }
       }
 
@@ -544,6 +632,13 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                 set({
                   phase: 'defeat',
                   logs: [...state.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+                });
+                return;
+              } else {
+                set({
+                  phase: 'switching',
+                  logs: [...state.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                  turnNumber: state.turnNumber + 1,
                 });
                 return;
               }

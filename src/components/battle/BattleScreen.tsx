@@ -64,7 +64,27 @@ export function BattleScreen() {
   if (!player || !enemy) return null;
 
   const handleEndBattle = (restart: boolean = false) => {
-    // Apply XP gains
+    // Capture - add caught Pokemon first
+    if (battle.caughtPokemon) {
+      gameStore.addPokemonToTeam(battle.caughtPokemon);
+    }
+
+    // Sync team HP/status/PP back from battle BEFORE XP processing
+    // (XP processing may add new moves from level-up, so sync must come first)
+    const freshState = useGameStore.getState();
+    const syncedTeam = [...freshState.team];
+    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
+      syncedTeam[i] = {
+        ...syncedTeam[i],
+        currentHp: battle.playerTeam[i].currentHp,
+        status: battle.playerTeam[i].status,
+        statusTurns: battle.playerTeam[i].statusTurns,
+      };
+      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
+    }
+    useGameStore.setState({ team: syncedTeam });
+
+    // Apply XP gains (may trigger level-up, move learning, evolution)
     for (const xp of battle.xpGained) {
       gameStore.grantXpAndProcess(xp.pokemonIndex, xp.defeatedId, xp.defeatedLevel, battle.type !== 'wild');
     }
@@ -83,25 +103,6 @@ export function BattleScreen() {
     if (battle.isGym && battle.gymId) {
       gameStore.markGymDefeated(battle.gymId);
     }
-
-    // Capture - add caught Pokemon BEFORE syncing team
-    if (battle.caughtPokemon) {
-      gameStore.addPokemonToTeam(battle.caughtPokemon);
-    }
-
-    // Sync team HP back - use getState() to get fresh state after capture
-    const freshState = useGameStore.getState();
-    const syncedTeam = [...freshState.team];
-    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
-      syncedTeam[i] = {
-        ...syncedTeam[i],
-        currentHp: battle.playerTeam[i].currentHp,
-        status: battle.playerTeam[i].status,
-        statusTurns: battle.playerTeam[i].statusTurns,
-      };
-      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
-    }
-    useGameStore.setState({ team: syncedTeam });
 
     // Auto-heal after battle
     useGameStore.getState().healTeam();
