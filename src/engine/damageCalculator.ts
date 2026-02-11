@@ -55,10 +55,7 @@ export function calculateDamage(
   const randomFactor = 0.85 + Math.random() * 0.15;
   baseDamage = Math.floor(baseDamage * randomFactor);
 
-  // Burn halves physical attack damage
-  if (attacker.status === 'burn' && move.category === 'physical') {
-    baseDamage = Math.floor(baseDamage * 0.5);
-  }
+  // Burn penalty is already applied in getEffectiveStat for attack
 
   // Minimum 1 damage for damaging moves
   if (baseDamage < 1) baseDamage = 1;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { getPokemonData, getMoveData } from '../../utils/dataLoader';
+import { xpForLevel } from '../../engine/experienceCalculator';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { Button } from '../ui/Button';
@@ -57,17 +58,28 @@ export function TeamView() {
 
         {/* XP bar */}
         <div style={{ marginTop: '8px' }}>
-          <div style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginBottom: '4px' }}>
-            XP: {pokemon.xp} / {pokemon.xpToNextLevel}
-          </div>
-          <div style={{ height: '6px', background: '#333', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{
-              width: `${Math.min(100, (pokemon.xp / pokemon.xpToNextLevel) * 100)}%`,
-              height: '100%',
-              background: '#2196F3',
-              borderRadius: '3px',
-            }} />
-          </div>
+          {(() => {
+            const pokData = getPokemonData(pokemon.dataId);
+            const currentLevelXp = xpForLevel(pokemon.level, pokData.expGroup);
+            const xpProgress = pokemon.xp - currentLevelXp;
+            const xpNeeded = pokemon.xpToNextLevel - currentLevelXp;
+            const xpPercent = xpNeeded > 0 ? Math.min(100, (xpProgress / xpNeeded) * 100) : 100;
+            return (
+              <>
+                <div style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginBottom: '4px' }}>
+                  XP: {xpProgress} / {xpNeeded}
+                </div>
+                <div style={{ height: '6px', background: '#333', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${xpPercent}%`,
+                    height: '100%',
+                    background: '#2196F3',
+                    borderRadius: '3px',
+                  }} />
+                </div>
+              </>
+            );
+          })()}
         </div>
 
         {/* Stats */}

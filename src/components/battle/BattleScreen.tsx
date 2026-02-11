@@ -64,7 +64,27 @@ export function BattleScreen() {
   if (!player || !enemy) return null;
 
   const handleEndBattle = (restart: boolean = false) => {
-    // Apply XP gains
+    // Capture - add caught Pokemon first
+    if (battle.caughtPokemon) {
+      gameStore.addPokemonToTeam(battle.caughtPokemon);
+    }
+
+    // Sync team HP/status/PP back from battle BEFORE XP processing
+    // (XP processing may add new moves from level-up, so sync must come first)
+    const freshState = useGameStore.getState();
+    const syncedTeam = [...freshState.team];
+    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
+      syncedTeam[i] = {
+        ...syncedTeam[i],
+        currentHp: battle.playerTeam[i].currentHp,
+        status: battle.playerTeam[i].status,
+        statusTurns: battle.playerTeam[i].statusTurns,
+      };
+      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
+    }
+    useGameStore.setState({ team: syncedTeam });
+
+    // Apply XP gains (may trigger level-up, move learning, evolution)
     for (const xp of battle.xpGained) {
       gameStore.grantXpAndProcess(xp.pokemonIndex, xp.defeatedId, xp.defeatedLevel, battle.type !== 'wild');
     }
@@ -84,28 +104,6 @@ export function BattleScreen() {
       gameStore.markGymDefeated(battle.gymId);
     }
 
-    // Capture - add caught Pokemon BEFORE syncing team
-    if (battle.caughtPokemon) {
-      gameStore.addPokemonToTeam(battle.caughtPokemon);
-    }
-
-    // Sync team HP back - use getState() to get fresh state after capture
-    const freshState = useGameStore.getState();
-    const syncedTeam = [...freshState.team];
-    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
-      syncedTeam[i] = {
-        ...syncedTeam[i],
-        currentHp: battle.playerTeam[i].currentHp,
-        status: battle.playerTeam[i].status,
-        statusTurns: battle.playerTeam[i].statusTurns,
-      };
-      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
-    }
-    useGameStore.setState({ team: syncedTeam });
-
-    // Auto-heal after battle
-    useGameStore.getState().healTeam();
-
     battle.clearBattle();
 
     if (restart && gameStore.selectedZone) {
@@ -122,9 +120,28 @@ export function BattleScreen() {
   };
 
   const handleDefeat = () => {
-    gameStore.healTeam();
+    const state = useGameStore.getState();
+    // Lose 25% money
+    const moneyLost = Math.floor(state.player.money * 0.25);
+    if (moneyLost > 0) {
+      useGameStore.setState({
+        player: { ...state.player, money: state.player.money - moneyLost },
+      });
+    }
+    // Reset league progress if in league
+    if (state.progress.leagueProgress > 0) {
+      useGameStore.getState().resetLeagueProgress();
+    }
+    // Heal team
+    useGameStore.getState().healTeam();
+    // Warp to last Pokemon Center
+    const center = state.progress.lastPokemonCenter || 'bourg-palette';
+    useGameStore.setState({
+      progress: { ...useGameStore.getState().progress, currentZone: center },
+    });
     battle.clearBattle();
-    gameStore.setView('world_map');
+    useGameStore.getState().selectZone(center);
+    useGameStore.getState().saveGameState();
   };
 
   // ====== VICTORY / CAUGHT SCREEN ======
@@ -206,6 +223,14 @@ export function BattleScreen() {
 
   // ====== DEFEAT SCREEN ======
   if (battle.phase === 'defeat') {
+    const moneyLost = Math.floor(gameStore.player.money * 0.25);
+    const centerZone = gameStore.progress.lastPokemonCenter || 'bourg-palette';
+    let centerName = centerZone;
+    try {
+      const zd = getZoneData(centerZone) as any;
+      centerName = zd.name || centerZone;
+    } catch {}
+
     return (
       <div className="battle-container" style={containerStyle}>
         <div className="battle-frame" style={frameStyle}>
@@ -221,16 +246,21 @@ export function BattleScreen() {
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               marginBottom: '16px',
             }}>
-              Defaite...
+              Blackout !
             </div>
+            {moneyLost > 0 && (
+              <div style={{ color: '#e94560', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+                -{moneyLost} P perdus
+              </div>
+            )}
             <div style={{ color: '#888', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '20px' }}>
-              Vos Pokemon sont soignes
+              Retour a {centerName}...
             </div>
           </div>
           <BattleLog logs={battle.logs} />
           <div style={{ marginTop: '16px', textAlign: 'center' }}>
             <Button variant="danger" onClick={handleDefeat}>
-              Retour
+              Continuer
             </Button>
           </div>
         </div>

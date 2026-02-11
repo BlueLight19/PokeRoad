@@ -1,6 +1,7 @@
 import { PokemonInstance, MoveData, StatusCondition, MoveInstance } from '../types/pokemon';
 import { BattleLogEntry, BattleAction } from '../types/battle';
 import { calculateDamage, } from './damageCalculator';
+import { getEffectiveStat } from './statCalculator';
 import { getMoveData, getPokemonData } from '../utils/dataLoader';
 
 /**
@@ -367,12 +368,9 @@ export function determineOrder(
     return playerMove.priority > enemyMove.priority ? 'player' : 'enemy';
   }
 
-  // Speed check (paralysis halves speed)
-  let playerSpeed = playerPokemon.stats.speed;
-  let enemySpeed = enemyPokemon.stats.speed;
-
-  if (playerPokemon.status === 'paralysis') playerSpeed = Math.floor(playerSpeed / 4);
-  if (enemyPokemon.status === 'paralysis') enemySpeed = Math.floor(enemySpeed / 4);
+  // Speed check (accounts for stat stages and paralysis)
+  const playerSpeed = getEffectiveStat(playerPokemon, 'speed');
+  const enemySpeed = getEffectiveStat(enemyPokemon, 'speed');
 
   if (playerSpeed !== enemySpeed) {
     return playerSpeed > enemySpeed ? 'player' : 'enemy';
@@ -405,6 +403,8 @@ export function fullHealTeam(team: PokemonInstance[]): void {
     pokemon.currentHp = pokemon.maxHp;
     pokemon.status = null;
     pokemon.statusTurns = 0;
+    pokemon.volatile = { confusion: 0, flinch: false, leechSeed: false, bound: 0 };
+    pokemon.statStages = { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 };
     for (const move of pokemon.moves) {
       move.currentPp = move.maxPp;
     }

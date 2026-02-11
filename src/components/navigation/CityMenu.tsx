@@ -71,9 +71,17 @@ export function CityMenu() {
   };
 
   const handleHeal = () => {
-    useGameStore.getState().healTeam();
+    const state = useGameStore.getState();
+    state.healTeam();
+    // Track last Pokemon Center for blackout
+    if (selectedZone) {
+      useGameStore.setState({
+        progress: { ...state.progress, lastPokemonCenter: selectedZone },
+      });
+    }
     setHealMessage('Votre equipe est soignee !');
     setTimeout(() => setHealMessage(''), 2000);
+    useGameStore.getState().saveGameState();
   };
 
   return (
@@ -243,17 +251,36 @@ export function CityMenu() {
           <button
             onClick={useGameStore.getState().startSafari}
             disabled={useGameStore.getState().player.money < 500}
-            className={`p-4 rounded-xl text-left transition-all border-b-4 flex items-center gap-3 shadow-lg group ${useGameStore.getState().player.money < 500
-                ? 'bg-gray-800 border-gray-900 text-gray-500 cursor-not-allowed'
-                : 'bg-green-600 hover:bg-green-700 border-green-800 text-white hover:scale-[1.02] active:scale-[0.98]'
-              }`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '14px 16px',
+              background: useGameStore.getState().player.money < 500 ? '#1a1a1a' : '#2E7D32',
+              border: useGameStore.getState().player.money < 500 ? '2px solid #333' : '2px solid #4CAF50',
+              borderRadius: '8px',
+              cursor: useGameStore.getState().player.money < 500 ? 'not-allowed' : 'pointer',
+              opacity: useGameStore.getState().player.money < 500 ? 0.5 : 1,
+              textAlign: 'left' as const,
+            }}
           >
-            <div className="bg-black/20 p-2 rounded-lg group-hover:bg-black/30 transition-colors">
-              <span className="text-xl">🦁</span>
-            </div>
+            <span style={{ fontSize: '20px' }}>S</span>
             <div>
-              <div className="font-bold font-press-start text-sm">Parc Safari</div>
-              <div className="text-xs opacity-75 mt-1 font-press-start">Coût: 500 $</div>
+              <div style={{
+                color: '#fff',
+                fontSize: '11px',
+                fontFamily: "'Press Start 2P', monospace",
+              }}>
+                Parc Safari
+              </div>
+              <div style={{
+                color: '#ccc',
+                fontSize: '8px',
+                fontFamily: "'Press Start 2P', monospace",
+                marginTop: '4px',
+              }}>
+                Cout: 500P
+              </div>
             </div>
           </button>
         )}
