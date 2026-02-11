@@ -103,6 +103,7 @@ export interface ProgressData {
   seenPokemon: number[];
   leagueProgress: number; // 0=None, 1=Lorelei, 2=Bruno, 3=Agatha, 4=Lance, 5=Champion
   repelSteps: number;
+  lastPokemonCenter: string;
 }
 
 export interface SafariState {

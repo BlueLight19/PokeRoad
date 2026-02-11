@@ -13,6 +13,12 @@ export const LeagueMenu: React.FC = () => {
         const trainer = getTrainerData(trainerId);
         if (!trainer) return;
 
+        // Set last Pokemon Center to Plateau Indigo for league
+        const state = useGameStore.getState();
+        useGameStore.setState({
+            progress: { ...state.progress, lastPokemonCenter: 'plateau-indigo' },
+        });
+
         // Start battle
         startTrainerBattle(trainer, useGameStore.getState().team);
         setView('battle');

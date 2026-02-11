@@ -211,10 +211,8 @@
       "mt-moon"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "argenta"
-      ]
+      "type": "badge",
+      "badge": "badge-roche"
     }
   },
   {
@@ -382,10 +380,8 @@
       "route-25"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "azuria"
-      ]
+      "type": "badge",
+      "badge": "badge-cascade"
     }
   },
   {
@@ -604,10 +600,8 @@
       "cave-diglett"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "carmin"
-      ]
+      "type": "badge",
+      "badge": "badge-foudre"
     }
   },
   {
@@ -916,10 +910,8 @@
       "celadopole"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "safrania"
-      ]
+      "type": "badge",
+      "badge": "badge-marais"
     }
   },
   {
@@ -984,10 +976,8 @@
       "route-17"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "celadopole"
-      ]
+      "type": "badge",
+      "badge": "badge-prisme"
     }
   },
   {
@@ -1104,7 +1094,8 @@
     "connectedZones": [
       "route-18",
       "route-15",
-      "route-19"
+      "route-19",
+      "parc-safari"
     ],
     "unlockCondition": {
       "type": "trainers",
@@ -1307,10 +1298,8 @@
       "route-20"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "parmanie"
-      ]
+      "type": "badge",
+      "badge": "badge-ame"
     }
   },
   {
@@ -1538,10 +1527,8 @@
       "route-21"
     ],
     "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "route-21"
-      ]
+      "type": "badge",
+      "badge": "badge-terre"
     }
   },
   {
@@ -1756,203 +1743,6 @@
       "azuria"
     ],
     "description": "Une grotte mystérieuse réservée aux maîtres."
-  },
-  {
-    "id": "route-12",
-    "name": "Route 12",
-    "region": "kanto",
-    "generation": 1,
-    "type": "route",
-    "wildEncounters": [
-      {
-        "pokemonId": 43,
-        "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 30
-      },
-      {
-        "pokemonId": 48,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 30
-      },
-      {
-        "pokemonId": 70,
-        "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 35
-      },
-      {
-        "pokemonId": 83,
-        "minLevel": 25,
-        "maxLevel": 28,
-        "rate": 5
-      }
-    ],
-    "trainers": [],
-    "connectedZones": [
-      "lavanville",
-      "route-13"
-    ],
-    "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "lavanville"
-      ]
-    }
-  },
-  {
-    "id": "route-13",
-    "name": "Route 13",
-    "region": "kanto",
-    "generation": 1,
-    "type": "route",
-    "wildEncounters": [
-      {
-        "pokemonId": 43,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 48,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 70,
-        "minLevel": 25,
-        "maxLevel": 29,
-        "rate": 30
-      },
-      {
-        "pokemonId": 132,
-        "minLevel": 25,
-        "maxLevel": 28,
-        "rate": 10
-      }
-    ],
-    "trainers": [],
-    "connectedZones": [
-      "route-12",
-      "route-14"
-    ],
-    "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "route-12"
-      ]
-    }
-  },
-  {
-    "id": "route-14",
-    "name": "Route 14",
-    "region": "kanto",
-    "generation": 1,
-    "type": "route",
-    "wildEncounters": [
-      {
-        "pokemonId": 43,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 48,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 70,
-        "minLevel": 25,
-        "maxLevel": 29,
-        "rate": 30
-      },
-      {
-        "pokemonId": 132,
-        "minLevel": 25,
-        "maxLevel": 28,
-        "rate": 10
-      }
-    ],
-    "trainers": [],
-    "connectedZones": [
-      "route-13",
-      "route-15"
-    ],
-    "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "route-13"
-      ]
-    }
-  },
-  {
-    "id": "route-15",
-    "name": "Route 15",
-    "region": "kanto",
-    "generation": 1,
-    "type": "route",
-    "wildEncounters": [
-      {
-        "pokemonId": 43,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 48,
-        "minLevel": 24,
-        "maxLevel": 28,
-        "rate": 20
-      },
-      {
-        "pokemonId": 70,
-        "minLevel": 25,
-        "maxLevel": 29,
-        "rate": 30
-      },
-      {
-        "pokemonId": 132,
-        "minLevel": 25,
-        "maxLevel": 28,
-        "rate": 10
-      }
-    ],
-    "trainers": [],
-    "connectedZones": [
-      "route-14",
-      "parmanie"
-    ],
-    "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "route-14"
-      ]
-    }
-  },
-  {
-    "id": "parmanie",
-    "name": "Parmanie",
-    "region": "kanto",
-    "generation": 1,
-    "type": "city",
-    "hasShop": true,
-    "gymId": "fuchsia-gym",
-    "wildEncounters": [],
-    "trainers": [],
-    "connectedZones": [
-      "route-15",
-      "parc-safari"
-    ],
-    "unlockCondition": {
-      "type": "trainers",
-      "zones": [
-        "route-15"
-      ]
-    }
   },
   {
     "id": "parc-safari",

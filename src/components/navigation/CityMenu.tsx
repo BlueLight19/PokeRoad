@@ -71,9 +71,17 @@ export function CityMenu() {
   };
 
   const handleHeal = () => {
-    useGameStore.getState().healTeam();
+    const state = useGameStore.getState();
+    state.healTeam();
+    // Track last Pokemon Center for blackout
+    if (selectedZone) {
+      useGameStore.setState({
+        progress: { ...state.progress, lastPokemonCenter: selectedZone },
+      });
+    }
     setHealMessage('Votre equipe est soignee !');
     setTimeout(() => setHealMessage(''), 2000);
+    useGameStore.getState().saveGameState();
   };
 
   return (

@@ -52,6 +52,7 @@ export interface GameState {
   // Pending actions
   pendingEvolution: { pokemonIndex: number; targetId: number } | null;
   pendingMoveLearn: { pokemonIndex: number; moveId: number; sourceItem?: string } | null;
+  pendingMoveQueue: { pokemonIndex: number; moveId: number }[];
 
   // Actions
   initGame: () => void;
@@ -126,12 +127,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     seenPokemon: [],
     leagueProgress: 0,
     repelSteps: 0,
+    lastPokemonCenter: 'bourg-palette',
   },
   safariState: null,
   selectedZone: null,
   selectedPokemonIndex: null,
   pendingEvolution: null,
   pendingMoveLearn: null,
+  pendingMoveQueue: [],
 
   initGame: () => {
     set({ currentView: 'title' });
@@ -170,10 +173,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         seenPokemon: [starterId],
         leagueProgress: 0,
         repelSteps: 0,
+        lastPokemonCenter: 'bourg-palette',
       },
       selectedZone: null,
       pendingEvolution: null,
       pendingMoveLearn: null,
+      pendingMoveQueue: [],
     });
 
     get().saveGameState();
@@ -622,14 +627,26 @@ export const useGameStore = create<GameState>((set, get) => ({
       pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + hpDiff);
       pokemon.xpToNextLevel = result.newXpToNextLevel;
 
-      // Handle move learning
+      // Handle move learning - process all learnable moves
       if (result.learnableMoves.length > 0) {
-        const moveId = result.learnableMoves[0]; // Learn first available
-        if (pokemon.moves.length < 4) {
-          const moveData = getMoveData(moveId);
-          pokemon.moves.push({ moveId, currentPp: moveData.pp, maxPp: moveData.pp });
-        } else {
-          set({ pendingMoveLearn: { pokemonIndex, moveId } });
+        const movesToQueue: { pokemonIndex: number; moveId: number }[] = [];
+        for (const moveId of result.learnableMoves) {
+          // Skip if already known
+          if (pokemon.moves.some(m => m.moveId === moveId)) continue;
+          if (pokemon.moves.length < 4) {
+            const moveData = getMoveData(moveId);
+            pokemon.moves.push({ moveId, currentPp: moveData.pp, maxPp: moveData.pp });
+          } else {
+            movesToQueue.push({ pokemonIndex, moveId });
+          }
+        }
+        if (movesToQueue.length > 0) {
+          const existing = get().pendingMoveQueue;
+          // Set first as pendingMoveLearn, rest go to queue
+          set({
+            pendingMoveLearn: movesToQueue[0],
+            pendingMoveQueue: [...existing, ...movesToQueue.slice(1)],
+          });
         }
       }
 
@@ -732,7 +749,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     // If forgetIndex is null, the move is not learned (and TM is not consumed)
 
-    set({ team: newTeam, pendingMoveLearn: null });
+    // Check if there are more moves in the queue
+    const queue = get().pendingMoveQueue;
+    if (queue.length > 0) {
+      const [next, ...rest] = queue;
+      set({ team: newTeam, pendingMoveLearn: next, pendingMoveQueue: rest });
+    } else {
+      set({ team: newTeam, pendingMoveLearn: null });
+    }
     get().saveGameState();
   },
 
@@ -761,16 +785,23 @@ export const useGameStore = create<GameState>((set, get) => ({
       pc = data.pc;
     }
 
+    // Migration: add lastPokemonCenter if missing
+    const progress = {
+      ...data.progress,
+      lastPokemonCenter: data.progress.lastPokemonCenter || 'bourg-palette',
+    };
+
     set({
       currentView: 'world_map',
       player: data.player,
       team: data.team,
       pc,
       inventory: data.inventory,
-      progress: data.progress,
+      progress,
       selectedZone: null,
       pendingEvolution: null,
       pendingMoveLearn: null,
+      pendingMoveQueue: [],
     });
     return true;
   },
