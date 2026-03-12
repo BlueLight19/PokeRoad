@@ -24,6 +24,16 @@
         "setsEvent": "received-hm05-flash"
       }
     ],
+    "staticEncounters": [
+      {
+        "id": "legendary-mew",
+        "name": "Présence mystérieuse",
+        "pokemonId": 151,
+        "level": 40,
+        "requiredItem": "ancient-radar",
+        "dialogue": "Le radar s'affole... L'air scintille. Quelque chose d'invisible vous observe depuis toujours."
+      }
+    ],
     "unlockCondition": null
   },
   {
@@ -203,6 +213,20 @@
         ],
         "givesItem": "old-amber",
         "setsEvent": "received-old-amber"
+      },
+      {
+        "id": "npc-museum-curator",
+        "name": "Conservateur du Musée",
+        "dialogue": [
+          "Ah... Vous avez trouvé les notes du Dr. Laurent ?",
+          "Il a travaillé ici avant de partir pour Cramois'Île.",
+          "Ses capteurs ont détecté une empreinte psychique résiduelle... très faible, mais constante. Toujours au même endroit.",
+          "Étrangement, le signal pointe vers Bourg Palette. L'endroit le plus ordinaire de Kanto.",
+          "Prenez ce prototype. Il est calibré sur cette fréquence. Si la créature est encore là-bas, vous la trouverez."
+        ],
+        "givesItem": "ancient-radar",
+        "requiredEvent": "mew-quest-start",
+        "setsEvent": "mew-quest-radar"
       }
     ],
     "unlockCondition": {
@@ -888,6 +912,7 @@
           "Elle réveille instantanément les Pokémon endormis."
         ],
         "givesItem": "poke-flute",
+        "requiredEvent": "received-silph-scope",
         "setsEvent": "received-poke-flute"
       }
     ],
@@ -1705,6 +1730,21 @@
       "mansion-burglar1",
       "mansion-scientist1"
     ],
+    "npcs": [
+      {
+        "id": "npc-mansion-journal",
+        "name": "Journal abandonné",
+        "dialogue": [
+          "...des pages jaunies sont éparpillées au sol.",
+          "\"9 Fév. — Le spécimen originel a été retrouvé dans la jungle de Guyana. Son ADN contient l'intégralité du code génétique Pokémon.\"",
+          "\"13 Fév. — Nous avons cloné le spécimen. Le clone est instable. L'original s'est échappé du laboratoire. Nous ne l'avons jamais revu.\"",
+          "\"Post-scriptum — Mon collègue au Musée d'Argenta pense avoir détecté des traces résiduelles. Si quelqu'un lit ceci, allez le voir.\""
+        ],
+        "givesItem": "mew-research-notes",
+        "requiredEvent": "champion-defeated",
+        "setsEvent": "mew-quest-start"
+      }
+    ],
     "connectedZones": [
       "cramois-ile",
       "route-21"
@@ -1926,7 +1966,7 @@
     "region": "kanto",
     "generation": 1,
     "hasShop": true,
-    "gymId": "elite-four",
+    "gymId": null,
     "wildEncounters": [],
     "trainers": [],
     "connectedZones": [
@@ -2050,7 +2090,7 @@
     "type": "dungeon",
     "unlockCondition": {
       "type": "badge",
-      "badge": "Terre"
+      "badge": "badge-terre"
     },
     "wildEncounters": [
       {

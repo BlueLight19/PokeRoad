@@ -115,7 +115,12 @@ export function BattleScreen() {
       }
     }
 
-    useGameStore.getState().setView('world_map');
+    // Check if player just became champion
+    if (useGameStore.getState().progress.leagueProgress >= 5) {
+      useGameStore.getState().setView('hall_of_fame');
+    } else {
+      useGameStore.getState().setView('world_map');
+    }
     useGameStore.getState().saveGameState();
   };
 

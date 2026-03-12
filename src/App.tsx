@@ -13,6 +13,7 @@ import { InventoryScreen } from './components/ui/InventoryScreen';
 import { PokedexScreen } from './components/ui/PokedexScreen';
 import { LeagueMenu } from './components/ui/LeagueMenu';
 import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
+import { HallOfFame } from './components/scenes/HallOfFame';
 
 // Initialize game data on load
 initializeData();
@@ -46,6 +47,8 @@ function App() {
         return <PokedexScreen />;
       case 'league':
         return <LeagueMenu />;
+      case 'hall_of_fame':
+        return <HallOfFame onComplete={() => useGameStore.getState().handleGameCleared()} />;
       default:
         return <TitleScreen />;
     }

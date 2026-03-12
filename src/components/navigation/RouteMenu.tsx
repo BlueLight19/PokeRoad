@@ -15,7 +15,7 @@ export function RouteMenu() {
     decrementRepelSteps,
     setRepelSteps, // In case we want to show it
     addItem,
-    addPokemonToTeam,
+    givePlayerPokemon,
     triggerEvent
   } = useGameStore();
   const { startWildBattle, startTrainerBattle } = useBattleStore();
@@ -130,7 +130,7 @@ export function RouteMenu() {
           addItem(activeNpc.givesItem, 1);
         }
         if (activeNpc.givesPokemon) {
-          addPokemonToTeam(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+          givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
         }
       }
       setActiveNpc(null);
@@ -365,6 +365,8 @@ export function RouteMenu() {
           staticEncounters.map((encounter: StaticEncounter) => {
             // Check if already captured/defeated/completed
             if (progress.events[encounter.id]) return null;
+            // Check if required item is in inventory
+            if (encounter.requiredItem && !useGameStore.getState().inventory.some(i => i.itemId === encounter.requiredItem && i.quantity > 0)) return null;
 
             return (
               <button

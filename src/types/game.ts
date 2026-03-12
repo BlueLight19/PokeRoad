@@ -164,7 +164,8 @@ export type GameView =
   | 'pokedex'
   | 'summary'
   | 'move_learn'
-  | 'league';
+  | 'league'
+  | 'hall_of_fame';
 
 export interface GameContext {
   currentView: GameView;

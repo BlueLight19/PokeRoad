@@ -3,11 +3,11 @@ import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getGymData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
-import { NPCData, CityData, RouteData } from '../../types/game';
+import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
 
 export function CityMenu() {
-  const { selectedZone, team, player, progress, setView, addItem, addPokemonToTeam, triggerEvent } = useGameStore();
-  const { startGymBattle } = useBattleStore();
+  const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent } = useGameStore();
+  const { startGymBattle, startWildBattle } = useBattleStore();
   const [healMessage, setHealMessage] = useState('');
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
   const [dialogueIndex, setDialogueIndex] = useState(0);
@@ -20,6 +20,7 @@ export function CityMenu() {
   const gymId = (zone as CityData).gymId;
   const trainers: string[] = zone.trainers || [];
   const npcs: NPCData[] = zone.npcs || [];
+  const staticEncounters: StaticEncounter[] = (zone as any).staticEncounters || [];
 
   let gym: any = null;
   let gymDefeated = false;
@@ -107,7 +108,7 @@ export function CityMenu() {
           addItem(activeNpc.givesItem, 1);
         }
         if (activeNpc.givesPokemon) {
-          addPokemonToTeam(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+          givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
         }
       }
       setActiveNpc(null);
@@ -333,6 +334,44 @@ export function CityMenu() {
                   }}
                 >
                   {defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
+        {/* Static Encounters */}
+        {staticEncounters.map((encounter: StaticEncounter) => {
+          if (progress.events[encounter.id]) return null;
+          if (encounter.requiredItem && !useGameStore.getState().inventory.some(i => i.itemId === encounter.requiredItem && i.quantity > 0)) return null;
+
+          return (
+            <button
+              key={encounter.id}
+              onClick={() => {
+                startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
+                setView('battle');
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                border: '2px solid #FFD700',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>★</span>
+              <div>
+                <div style={{ color: '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+                  {encounter.name}
+                </div>
+                <div style={{ color: '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px', lineHeight: '1.4' }}>
+                  {encounter.dialogue || 'Une présence imposante...'}
                 </div>
               </div>
             </button>

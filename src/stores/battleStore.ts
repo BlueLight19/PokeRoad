@@ -324,7 +324,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
         // Static Encounter Defeat (Legendaries/Snorlax)
         if (state.encounterId) {
-          useGameStore.getState().markTrainerDefeated(state.encounterId);
+          useGameStore.getState().triggerEvent(state.encounterId);
         }
 
         newState.xpGained = [...state.xpGained, xpEntry];
@@ -618,7 +618,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       });
 
       if (state.encounterId) {
-        useGameStore.getState().markTrainerDefeated(state.encounterId);
+        useGameStore.getState().triggerEvent(state.encounterId);
       }
     } else {
       // Enemy attacks after failed capture
@@ -739,7 +739,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
         caughtPokemon: enemy,
       });
       if (state.encounterId) {
-        useGameStore.getState().markTrainerDefeated(state.encounterId);
+        useGameStore.getState().triggerEvent(state.encounterId);
       }
     } else {
       // Pokemon might flee

@@ -211,6 +211,26 @@
     "usableOutside": false
   },
   {
+    "id": "mew-research-notes",
+    "name": "Notes de Recherche",
+    "description": "Des pages jaunies couvertes de données génétiques. Mention d'un 'specimen originel'.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "ancient-radar",
+    "name": "Radar Psychique",
+    "description": "Un appareil bricolé qui capte de faibles ondes psychiques.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
     "id": "silph-scope",
     "name": "Scope Sylphe",
     "description": "Des lunettes spéciales permettant de voir l'invisible.",
@@ -234,6 +254,16 @@
     "id": "old-rod",
     "name": "Canne",
     "description": "Une vieille canne à pêche pour attraper de petits Pokémon aquatiques.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "good-rod",
+    "name": "Super Canne",
+    "description": "Une bonne canne à pêche. Permet d'attraper plus de Pokémon aquatiques.",
     "category": "key",
     "price": 0,
     "effect": null,

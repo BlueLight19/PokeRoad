@@ -64,6 +64,7 @@ export interface GameState {
 
   // Team management
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
+  givePlayerPokemon: (pokemonId: number, level: number) => void;
   switchTeamOrder: (idx1: number, idx2: number) => void;
   releasePokemon: (uid: string) => void;
   moveToPc: (uid: string) => void;
@@ -101,6 +102,9 @@ export interface GameState {
   healTeam: () => void;
   confirmEvolution: (accept: boolean) => void;
   learnMoveChoice: (forgetIndex: number | null) => void;
+
+  // Post-game
+  handleGameCleared: () => void;
 
   // Save/load
   saveGameState: () => void;
@@ -230,6 +234,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().saveGameState();
   },
 
+  givePlayerPokemon: (pokemonId: number, level: number) => {
+    const pokemon = createPokemonInstance(pokemonId, level);
+    pokemon.moves = pokemon.moves.map(m => {
+      const data = getMoveData(m.moveId);
+      return { moveId: m.moveId, currentPp: data.pp, maxPp: data.pp };
+    });
+    get().addPokemonToTeam(pokemon);
+  },
+
   switchTeamOrder: (idx1: number, idx2: number) => {
     const team = [...get().team];
     if (idx1 < 0 || idx1 >= team.length || idx2 < 0 || idx2 >= team.length) return;
@@ -295,6 +308,35 @@ export const useGameStore = create<GameState>((set, get) => ({
       inventory.push({ itemId, quantity: qty });
     }
     set({ inventory });
+
+    // Re-check zone unlocks for item-type conditions
+    const newProgress = { ...get().progress };
+    const allZones = getAllZones();
+    let changed = false;
+    for (const zone of allZones) {
+      const zoneId = zone.id;
+      if (newProgress.unlockedZones.includes(zoneId)) continue;
+      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
+      if (!isConnected) continue;
+      try {
+        const condition = (zone as any).unlockCondition;
+        if (!condition) {
+          newProgress.unlockedZones.push(zoneId);
+          changed = true;
+          continue;
+        }
+        if (condition.type === 'item' && condition.itemId) {
+          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
+            newProgress.unlockedZones.push(zoneId);
+            changed = true;
+          }
+        }
+      } catch {}
+    }
+    if (changed) {
+      set({ progress: newProgress });
+      get().saveGameState();
+    }
   },
 
   removeItem: (itemId: string, qty: number) => {
@@ -484,6 +526,12 @@ export const useGameStore = create<GameState>((set, get) => ({
             newProgress.unlockedZones.push(zoneId);
           }
         }
+
+        if (condition.type === 'item' && condition.itemId) {
+          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0) && !newProgress.unlockedZones.includes(zoneId)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
       } catch {
         // Zone not found, skip
       }
@@ -551,6 +599,11 @@ export const useGameStore = create<GameState>((set, get) => ({
             }
           });
           if (allDefeated) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'item' && condition.itemId) {
+          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
             newProgress.unlockedZones.push(zoneId);
           }
         }
@@ -629,6 +682,8 @@ export const useGameStore = create<GameState>((set, get) => ({
           if (get().player.badges.includes(getGymData(condition.gymId).badge)) newProgress.unlockedZones.push(zoneId);
         } else if (condition.type === 'badge' && condition.badge) {
           if (get().player.badges.includes(condition.badge)) newProgress.unlockedZones.push(zoneId);
+        } else if (condition.type === 'item' && condition.itemId) {
+          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) newProgress.unlockedZones.push(zoneId);
         }
       } catch { }
     }
@@ -813,6 +868,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else {
       set({ team: newTeam, pendingMoveLearn: null });
     }
+    get().saveGameState();
+  },
+
+  handleGameCleared: () => {
+    const state = get();
+    const newEvents = { ...state.progress.events, 'champion-defeated': true };
+    set({
+      currentView: 'world_map',
+      progress: { ...state.progress, leagueProgress: 0, events: newEvents },
+    });
     get().saveGameState();
   },
 
