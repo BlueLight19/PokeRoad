@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { initializeData } from './utils/dataLoader';
+import { deleteSave } from './utils/saveManager';
 import { TitleScreen } from './components/TitleScreen';
 import { WorldMap } from './components/navigation/WorldMap';
 import { RouteMenu } from './components/navigation/RouteMenu';
@@ -79,6 +80,13 @@ function DevTools() {
         }
     };
 
+    const handleReset = () => {
+        if (window.confirm("Voulez-vous vraiment effacer complètement votre partie ? Cette action est irréversible !")) {
+            deleteSave();
+            window.location.reload(); // Recharge la page pour revenir à l'écran titre à zéro
+        }
+    };
+
     // --- ECRAN DE CONNEXION ---
     if (!isAuthenticated) {
         return (
@@ -143,12 +151,23 @@ function DevTools() {
                 <button style={btnStyle} onClick={() => givePlayerPokemon(pokeId, pokeLevel)}>Donner Pokémon</button>
             </div>
 
-            <div>
+            <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                     <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
                     <button style={{...btnStyle, width: 'auto'}} onClick={() => addMoney(moneyAmount)}>+ P</button>
                 </div>
+            </div>
+
+            {/* --- Section Danger --- */}
+            <div>
+                <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
+                <button
+                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000'}}
+                    onClick={handleReset}
+                >
+                    Réinitialiser la Sauvegarde
+                </button>
             </div>
         </div>
     );
