@@ -22,14 +22,30 @@ export function calculateDamage(
   const attackerData = getPokemonData(attacker.dataId);
   const defenderData = getPokemonData(defender.dataId);
 
-  // Physical vs Special split
-  const atk = move.category === 'physical'
-    ? getEffectiveStat(attacker, 'attack')
-    : getEffectiveStat(attacker, 'spAtk');
+  // Critical hit check (1/16 chance)
+  const isCritical = Math.random() < (1 / 16);
 
-  const def = move.category === 'physical'
-    ? getEffectiveStat(defender, 'defense')
-    : getEffectiveStat(defender, 'spDef');
+  // Physical vs Special split
+  // Critical hits ignore attacker's negative attack stages and defender's positive defense stages
+  const atkStat = move.category === 'physical' ? 'attack' : 'spAtk';
+  const defStat = move.category === 'physical' ? 'defense' : 'spDef';
+
+  let atk: number;
+  let def: number;
+
+  if (isCritical) {
+    // Use raw stat if attacker has negative stages, otherwise use effective stat
+    atk = attacker.statStages[atkStat] < 0
+      ? attacker.stats[atkStat]
+      : getEffectiveStat(attacker, atkStat);
+    // Use raw stat if defender has positive stages, otherwise use effective stat
+    def = defender.statStages[defStat] > 0
+      ? defender.stats[defStat]
+      : getEffectiveStat(defender, defStat);
+  } else {
+    atk = getEffectiveStat(attacker, atkStat);
+    def = getEffectiveStat(defender, defStat);
+  }
 
   // Base damage
   const levelFactor = ((2 * attacker.level) / 5 + 2);
@@ -45,8 +61,7 @@ export function calculateDamage(
   const effectiveness = getTypeEffectiveness(move.type, defenderData.types as PokemonType[]);
   baseDamage = Math.floor(baseDamage * effectiveness);
 
-  // Critical hit (1/16 chance, 1.5x multiplier)
-  const isCritical = Math.random() < (1 / 16);
+  // Critical hit multiplier (1.5x)
   if (isCritical) {
     baseDamage = Math.floor(baseDamage * 1.5);
   }

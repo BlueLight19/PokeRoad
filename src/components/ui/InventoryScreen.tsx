@@ -9,16 +9,19 @@ export function InventoryScreen() {
     const [targetMode, setTargetMode] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
-    const inventoryItems = inventory.map(i => ({
-        ...i,
-        data: getItemData(i.itemId)
-    })).filter(i => i.data); // Filter known items
+    const inventoryItems = inventory.map(i => {
+        try {
+            return { ...i, data: getItemData(i.itemId) };
+        } catch {
+            return null;
+        }
+    }).filter((i): i is NonNullable<typeof i> => i !== null && !!i.data);
 
     const handleUse = (itemId: string) => {
         const item = getItemData(itemId);
         if (!item) return;
 
-        const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution'].includes(item.effect?.type || '');
+        const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'teach', 'boost'].includes(item.effect?.type || '');
         if (requiresTarget) {
             setSelectedItemId(itemId);
             setTargetMode(true);

@@ -1,0 +1,24 @@
+====================================================================
+RAPPORT DE BUGS ET PROBLÈMES LOGIQUES - POKEROAD
+====================================================================
+
+1. SYSTÈME DE COMBAT (BATTLE ENGINE)
+--------------------------------------------------------------------
+- Double K.O. ignoré : Si une attaque avec dégâts de recul (ex: Damoclès) met K.O. l'ennemi ET le Pokémon du joueur simultanément, le jeu valide la mort de l'ennemi mais laisse le Pokémon du joueur sur le terrain à 0 PV sans déclencher l'écran de défaite ou de remplacement.
+- Tours gratuits via le Sac : L'utilisation d'un objet de Soin (Potion) déclenche bien l'attaque ennemie, mais l'utilisation d'un objet de Statut (Antidote) ou de Résurrection (Rappel) passe le tour de l'ennemi. Le joueur gagne une action gratuite.
+- Munitions (PP) ennemies infinies : Lorsqu'un Pokémon ennemi n'a plus de PP sur aucune de ses attaques, le jeu le force à utiliser sa première attaque en boucle à l'infini au lieu de déclencher la mécanique officielle de "Lutte" (Struggle).
+- Vol de Vie (Drain) disproportionné : Les attaques comme Giga-Sangsue soignent le lanceur sur la base des dégâts totaux calculés, sans limite. Frapper un Pokémon ayant 10 PV avec une attaque infligeant 500 dégâts soignera de 250 PV au lieu de 5.
+- Coups Critiques incomplets : Un coup critique applique juste un multiplicateur de dégâts (x1.5), mais n'annule pas les malus d'attaque du lanceur ni les bonus de défense de la cible comme il devrait le faire.
+- Attaques de statut sur le lanceur : Les capacités ciblant le lanceur qui modifient le statut (comme "Repos") ne sont pas gérées par la fonction de combat actuelle.
+
+2. PROGRESSION, EXPÉRIENCE ET STATISTIQUES (GAME STORE)
+--------------------------------------------------------------------
+- Écrasement des gains de fin de combat : Si, à la fin d'un combat, plusieurs Pokémon de l'équipe montent de niveau, évoluent, ou apprennent de nouvelles capacités, le jeu n'affiche que le tout dernier événement. Tous les apprentissages et évolutions des autres Pokémon sont définitivement perdus.
+- EVs inactifs sans montée de niveau : Les EVs gagnés en combat sont bien calculés, mais les statistiques du Pokémon ne sont recalculées qu'au moment où il monte de niveau. Un Pokémon niveau 100 ne bénéficiera donc jamais de ses EVs.
+- Objets CT/CS potentiellement perdus : Lors de l'apprentissage d'une capacité, si l'inventaire du Pokémon est plein (4 attaques) et que le joueur refuse finalement d'oublier une ancienne capacité, la gestion de l'état ne garantit pas la restitution correcte de la Capsule Technique (CT).
+
+3. INTERFACE ET INVENTAIRE (UI / REACT)
+--------------------------------------------------------------------
+- Crash Fatal de l'Inventaire (Écran Vide) : Si le joueur possède un objet dont l'ID n'est pas répertorié dans les fichiers de données (ex: un Fossile donné par le script d'un PNJ), ouvrir le sac provoque un crash silencieux qui fait disparaître toute l'interface.
+- CT et Super Bonbons inutilisables : Cliquer sur "Utiliser" pour une Capsule Technique ou un objet de boost de statistiques depuis le menu hors combat ne fait rien (ou affiche une erreur), car l'interface n'ouvre pas le sous-menu permettant de sélectionner le Pokémon cible.
+- Défaut d'affichage des nouvelles capacités : Modifier les attaques d'un Pokémon via le code modifie les données, mais l'interface visuelle du menu "Équipe" peut ne pas se rafraîchir immédiatement à cause d'une copie superficielle de la mémoire (mutabilité).

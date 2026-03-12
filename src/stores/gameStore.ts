@@ -25,6 +25,7 @@ import {
   processLevelUp,
   calculateXpGain,
   applyEvGains,
+  recalculateStats,
 } from '../engine/experienceCalculator';
 import {
   createPCStorage,
@@ -51,6 +52,7 @@ export interface GameState {
 
   // Pending actions
   pendingEvolution: { pokemonIndex: number; targetId: number } | null;
+  pendingEvolutionQueue: { pokemonIndex: number; targetId: number }[];
   pendingMoveLearn: { pokemonIndex: number; moveId: number; sourceItem?: string } | null;
   pendingMoveQueue: { pokemonIndex: number; moveId: number }[];
 
@@ -139,6 +141,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   selectedZone: null,
   selectedPokemonIndex: null,
   pendingEvolution: null,
+  pendingEvolutionQueue: [],
   pendingMoveLearn: null,
   pendingMoveQueue: [],
 
@@ -184,6 +187,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       },
       selectedZone: null,
       pendingEvolution: null,
+      pendingEvolutionQueue: [],
       pendingMoveLearn: null,
       pendingMoveQueue: [],
     });
@@ -753,18 +757,38 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
         if (movesToQueue.length > 0) {
           const existing = get().pendingMoveQueue;
-          // Set first as pendingMoveLearn, rest go to queue
-          set({
-            pendingMoveLearn: movesToQueue[0],
-            pendingMoveQueue: [...existing, ...movesToQueue.slice(1)],
-          });
+          if (!get().pendingMoveLearn) {
+            // Set first as pendingMoveLearn, rest go to queue
+            set({
+              pendingMoveLearn: movesToQueue[0],
+              pendingMoveQueue: [...existing, ...movesToQueue.slice(1)],
+            });
+          } else {
+            // Already a pending move learn - queue all
+            set({
+              pendingMoveQueue: [...existing, ...movesToQueue],
+            });
+          }
         }
       }
 
-      // Handle evolution
+      // Handle evolution - queue instead of overwriting
       if (result.canEvolve && result.evolutionId) {
-        set({ pendingEvolution: { pokemonIndex, targetId: result.evolutionId } });
+        const evoEntry = { pokemonIndex, targetId: result.evolutionId };
+        if (!get().pendingEvolution) {
+          set({ pendingEvolution: evoEntry });
+        } else {
+          // Queue for later
+          set({ pendingEvolutionQueue: [...get().pendingEvolutionQueue, evoEntry] });
+        }
       }
+    } else {
+      // No level up, but still recalculate stats for EV gains (important for lv100 pokemon)
+      const newStats = recalculateStats(pokemon);
+      const hpDiff = newStats.hp - pokemon.maxHp;
+      pokemon.stats = newStats;
+      pokemon.maxHp = newStats.hp;
+      pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + Math.max(0, hpDiff));
     }
 
     // Track seen
@@ -775,6 +799,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
     }
 
+    // Create fresh references for modified pokemon to trigger React re-renders
+    team[pokemonIndex] = {
+      ...pokemon,
+      moves: pokemon.moves.map(m => ({ ...m })),
+      stats: { ...pokemon.stats },
+      evs: { ...pokemon.evs },
+    };
     set({ team });
     get().saveGameState();
   },
@@ -807,7 +838,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   confirmEvolution: (accept: boolean) => {
-    const { pendingEvolution, team } = get();
+    const { pendingEvolution, pendingEvolutionQueue, team } = get();
     if (!pendingEvolution) return;
 
     if (accept) {
@@ -816,9 +847,21 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (pokemon) {
         evolvePokemon(pokemon, pendingEvolution.targetId);
       }
-      set({ team: newTeam, pendingEvolution: null });
+      // Process next evolution from queue
+      if (pendingEvolutionQueue.length > 0) {
+        const [next, ...rest] = pendingEvolutionQueue;
+        set({ team: newTeam, pendingEvolution: next, pendingEvolutionQueue: rest });
+      } else {
+        set({ team: newTeam, pendingEvolution: null });
+      }
     } else {
-      set({ pendingEvolution: null });
+      // Declined - process next from queue
+      if (pendingEvolutionQueue.length > 0) {
+        const [next, ...rest] = pendingEvolutionQueue;
+        set({ pendingEvolution: next, pendingEvolutionQueue: rest });
+      } else {
+        set({ pendingEvolution: null });
+      }
     }
 
     get().saveGameState();
@@ -922,6 +965,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       progress,
       selectedZone: null,
       pendingEvolution: null,
+      pendingEvolutionQueue: [],
       pendingMoveLearn: null,
       pendingMoveQueue: [],
     });

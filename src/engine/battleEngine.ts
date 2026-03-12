@@ -245,7 +245,23 @@ export function executeMove(
   if (move.category === 'status') {
     // Status move: apply effect
     if (move.target === 'self') {
-      logs.push(...tryApplyStatChange(attacker, move, true));
+      // Handle Rest specially: heal fully, cure status, apply 2-turn sleep
+      if (move.effect?.type === 'status' && move.effect.status === 'sleep') {
+        if (attacker.currentHp >= attacker.maxHp) {
+          logs.push({ message: `Mais cela échoue !`, type: 'info' });
+        } else {
+          attacker.status = null; // Clear any existing status
+          attacker.statusTurns = 0;
+          attacker.currentHp = attacker.maxHp;
+          attacker.status = 'sleep';
+          attacker.statusTurns = 2;
+          logs.push({ message: `${attackerName} récupère tous ses PV et s'endort !`, type: 'info' });
+        }
+      } else {
+        // Other self-targeting status/stat moves (e.g., Swords Dance)
+        logs.push(...tryApplyStatus(attacker, move));
+        logs.push(...tryApplyStatChange(attacker, move, true));
+      }
     } else {
       logs.push(...tryApplyStatus(defender, move));
       logs.push(...tryApplyStatChange(defender, move, false));
@@ -274,6 +290,7 @@ export function executeMove(
 
     let totalDamage = 0;
     let hitCount = 0;
+    const defenderHpBefore = defender.currentHp; // Track for drain cap
 
     for (let i = 0; i < hits; i++) {
       const result = calculateDamage(attacker, defender, move);
@@ -312,9 +329,10 @@ export function executeMove(
       logs.push({ message: `${attackerName} subit le contrecoup ! (-${recoil} PV)`, type: 'damage' });
     }
 
-    // Drain
+    // Drain (capped at actual HP the defender lost, not raw calculated damage)
     if (move.effect?.type === 'drain' && move.effect.amount) {
-      const healAmount = Math.max(1, Math.floor(totalDamage * move.effect.amount / 100));
+      const actualHpLost = defenderHpBefore - defender.currentHp;
+      const healAmount = Math.max(1, Math.floor(actualHpLost * move.effect.amount / 100));
       attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + healAmount);
       logs.push({ message: `${attackerName} récupère ${healAmount} PV !`, type: 'info' });
     }
@@ -389,10 +407,51 @@ export function chooseEnemyMove(pokemon: PokemonInstance): number {
     .map((m, i) => ({ ...m, index: i }))
     .filter(m => m.currentPp > 0);
 
-  if (available.length === 0) return 0;
+  if (available.length === 0) return -1; // Signal: use Struggle
 
   const chosen = available[Math.floor(Math.random() * available.length)];
   return chosen.index;
+}
+
+/**
+ * Execute Struggle (Lutte) - typeless move with 50 base power and 25% recoil
+ * Used when a Pokémon has no PP left on any move.
+ */
+export function executeStruggle(
+  attacker: PokemonInstance,
+  defender: PokemonInstance
+): MoveExecutionResult {
+  const logs: BattleLogEntry[] = [];
+  const attackerName = attacker.nickname || getPokemonData(attacker.dataId).name;
+  const defenderName = defender.nickname || getPokemonData(defender.dataId).name;
+
+  logs.push({ message: `${attackerName} n'a plus de PP !`, type: 'info' });
+  logs.push({ message: `${attackerName} utilise Lutte !`, type: 'info' });
+
+  // Struggle: 50 base power, typeless (neutral effectiveness), no STAB
+  const atk = getEffectiveStat(attacker, 'attack');
+  const def = getEffectiveStat(defender, 'defense');
+  const levelFactor = ((2 * attacker.level) / 5 + 2);
+  let damage = Math.floor((levelFactor * 50 * atk / def) / 50) + 2;
+
+  // Random factor (85-100%)
+  const randomFactor = 0.85 + Math.random() * 0.15;
+  damage = Math.max(1, Math.floor(damage * randomFactor));
+
+  defender.currentHp = Math.max(0, defender.currentHp - damage);
+  logs.push({ message: `${defenderName} perd ${damage} PV !`, type: 'damage' });
+
+  // 25% recoil of damage dealt
+  const recoil = Math.max(1, Math.floor(damage / 4));
+  attacker.currentHp = Math.max(0, attacker.currentHp - recoil);
+  logs.push({ message: `${attackerName} subit le contrecoup ! (-${recoil} PV)`, type: 'damage' });
+
+  const defenderFainted = defender.currentHp <= 0;
+  if (defenderFainted) {
+    logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
+  }
+
+  return { logs, defenderFainted };
 }
 
 /**
