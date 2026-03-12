@@ -18,13 +18,14 @@ export function TeamView() {
       return null;
     }
     const data = getPokemonData(pokemon.dataId);
+    const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
     const name = pokemon.nickname || data.name;
 
     return (
       <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <img
-            src={data.spriteUrl}
+            src={spriteUrl}
             alt={name}
             style={{ width: '80px', height: '80px', imageRendering: 'pixelated' }}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -150,6 +151,7 @@ export function TeamView() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {team.map((pokemon, index) => {
           const data = getPokemonData(pokemon.dataId);
+          const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
           const name = pokemon.nickname || data.name;
           const isFainted = pokemon.currentHp <= 0;
 
@@ -170,7 +172,7 @@ export function TeamView() {
               }}
             >
               <img
-                src={data.spriteUrl}
+                src={spriteUrl}
                 alt={name}
                 style={{ width: '48px', height: '48px', imageRendering: 'pixelated', opacity: isFainted ? 0.4 : 1 }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

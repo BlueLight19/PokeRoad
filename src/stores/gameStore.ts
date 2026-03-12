@@ -89,6 +89,7 @@ export interface GameState {
   getTrainersForZone: (zoneId: string) => TrainerData[];
   decrementRepelSteps: () => void;
   setRepelSteps: (steps: number) => void;
+  triggerEvent: (eventId: string) => void;
 
   // Post-battle
   grantXpAndProcess: (
@@ -128,6 +129,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     leagueProgress: 0,
     repelSteps: 0,
     lastPokemonCenter: 'bourg-palette',
+    events: {},
   },
   safariState: null,
   selectedZone: null,
@@ -174,6 +176,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         leagueProgress: 0,
         repelSteps: 0,
         lastPokemonCenter: 'bourg-palette',
+        events: {},
       },
       selectedZone: null,
       pendingEvolution: null,
@@ -448,6 +451,10 @@ export const useGameStore = create<GameState>((set, get) => ({
           continue;
         }
 
+        // Check Event/Item Locks
+        if (condition.eventId && !newProgress.events[condition.eventId]) continue;
+        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
+
         if (condition.type === 'trainers' && condition.zones) {
           const allDefeated = condition.zones.every((z: string) => {
             try {
@@ -516,6 +523,10 @@ export const useGameStore = create<GameState>((set, get) => ({
           newProgress.unlockedZones.push(zoneId);
           continue;
         }
+
+        // Check Event/Item Locks
+        if (condition.eventId && !newProgress.events[condition.eventId]) continue;
+        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
         if (condition.type === 'gym' && condition.gymId) {
           const condGym = getGymData(condition.gymId);
           if (get().player.badges.includes(condGym.badge)) {
@@ -577,6 +588,51 @@ export const useGameStore = create<GameState>((set, get) => ({
       ...state.progress,
       leagueProgress: 0
     };
+    set({ progress: newProgress });
+    get().saveGameState();
+  },
+
+  triggerEvent: (eventId: string) => {
+    const state = get();
+    const newEvents = { ...state.progress.events, [eventId]: true };
+    const newProgress = { ...state.progress, events: newEvents };
+
+    // Trigger zone unlocks after event completion
+    const allZones = getAllZones();
+    for (const zone of allZones) {
+      const zoneId = zone.id;
+      if (newProgress.unlockedZones.includes(zoneId)) continue;
+
+      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
+      if (!isConnected) continue;
+
+      try {
+        const condition = (zone as any).unlockCondition;
+        if (!condition) {
+          newProgress.unlockedZones.push(zoneId);
+          continue;
+        }
+
+        if (condition.eventId && !newEvents[condition.eventId]) continue;
+        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
+
+        if (condition.type === 'trainers' && condition.zones) {
+          const allDefeated = condition.zones.every((z: string) => {
+            try {
+              const zoneData = getZoneData(z) as any;
+              const zoneTrainers: string[] = zoneData.trainers || [];
+              return zoneTrainers.every((t: string) => newProgress.defeatedTrainers.includes(t));
+            } catch { return true; }
+          });
+          if (allDefeated) newProgress.unlockedZones.push(zoneId);
+        } else if (condition.type === 'gym' && condition.gymId) {
+          if (get().player.badges.includes(getGymData(condition.gymId).badge)) newProgress.unlockedZones.push(zoneId);
+        } else if (condition.type === 'badge' && condition.badge) {
+          if (get().player.badges.includes(condition.badge)) newProgress.unlockedZones.push(zoneId);
+        }
+      } catch { }
+    }
+
     set({ progress: newProgress });
     get().saveGameState();
   },
@@ -785,10 +841,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       pc = data.pc;
     }
 
-    // Migration: add lastPokemonCenter if missing
+    // Migration: add lastPokemonCenter and events if missing
     const progress = {
       ...data.progress,
       lastPokemonCenter: data.progress.lastPokemonCenter || 'bourg-palette',
+      events: data.progress.events || {},
     };
 
     set({

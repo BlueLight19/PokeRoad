@@ -6,11 +6,16 @@ import { InventoryItem } from './inventory';
 
 export interface RouteData {
   id: string;
+  type: 'route';
   name: string;
   region: string;
   generation: number;
   unlockCondition: UnlockCondition | null;
   wildEncounters: WildEncounter[];
+  waterEncounters?: WildEncounter[];
+  fishingEncounters?: WildEncounter[];
+  staticEncounters?: StaticEncounter[];
+  npcs?: NPCData[];
   trainers: string[];
   connectedZones: string[];
 }
@@ -22,8 +27,32 @@ export interface WildEncounter {
   rate: number;
 }
 
+export interface StaticEncounter {
+  id: string; // Unique ID for the encounter (e.g. snorlax_route12, mewtwo)
+  pokemonId: number;
+  level: number;
+  name: string; // Display name on map (e.g. "Ronflex endormi")
+  requiredItem?: string; // e.g. "poke-flute"
+  isGift?: boolean; // If true, adds directly to team/PC without combat
+  dialogue?: string; // Text shown before encounter
+}
+
+export interface NPCData {
+  id: string;
+  name: string;
+  dialogue: string[]; // Sequential dialogue or just random strings, can just be one string.
+  givesItem?: string;
+  givesPokemon?: {
+    pokemonId: number;
+    level: number;
+  };
+  requiredEvent?: string; // E.g., must have 'badge-foudre' to appear
+  setsEvent?: string; // E.g., 'received-bike-voucher'
+}
+
 export interface CityData {
   id: string;
+  type: 'city' | 'dungeon';
   name: string;
   region: string;
   generation: number;
@@ -31,7 +60,12 @@ export interface CityData {
   hasCenter: boolean;
   gymId?: string; // ID of the gym leader
   trainers?: string[]; // IDs of trainers in the city (e.g. Rival)
+  shopItems?: string[]; // IDs of items sold in this city's Poke Mart
   wildEncounters?: WildEncounter[]; // Surfing/Fishing/Safari?
+  waterEncounters?: WildEncounter[];
+  fishingEncounters?: WildEncounter[];
+  staticEncounters?: StaticEncounter[];
+  npcs?: NPCData[];
   connectedZones: string[];
   unlockCondition?: UnlockCondition;
 }
@@ -68,11 +102,13 @@ export interface TrainerPokemon {
 }
 
 export interface UnlockCondition {
-  type: 'trainers' | 'badge' | 'gym';
+  type: 'trainers' | 'badge' | 'gym' | 'item' | 'event';
   defeatedTrainers?: string[];
   badge?: string;
   gymId?: string;
   zones?: string[];
+  itemId?: string; // Require a specific item in absolute inventory (e.g. silph-scope)
+  eventId?: string; // Require a specific story event flag
 }
 
 // ===== Save Data =====
@@ -104,6 +140,7 @@ export interface ProgressData {
   leagueProgress: number; // 0=None, 1=Lorelei, 2=Bruno, 3=Agatha, 4=Lance, 5=Champion
   repelSteps: number;
   lastPokemonCenter: string;
+  events: Record<string, boolean>; // Tracks completed story events and caught/defeated static encounters
 }
 
 export interface SafariState {

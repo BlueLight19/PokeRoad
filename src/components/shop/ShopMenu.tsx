@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getShopItems } from '../../utils/dataLoader';
+import { getCityShopItems, getShopItems } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 
 export function ShopMenu() {
-  const { player, addItem, spendMoney, setView, inventory } = useGameStore();
+  const { player, addItem, spendMoney, setView, inventory, selectedZone } = useGameStore();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [message, setMessage] = useState<string | null>(null);
 
-  const items = getShopItems();
+  const items = selectedZone ? getCityShopItems(selectedZone) : getShopItems();
 
   const handleBuy = (itemId: string, price: number) => {
     const qty = quantities[itemId] || 1;

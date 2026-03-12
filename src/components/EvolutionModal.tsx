@@ -15,6 +15,8 @@ export function EvolutionModal() {
   const currentData = getPokemonData(pokemon.dataId);
   const targetData = getPokemonData(pendingEvolution.targetId);
   const name = pokemon.nickname || currentData.name;
+  const currentSpriteUrl = pokemon.isShiny ? currentData.spriteUrl.replace('pokemon', 'pokemon/shiny') : currentData.spriteUrl;
+  const targetSpriteUrl = pokemon.isShiny ? targetData.spriteUrl.replace('pokemon', 'pokemon/shiny') : targetData.spriteUrl;
 
   return (
     <Modal open={true} title="Evolution !">
@@ -31,7 +33,7 @@ export function EvolutionModal() {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
           <div>
             <img
-              src={currentData.spriteUrl}
+              src={currentSpriteUrl}
               alt={currentData.name}
               style={{ width: '80px', height: '80px', imageRendering: 'pixelated' }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -43,7 +45,7 @@ export function EvolutionModal() {
           <div style={{ color: '#FFD600', fontSize: '20px' }}>→</div>
           <div>
             <img
-              src={targetData.spriteUrl}
+              src={targetSpriteUrl}
               alt={targetData.name}
               style={{ width: '80px', height: '80px', imageRendering: 'pixelated' }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

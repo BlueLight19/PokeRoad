@@ -19,6 +19,7 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
   const data = getPokemonData(pokemon.dataId);
   const name = pokemon.nickname || data.name;
   const isFainted = pokemon.currentHp <= 0;
+  const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
   const borderColor = isPlayer ? '#2196F3' : '#e94560';
 
   return (
@@ -66,7 +67,7 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
           filter: 'blur(8px)',
         }} />
         <img
-          src={data.spriteUrl}
+          src={spriteUrl}
           alt={name}
           style={{
             width: '96px',
@@ -79,6 +80,23 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
           }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
+        {pokemon.isShiny && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '32px',
+            animation: 'pulse 1s infinite alternate',
+            textShadow: '0 0 10px gold',
+            zIndex: 10
+          }}>✨</div>
+        )}
       </div>
 
       {/* Info */}

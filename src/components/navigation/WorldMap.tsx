@@ -1,5 +1,7 @@
+import React, { useState, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getAllZones, getGymData } from '../../utils/dataLoader';
+import { getZoneData, getAllZones, getGymData } from '../../utils/dataLoader';
+import { CityData, RouteData } from '../../types/game';
 import { Button } from '../ui/Button';
 
 // Complete Kanto progression order
@@ -216,10 +218,18 @@ export function WorldMap() {
 
               const hasGym = isCity && (zone as any).gymId;
               const gymBadgeEarned = hasGym && (() => {
-                try {
-                  const gymInfo = getGymData((zone as any).gymId);
-                  return player.badges.includes(gymInfo.badge);
-                } catch { return false; }
+                let gymDefeated = false;
+                if ((zone as any).gymId) {
+                  try {
+                    const gym = getGymData((zone as any).gymId!);
+                    if (gym) {
+                      gymDefeated = player.badges.includes(gym.badge);
+                    }
+                  } catch {
+                    // Gym data might be missing or gymId invalid
+                  }
+                }
+                return gymDefeated;
               })();
 
               const accentColor = isCity ? '#FFD600' : isDungeon ? '#9C27B0' : '#4CAF50';
@@ -256,7 +266,7 @@ export function WorldMap() {
                           : '2px solid #151515',
                       borderRadius: '10px',
                       cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                      opacity: isUnlocked ? 1 : 0.35,
+                      opacity: isUnlocked ? 1 : 0.6,
                       transition: 'all 0.25s ease',
                       textAlign: 'left',
                       position: 'relative',
@@ -351,6 +361,26 @@ export function WorldMap() {
                             fontFamily: "'Press Start 2P', monospace",
                           }}>
                             Donjon
+                          </span>
+                        )}
+
+                        {/* Lock indication */}
+                        {!isUnlocked && (zone as any).unlockCondition?.itemId && (
+                          <span style={{
+                            color: '#FF9800',
+                            fontSize: '7px',
+                            fontFamily: "'Press Start 2P', monospace",
+                          }}>
+                            [Objet Requis]
+                          </span>
+                        )}
+                        {!isUnlocked && (zone as any).unlockCondition?.eventId && (
+                          <span style={{
+                            color: '#E91E63',
+                            fontSize: '7px',
+                            fontFamily: "'Press Start 2P', monospace",
+                          }}>
+                            [Bloqué]
                           </span>
                         )}
                       </div>

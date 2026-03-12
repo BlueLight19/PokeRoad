@@ -112,8 +112,17 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
     }
 
+    // Check for Chroma Charms
+    const gameStore = useGameStore.getState();
+    const inventory = gameStore.inventory;
+    const chromaCharms = inventory.find(i => i.itemId === 'chroma-charm')?.quantity || 0;
+
+    // Base rate 1/4096. 1 charm = +75% (x1.75).
+    const shinyRate = (1 / 4096) * Math.pow(1.75, chromaCharms);
+    const isShiny = Math.random() < shinyRate;
+
     const level = chosen.minLevel + Math.floor(Math.random() * (chosen.maxLevel - chosen.minLevel + 1));
-    const wildPokemon = createPokemonInstance(chosen.pokemonId, level);
+    const wildPokemon = createPokemonInstance(chosen.pokemonId, level, undefined, isShiny);
     // Fix PP
     wildPokemon.moves = wildPokemon.moves.map(m => {
       const data = getMoveData(m.moveId);

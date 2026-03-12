@@ -107,6 +107,7 @@ export interface PokemonInstance {
   xp: number;
   xpToNextLevel: number;
   friendship: number;
+  isShiny: boolean;
 }
 
 export interface MoveInstance {

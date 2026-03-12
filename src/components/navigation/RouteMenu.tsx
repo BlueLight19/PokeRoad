@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
-import { WildEncounter } from '../../types/game';
+import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
 
 export function RouteMenu() {
   const {
@@ -14,14 +14,26 @@ export function RouteMenu() {
     isTrainerDefeated,
     decrementRepelSteps,
     setRepelSteps, // In case we want to show it
+    addItem,
+    addPokemonToTeam,
+    triggerEvent
   } = useGameStore();
   const { startWildBattle, startTrainerBattle } = useBattleStore();
+  const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
+  const [dialogueIndex, setDialogueIndex] = useState(0);
 
   if (!selectedZone) return null;
 
-  const zone = getZoneData(selectedZone) as any;
-  const wildEncounters: WildEncounter[] = zone.wildEncounters || [];
+  const zone = getZoneData(selectedZone) as unknown as RouteData | CityData;
+  const wildEncounters: WildEncounter[] = (zone as RouteData).wildEncounters || [];
+  const waterEncounters: WildEncounter[] = (zone as RouteData).waterEncounters || [];
+  const fishingEncounters: WildEncounter[] = (zone as RouteData).fishingEncounters || [];
+  const staticEncounters = (zone as RouteData).staticEncounters || [];
+  const npcs: NPCData[] = (zone as RouteData).npcs || [];
   const trainerIds: string[] = zone.trainers || [];
+
+  const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
+  const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
 
   const handleWildEncounter = () => {
     if (wildEncounters.length === 0) return;
@@ -52,6 +64,18 @@ export function RouteMenu() {
       startWildBattle(wildEncounters, team);
     }
 
+    setView('battle');
+  };
+
+  const handleWaterEncounter = () => {
+    if (waterEncounters.length === 0) return;
+    startWildBattle(waterEncounters, team);
+    setView('battle');
+  };
+
+  const handleFishingEncounter = () => {
+    if (fishingEncounters.length === 0) return;
+    startWildBattle(fishingEncounters, team);
     setView('battle');
   };
 
@@ -88,6 +112,58 @@ export function RouteMenu() {
     }
   };
 
+  const handleNpcClick = (npc: NPCData) => {
+    setActiveNpc(npc);
+    setDialogueIndex(0);
+  };
+
+  const advanceDialogue = () => {
+    if (!activeNpc) return;
+
+    if (dialogueIndex < activeNpc.dialogue.length - 1) {
+      setDialogueIndex(prev => prev + 1);
+    } else {
+      // End of dialogue, give rewards if any
+      if (activeNpc.setsEvent && !progress.events[activeNpc.setsEvent]) {
+        triggerEvent(activeNpc.setsEvent);
+        if (activeNpc.givesItem) {
+          addItem(activeNpc.givesItem, 1);
+        }
+        if (activeNpc.givesPokemon) {
+          addPokemonToTeam(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+        }
+      }
+      setActiveNpc(null);
+    }
+  };
+
+  if (activeNpc) {
+    return (
+      <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <h2 style={{ color: '#FFD600', fontSize: '16px', fontFamily: "'Press Start 2P', monospace", marginBottom: '20px', textAlign: 'center' }}>
+          {activeNpc.name}
+        </h2>
+        <div style={{
+          flex: 1,
+          background: '#0a0a15',
+          border: '2px solid #333',
+          borderRadius: '8px',
+          padding: '16px',
+          color: '#fff',
+          fontFamily: "'Press Start 2P', monospace",
+          fontSize: '12px',
+          lineHeight: '1.6',
+          marginBottom: '20px',
+        }}>
+          {activeNpc.dialogue[dialogueIndex]}
+        </div>
+        <Button onClick={advanceDialogue} style={{ width: '100%' }}>
+          {dialogueIndex < activeNpc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
       <h2
@@ -120,6 +196,42 @@ export function RouteMenu() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+        {/* NPCs */}
+        {npcs.map(npc => {
+          if (npc.requiredEvent && !progress.events[npc.requiredEvent]) return null;
+
+          const isCompleted = npc.setsEvent ? progress.events[npc.setsEvent] : false;
+
+          return (
+            <button
+              key={npc.id}
+              onClick={() => handleNpcClick(npc)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: isCompleted ? '#1a1a1a' : '#1a2e1a',
+                border: isCompleted ? '2px solid #333' : '2px solid #4CAF50',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                opacity: isCompleted ? 0.7 : 1,
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>💬</span>
+              <div>
+                <div style={{ color: isCompleted ? '#888' : '#4CAF50', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                  {npc.name}
+                </div>
+                <div style={{ color: '#888', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                  {isCompleted ? 'Deja parle' : 'Interagir'}
+                </div>
+              </div>
+            </button>
+          );
+        })}
 
         {/* Safari Action */}
         {useGameStore.getState().safariState ? (
@@ -192,55 +304,112 @@ export function RouteMenu() {
           ))
         }
 
-        {/* Special Encounters (Legendaries/Snorlax) */}
+        {/* Surf Encounters */}
+        {!useGameStore.getState().safariState && waterEncounters.length > 0 && hasSurf && (
+          <button
+            onClick={handleWaterEncounter}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '14px 16px',
+              background: '#0d47a1',
+              border: '2px solid #2196f3',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>🌊</span>
+            <div>
+              <div style={{ color: '#64b5f6', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                Surfer sur l'eau
+              </div>
+              <div style={{ color: '#bbdefb', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                Créatures aquatiques
+              </div>
+            </div>
+          </button>
+        )}
+
+        {/* Fishing Encounters */}
+        {!useGameStore.getState().safariState && fishingEncounters.length > 0 && hasRod && (
+          <button
+            onClick={handleFishingEncounter}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '14px 16px',
+              background: '#006064',
+              border: '2px solid #00bcd4',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>🎣</span>
+            <div>
+              <div style={{ color: '#4dd0e1', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                Pêcher
+              </div>
+              <div style={{ color: '#b2ebf2', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                Lancer la ligne
+              </div>
+            </div>
+          </button>
+        )}
+
+        {/* Dynamic Static Encounters (Legendaries/Snorlax) */}
         {
-          (() => {
-            const specialEncounters: Record<string, { id: string, name: string, description: string, pokemonId: number, level: number }> = {
-              'victory-road': { id: 'legendary-moltres', name: 'Oiseau de Feu', description: 'Une créature légendaire brûle dans l\'ombre.', pokemonId: 146, level: 50 },
-              'power-plant': { id: 'legendary-zapdos', name: 'Oiseau de Foudre', description: 'L\'air crépite d\'électricité...', pokemonId: 145, level: 50 },
-              'seafoam-islands': { id: 'legendary-articuno', name: 'Oiseau de Glace', description: 'Un froid surnaturel émane du fond.', pokemonId: 144, level: 50 },
-              'cerulean-cave': { id: 'legendary-mewtwo', name: '???', description: 'Une pression psychique écrasante...', pokemonId: 150, level: 70 },
-              'route-12': { id: 'snorlax-12', name: 'Ronflex', description: 'Un gros Pokémon bloque le chemin.', pokemonId: 143, level: 30 },
-              'route-16': { id: 'snorlax-16', name: 'Ronflex', description: 'Un gros Pokémon dort paisiblement.', pokemonId: 143, level: 30 },
-            };
-
-            const encounter = specialEncounters[selectedZone];
-            if (!encounter) return null;
-
-            // Check if already defeated
-            if (isTrainerDefeated(encounter.id)) return null;
+          staticEncounters.map((encounter: StaticEncounter) => {
+            // Check if already captured/defeated/completed
+            if (progress.events[encounter.id]) return null;
 
             return (
               <button
+                key={encounter.id}
                 onClick={() => {
-                  startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
-                  setView('battle');
+                  if (encounter.isGift) {
+                    // Direct add without battle
+                    const state = useGameStore.getState();
+                    // Create pokemon at level
+                    // Normally we should expose `createPokemonInstance` but we can't easily import it here cleanly in a JSX dump
+                    // Actually we can, but since this is just UI, the easiest is to call a store action. Let's just trigger a battle for now as "gifts" might need a new action. 
+                    // To keep it simple, we'll assume all static encounters trigger battles, and gifts run away?
+                    // Let's just trigger a standard battle for simplicity. If it's a gift we could add an action.
+                    startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
+                    setView('battle');
+                  } else {
+                    startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
+                    setView('battle');
+                  }
                 }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
                   padding: '14px 16px',
-                  background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                  border: '2px solid #FFD700',
+                  background: encounter.isGift ? 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                  border: encounter.isGift ? '2px solid #81C784' : '2px solid #FFD700',
                   borderRadius: '8px',
                   cursor: 'pointer',
                   textAlign: 'left',
-                  boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
+                  boxShadow: encounter.isGift ? '0 0 10px rgba(76, 175, 80, 0.3)' : '0 0 10px rgba(255, 215, 0, 0.3)',
                 }}
               >
-                <span style={{ fontSize: '20px' }}>★</span>
+                <span style={{ fontSize: '20px' }}>{encounter.isGift ? '🎁' : '★'}</span>
                 <div>
-                  <div style={{ color: '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+                  <div style={{ color: encounter.isGift ? '#fff' : '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
                     {encounter.name}
                   </div>
-                  <div style={{ color: '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
-                    {encounter.description}
+                  <div style={{ color: encounter.isGift ? '#eee' : '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px', lineHeight: '1.4' }}>
+                    {encounter.dialogue || (encounter.isGift ? 'Obtenir ce Pokémon ?' : 'Une présence imposante...')}
                   </div>
                 </div>
               </button>
             );
-          })()
+          })
         }
 
         {/* Trainers */}

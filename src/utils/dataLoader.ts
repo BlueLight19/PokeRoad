@@ -132,6 +132,19 @@ export function getShopItems(): ItemData[] {
   return Array.from(itemRegistry.values()).filter(i => i.price > 0);
 }
 
+export function getCityShopItems(cityId: string): ItemData[] {
+  const city = getZoneData(cityId) as CityData;
+  if (!city.hasShop || !city.shopItems) return [];
+
+  return city.shopItems.map(itemId => {
+    try {
+      return getItemData(itemId);
+    } catch {
+      return null;
+    }
+  }).filter((i): i is ItemData => i !== null);
+}
+
 export function getTypeEffectiveness(attackType: PokemonType, defenseTypes: PokemonType[]): number {
   let multiplier = 1;
   for (const defType of defenseTypes) {

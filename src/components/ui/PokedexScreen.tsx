@@ -4,7 +4,7 @@ import { getPokemonData, getAllPokemon } from '../../utils/dataLoader';
 import { Button } from './Button';
 
 export function PokedexScreen() {
-    const { progress, setView } = useGameStore();
+    const { progress, setView, inventory, addItem } = useGameStore();
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
     // Get all 151
@@ -21,6 +21,14 @@ export function PokedexScreen() {
             <div style={{ textAlign: 'center', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", color: '#888', marginBottom: '16px' }}>
                 Vus: {seenCount} | Pris: {caughtCount}
             </div>
+
+            {caughtCount >= 151 && !inventory.some(i => i.itemId === 'chroma-charm') && (
+                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                    <Button variant="primary" onClick={() => addItem('chroma-charm', 1)}>
+                        ⭐ Réclamer le Charme Chroma ! ⭐
+                    </Button>
+                </div>
+            )}
 
             <div style={{ flex: 1, overflowY: 'auto', background: '#16213e', borderRadius: '8px', padding: '8px' }}>
                 {allPokemon.map(p => {

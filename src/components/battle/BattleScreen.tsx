@@ -179,7 +179,7 @@ export function BattleScreen() {
                 animation: 'bounceIn 0.6s ease',
               }}>
                 <img
-                  src={getPokemonData(battle.caughtPokemon.dataId).spriteUrl}
+                  src={battle.caughtPokemon.isShiny ? getPokemonData(battle.caughtPokemon.dataId).spriteUrl.replace('pokemon', 'pokemon/shiny') : getPokemonData(battle.caughtPokemon.dataId).spriteUrl}
                   alt={caughtName || ''}
                   style={{ width: '96px', height: '96px', imageRendering: 'pixelated' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -229,7 +229,7 @@ export function BattleScreen() {
     try {
       const zd = getZoneData(centerZone) as any;
       centerName = zd.name || centerZone;
-    } catch {}
+    } catch { }
 
     return (
       <div className="battle-container" style={containerStyle}>
@@ -339,7 +339,7 @@ export function BattleScreen() {
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  <img src={pData.spriteUrl} alt={pData.name}
+                  <img src={p.isShiny ? pData.spriteUrl.replace('pokemon', 'pokemon/shiny') : pData.spriteUrl} alt={pData.name}
                     style={{ width: '48px', height: '48px', imageRendering: 'pixelated', filter: isFainted ? 'grayscale(1)' : 'none' }}
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />

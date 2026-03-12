@@ -83,6 +83,7 @@ export function PCStorage() {
               );
             }
             const data = getPokemonData(pokemon.dataId);
+            const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
             const isSelected = selected?.type === 'team' && selected.index === idx;
             const hpRatio = pokemon.currentHp / pokemon.maxHp;
             const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
@@ -106,7 +107,7 @@ export function PCStorage() {
                 }}
               >
                 <img
-                  src={data.spriteUrl}
+                  src={spriteUrl}
                   alt={data.name}
                   style={{ width: '80%', height: '80%', imageRendering: 'pixelated' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -183,6 +184,7 @@ export function PCStorage() {
           }
 
           const data = getPokemonData(pokemon.dataId);
+          const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
           const isSelected = selected?.type === 'pc' && selected.uid === pokemon.uid;
           const hpRatio = pokemon.currentHp / pokemon.maxHp;
           const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
@@ -206,7 +208,7 @@ export function PCStorage() {
               }}
             >
               <img
-                src={data.spriteUrl}
+                src={spriteUrl}
                 alt={data.name}
                 style={{ width: '80%', height: '80%', imageRendering: 'pixelated' }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -263,6 +265,7 @@ function DetailPanel({
   onClose: () => void;
 }) {
   const data = getPokemonData(pokemon.dataId);
+  const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
   const hpRatio = pokemon.currentHp / pokemon.maxHp;
   const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
   const font = "'Press Start 2P', monospace";
@@ -282,7 +285,7 @@ function DetailPanel({
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
         <img
-          src={data.spriteUrl}
+          src={spriteUrl}
           alt={data.name}
           style={{ width: '64px', height: '64px', imageRendering: 'pixelated' }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -293,7 +296,7 @@ function DetailPanel({
           </div>
           <div style={{ color: '#888', fontSize: '8px', fontFamily: font, marginTop: '4px' }}>
             Nv.{pokemon.level}
-            {pokemon.status !== 'none' && (
+            {pokemon.status !== null && (
               <span style={{ color: '#e94560', marginLeft: '8px' }}>
                 [{pokemon.status.toUpperCase()}]
               </span>

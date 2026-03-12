@@ -199,5 +199,130 @@
     },
     "usableInBattle": false,
     "usableOutside": true
+  },
+  {
+    "id": "chroma-charm",
+    "name": "Charme Chroma",
+    "description": "Un charme mystérieux qui augmente vos chances (+75%) de rencontrer un Pokémon chromatique. Obtenu en complétant le Pokédex.",
+    "category": "misc",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "silph-scope",
+    "name": "Scope Sylphe",
+    "description": "Des lunettes spéciales permettant de voir l'invisible.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "poke-flute",
+    "name": "Poké Flûte",
+    "description": "Une flûte qui réveille instantanément n'importe quel Pokémon.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": true,
+    "usableOutside": true
+  },
+  {
+    "id": "old-rod",
+    "name": "Canne",
+    "description": "Une vieille canne à pêche pour attraper de petits Pokémon aquatiques.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "super-rod",
+    "name": "Super Canne",
+    "description": "La meilleure des cannes à pêche. Pour les vrais pêcheurs !",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "itemfinder",
+    "name": "Cherch'Objet",
+    "description": "Une machine qui émet un son quand un objet invisible est proche.",
+    "category": "key",
+    "price": 0,
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "hm-01",
+    "name": "CS01 Coupe",
+    "description": "Permet de couper les petits arbres qui bloquent le chemin.",
+    "category": "misc",
+    "price": 0,
+    "effect": {
+      "type": "teach",
+      "moveId": 15
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "hm-02",
+    "name": "CS02 Vol",
+    "description": "Permet de s'envoler vers n'importe quelle ville déjà visitée.",
+    "category": "misc",
+    "price": 0,
+    "effect": {
+      "type": "teach",
+      "moveId": 19
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "hm-03",
+    "name": "CS03 Surf",
+    "description": "Permet de se déplacer sur l'eau.",
+    "category": "misc",
+    "price": 0,
+    "effect": {
+      "type": "teach",
+      "moveId": 57
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "hm-04",
+    "name": "CS04 Force",
+    "description": "Permet de déplacer de gros rochers ronds.",
+    "category": "misc",
+    "price": 0,
+    "effect": {
+      "type": "teach",
+      "moveId": 70
+    },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "hm-05",
+    "name": "CS05 Flash",
+    "description": "Éclaire les endroits sombres comme les grottes.",
+    "category": "misc",
+    "price": 0,
+    "effect": {
+      "type": "teach",
+      "moveId": 148
+    },
+    "usableInBattle": false,
+    "usableOutside": true
   }
 ]

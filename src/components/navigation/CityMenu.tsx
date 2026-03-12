@@ -3,18 +3,23 @@ import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getGymData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
+import { NPCData, CityData, RouteData } from '../../types/game';
 
 export function CityMenu() {
-  const { selectedZone, team, player, progress, setView } = useGameStore();
+  const { selectedZone, team, player, progress, setView, addItem, addPokemonToTeam, triggerEvent } = useGameStore();
   const { startGymBattle } = useBattleStore();
   const [healMessage, setHealMessage] = useState('');
+  const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
+  const [dialogueIndex, setDialogueIndex] = useState(0);
 
   if (!selectedZone) return null;
 
-  const zone = getZoneData(selectedZone) as any;
-  const hasShop = zone.hasShop;
-  const gymId = zone.gymId;
+  const zone = getZoneData(selectedZone) as CityData | RouteData;
+  const isCity = zone.type === 'city';
+  const hasShop = (zone as CityData).hasShop;
+  const gymId = (zone as CityData).gymId;
   const trainers: string[] = zone.trainers || [];
+  const npcs: NPCData[] = zone.npcs || [];
 
   let gym: any = null;
   let gymDefeated = false;
@@ -84,6 +89,58 @@ export function CityMenu() {
     useGameStore.getState().saveGameState();
   };
 
+  const handleNpcClick = (npc: NPCData) => {
+    setActiveNpc(npc);
+    setDialogueIndex(0);
+  };
+
+  const advanceDialogue = () => {
+    if (!activeNpc) return;
+
+    if (dialogueIndex < activeNpc.dialogue.length - 1) {
+      setDialogueIndex(prev => prev + 1);
+    } else {
+      // End of dialogue, give rewards if any
+      if (activeNpc.setsEvent && !progress.events[activeNpc.setsEvent]) {
+        triggerEvent(activeNpc.setsEvent);
+        if (activeNpc.givesItem) {
+          addItem(activeNpc.givesItem, 1);
+        }
+        if (activeNpc.givesPokemon) {
+          addPokemonToTeam(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+        }
+      }
+      setActiveNpc(null);
+    }
+  };
+
+  if (activeNpc) {
+    return (
+      <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <h2 style={{ color: '#FFD600', fontSize: '16px', fontFamily: "'Press Start 2P', monospace", marginBottom: '20px', textAlign: 'center' }}>
+          {activeNpc.name}
+        </h2>
+        <div style={{
+          flex: 1,
+          background: '#0a0a15',
+          border: '2px solid #333',
+          borderRadius: '8px',
+          padding: '16px',
+          color: '#fff',
+          fontFamily: "'Press Start 2P', monospace",
+          fontSize: '12px',
+          lineHeight: '1.6',
+          marginBottom: '20px',
+        }}>
+          {activeNpc.dialogue[dialogueIndex]}
+        </div>
+        <Button onClick={advanceDialogue} style={{ width: '100%' }}>
+          {dialogueIndex < activeNpc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
       <h2
@@ -99,6 +156,42 @@ export function CityMenu() {
       </h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* NPCs */}
+        {npcs.map(npc => {
+          if (npc.requiredEvent && !progress.events[npc.requiredEvent]) return null;
+
+          const isCompleted = npc.setsEvent ? progress.events[npc.setsEvent] : false;
+
+          return (
+            <button
+              key={npc.id}
+              onClick={() => handleNpcClick(npc)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                background: isCompleted ? '#1a1a1a' : '#1a2e1a',
+                border: isCompleted ? '2px solid #333' : '2px solid #4CAF50',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                opacity: isCompleted ? 0.7 : 1,
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>💬</span>
+              <div>
+                <div style={{ color: isCompleted ? '#888' : '#4CAF50', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                  {npc.name}
+                </div>
+                <div style={{ color: '#888', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                  {isCompleted ? 'Deja parle' : 'Interagir'}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+
         {/* Shop */}
         {hasShop && (
           <button

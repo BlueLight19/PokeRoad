@@ -12,6 +12,18 @@
     "connectedZones": [
       "route-1"
     ],
+    "npcs": [
+      {
+        "id": "npc-oak-aide",
+        "name": "Assistant du Professeur Chen",
+        "dialogue": [
+          "Bonjour !",
+          "Le Professeur m'a demandé de te donner ceci pour t'aider dans ton voyage."
+        ],
+        "givesItem": "hm-05",
+        "setsEvent": "received-hm05-flash"
+      }
+    ],
     "unlockCondition": null
   },
   {
@@ -25,13 +37,13 @@
         "pokemonId": 16,
         "minLevel": 2,
         "maxLevel": 5,
-        "rate": 45
+        "rate": 50
       },
       {
         "pokemonId": 19,
         "minLevel": 2,
         "maxLevel": 4,
-        "rate": 55
+        "rate": 50
       }
     ],
     "trainers": [
@@ -58,6 +70,12 @@
       "route-1",
       "route-2"
     ],
+    "shopItems": [
+      "poke-ball",
+      "potion",
+      "antidote",
+      "anti-para"
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -76,19 +94,19 @@
         "pokemonId": 16,
         "minLevel": 3,
         "maxLevel": 5,
-        "rate": 30
+        "rate": 45
       },
       {
         "pokemonId": 19,
-        "minLevel": 3,
+        "minLevel": 2,
         "maxLevel": 5,
         "rate": 40
       },
       {
-        "pokemonId": 21,
+        "pokemonId": 13,
         "minLevel": 3,
         "maxLevel": 5,
-        "rate": 30
+        "rate": 15
       }
     ],
     "trainers": [
@@ -114,28 +132,34 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 16,
-        "minLevel": 4,
-        "maxLevel": 6,
-        "rate": 20
-      },
-      {
-        "pokemonId": 19,
+        "pokemonId": 13,
         "minLevel": 3,
         "maxLevel": 5,
-        "rate": 25
+        "rate": 50
+      },
+      {
+        "pokemonId": 10,
+        "minLevel": 3,
+        "maxLevel": 5,
+        "rate": 5
+      },
+      {
+        "pokemonId": 14,
+        "minLevel": 4,
+        "maxLevel": 6,
+        "rate": 35
+      },
+      {
+        "pokemonId": 11,
+        "minLevel": 4,
+        "maxLevel": 6,
+        "rate": 5
       },
       {
         "pokemonId": 25,
         "minLevel": 3,
         "maxLevel": 5,
         "rate": 5
-      },
-      {
-        "pokemonId": 21,
-        "minLevel": 4,
-        "maxLevel": 6,
-        "rate": 50
       }
     ],
     "trainers": [
@@ -168,6 +192,19 @@
       "foret-jade",
       "route-3"
     ],
+    "npcs": [
+      {
+        "id": "npc-pewter-scientist",
+        "name": "Scientifique du Musée",
+        "dialogue": [
+          "Fascinant !",
+          "Cet Ambre contient l'ADN d'un Pokémon préhistorique...",
+          "Prends-le, je n'ai plus la place dans mon laboratoire."
+        ],
+        "givesItem": "old-amber",
+        "setsEvent": "received-old-amber"
+      }
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -183,22 +220,22 @@
     "generation": 1,
     "wildEncounters": [
       {
+        "pokemonId": 16,
+        "minLevel": 6,
+        "maxLevel": 8,
+        "rate": 45
+      },
+      {
         "pokemonId": 21,
         "minLevel": 6,
         "maxLevel": 8,
-        "rate": 35
+        "rate": 45
       },
       {
-        "pokemonId": 19,
-        "minLevel": 6,
-        "maxLevel": 8,
-        "rate": 35
-      },
-      {
-        "pokemonId": 74,
-        "minLevel": 7,
-        "maxLevel": 10,
-        "rate": 30
+        "pokemonId": 39,
+        "minLevel": 3,
+        "maxLevel": 7,
+        "rate": 10
       }
     ],
     "trainers": [
@@ -224,27 +261,27 @@
     "wildEncounters": [
       {
         "pokemonId": 41,
-        "minLevel": 8,
-        "maxLevel": 12,
-        "rate": 60
+        "minLevel": 7,
+        "maxLevel": 10,
+        "rate": 79
       },
       {
         "pokemonId": 74,
         "minLevel": 8,
         "maxLevel": 10,
-        "rate": 25
+        "rate": 11
       },
       {
         "pokemonId": 35,
-        "minLevel": 10,
-        "maxLevel": 12,
-        "rate": 10
+        "minLevel": 8,
+        "maxLevel": 8,
+        "rate": 1
       },
       {
         "pokemonId": 46,
         "minLevel": 8,
         "maxLevel": 10,
-        "rate": 5
+        "rate": 9
       }
     ],
     "trainers": [
@@ -275,19 +312,19 @@
         "pokemonId": 19,
         "minLevel": 8,
         "maxLevel": 12,
-        "rate": 35
+        "rate": 45
+      },
+      {
+        "pokemonId": 21,
+        "minLevel": 8,
+        "maxLevel": 12,
+        "rate": 15
       },
       {
         "pokemonId": 23,
-        "minLevel": 8,
-        "maxLevel": 12,
-        "rate": 35
-      },
-      {
-        "pokemonId": 27,
         "minLevel": 10,
         "maxLevel": 12,
-        "rate": 30
+        "rate": 40
       }
     ],
     "trainers": [
@@ -322,6 +359,30 @@
       "route-5",
       "route-9"
     ],
+    "npcs": [
+      {
+        "id": "npc-bike-shop",
+        "name": "Vendeur de Cycles",
+        "dialogue": [
+          "Nos Bicyclettes sont les meilleures !",
+          "Hmm... Tu as l'air d'un bon dresseur.",
+          "Tiens, je t'offre une Bicyclette pour tes voyages."
+        ],
+        "givesItem": "bicycle",
+        "setsEvent": "received-bicycle"
+      }
+    ],
+    "shopItems": [
+      "poke-ball",
+      "potion",
+      "super-potion",
+      "antidote",
+      "anti-para",
+      "reveil",
+      "anti-brule",
+      "corde-sortie",
+      "repousse"
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -337,33 +398,33 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 16,
-        "minLevel": 12,
-        "maxLevel": 14,
-        "rate": 25
-      },
-      {
-        "pokemonId": 10,
-        "minLevel": 12,
-        "maxLevel": 14,
+        "pokemonId": 13,
+        "minLevel": 7,
+        "maxLevel": 7,
         "rate": 20
       },
       {
-        "pokemonId": 13,
+        "pokemonId": 14,
+        "minLevel": 8,
+        "maxLevel": 8,
+        "rate": 20
+      },
+      {
+        "pokemonId": 16,
         "minLevel": 12,
-        "maxLevel": 14,
+        "maxLevel": 13,
         "rate": 20
       },
       {
         "pokemonId": 43,
         "minLevel": 12,
         "maxLevel": 14,
-        "rate": 15
+        "rate": 20
       },
       {
         "pokemonId": 63,
         "minLevel": 10,
-        "maxLevel": 12,
+        "maxLevel": 14,
         "rate": 20
       }
     ],
@@ -392,40 +453,34 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 16,
-        "minLevel": 12,
-        "maxLevel": 14,
+        "pokemonId": 13,
+        "minLevel": 7,
+        "maxLevel": 7,
         "rate": 20
       },
       {
-        "pokemonId": 10,
-        "minLevel": 12,
-        "maxLevel": 14,
-        "rate": 15
+        "pokemonId": 14,
+        "minLevel": 8,
+        "maxLevel": 8,
+        "rate": 20
       },
       {
-        "pokemonId": 13,
-        "minLevel": 12,
-        "maxLevel": 14,
+        "pokemonId": 16,
+        "minLevel": 13,
+        "maxLevel": 13,
         "rate": 15
       },
       {
         "pokemonId": 43,
         "minLevel": 12,
         "maxLevel": 14,
-        "rate": 10
+        "rate": 40
       },
       {
         "pokemonId": 63,
         "minLevel": 10,
-        "maxLevel": 12,
-        "rate": 15
-      },
-      {
-        "pokemonId": 98,
-        "minLevel": 12,
-        "maxLevel": 14,
-        "rate": 25
+        "maxLevel": 10,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -455,25 +510,19 @@
         "pokemonId": 16,
         "minLevel": 13,
         "maxLevel": 16,
-        "rate": 30
-      },
-      {
-        "pokemonId": 52,
-        "minLevel": 10,
-        "maxLevel": 16,
-        "rate": 30
+        "rate": 40
       },
       {
         "pokemonId": 43,
         "minLevel": 13,
         "maxLevel": 16,
-        "rate": 20
+        "rate": 35
       },
       {
-        "pokemonId": 39,
-        "minLevel": 13,
-        "maxLevel": 15,
-        "rate": 20
+        "pokemonId": 56,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 25
       }
     ],
     "trainers": [],
@@ -500,25 +549,19 @@
         "pokemonId": 16,
         "minLevel": 13,
         "maxLevel": 16,
-        "rate": 30
-      },
-      {
-        "pokemonId": 52,
-        "minLevel": 10,
-        "maxLevel": 16,
-        "rate": 30
+        "rate": 40
       },
       {
         "pokemonId": 43,
         "minLevel": 13,
         "maxLevel": 16,
-        "rate": 20
+        "rate": 35
       },
       {
-        "pokemonId": 39,
-        "minLevel": 13,
-        "maxLevel": 15,
-        "rate": 20
+        "pokemonId": 56,
+        "minLevel": 10,
+        "maxLevel": 12,
+        "rate": 25
       }
     ],
     "trainers": [
@@ -551,6 +594,39 @@
       "route-11",
       "cave-diglett"
     ],
+    "shopItems": [
+      "poke-ball",
+      "super-potion",
+      "anti-para",
+      "reveil",
+      "anti-brule",
+      "repousse"
+    ],
+    "npcs": [
+      {
+        "id": "npc-fishing-guru-1",
+        "name": "Maître Pêcheur",
+        "dialogue": [
+          "Je suis le Maître Pêcheur !",
+          "Tu aimes la pêche ?",
+          "Super ! Prends cette Canne !",
+          "Avec ça, tu pourras pêcher de superbes Pokémon !"
+        ],
+        "givesItem": "old-rod",
+        "setsEvent": "received-old-rod"
+      },
+      {
+        "id": "npc-ss-anne-captain",
+        "name": "Capitaine de l'Océane",
+        "dialogue": [
+          "Ouarf... Je me sens mal...",
+          "Merci de m'avoir fait un massage !",
+          "Tiens, prends ceci en récompense. C'est la CS Coupe !"
+        ],
+        "givesItem": "hm-01",
+        "setsEvent": "received-hm01-cut"
+      }
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -567,27 +643,21 @@
     "wildEncounters": [
       {
         "pokemonId": 23,
-        "minLevel": 14,
-        "maxLevel": 17,
-        "rate": 25
+        "minLevel": 11,
+        "maxLevel": 15,
+        "rate": 50
+      },
+      {
+        "pokemonId": 96,
+        "minLevel": 11,
+        "maxLevel": 15,
+        "rate": 40
       },
       {
         "pokemonId": 21,
         "minLevel": 13,
-        "maxLevel": 16,
-        "rate": 25
-      },
-      {
-        "pokemonId": 96,
-        "minLevel": 13,
-        "maxLevel": 16,
-        "rate": 25
-      },
-      {
-        "pokemonId": 27,
-        "minLevel": 13,
-        "maxLevel": 15,
-        "rate": 25
+        "maxLevel": 17,
+        "rate": 10
       }
     ],
     "trainers": [
@@ -646,28 +716,28 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 19,
-        "minLevel": 14,
-        "maxLevel": 17,
-        "rate": 30
-      },
-      {
         "pokemonId": 21,
         "minLevel": 14,
-        "maxLevel": 17,
-        "rate": 30
+        "maxLevel": 16,
+        "rate": 40
       },
       {
-        "pokemonId": 100,
+        "pokemonId": 19,
         "minLevel": 14,
         "maxLevel": 16,
-        "rate": 15
+        "rate": 40
       },
       {
         "pokemonId": 23,
         "minLevel": 13,
-        "maxLevel": 15,
-        "rate": 25
+        "maxLevel": 17,
+        "rate": 15
+      },
+      {
+        "pokemonId": 22,
+        "minLevel": 13,
+        "maxLevel": 17,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -697,19 +767,25 @@
         "pokemonId": 100,
         "minLevel": 14,
         "maxLevel": 17,
-        "rate": 35
+        "rate": 40
       },
       {
         "pokemonId": 21,
         "minLevel": 14,
         "maxLevel": 17,
-        "rate": 35
+        "rate": 40
       },
       {
         "pokemonId": 23,
         "minLevel": 13,
         "maxLevel": 15,
-        "rate": 30
+        "rate": 15
+      },
+      {
+        "pokemonId": 66,
+        "minLevel": 15,
+        "maxLevel": 17,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -791,6 +867,30 @@
       "route-8",
       "route-12"
     ],
+    "shopItems": [
+      "super-ball",
+      "super-potion",
+      "rappel",
+      "antidote",
+      "anti-para",
+      "anti-brule",
+      "corde-sortie",
+      "super-repousse"
+    ],
+    "npcs": [
+      {
+        "id": "npc-mr-fuji",
+        "name": "Mr. Fuji",
+        "dialogue": [
+          "M. Fuji : Tu es venu sauver les Pokémon de la Tour ?",
+          "Ton cœur est pur.",
+          "Je veux que tu aies ceci. C'est la Poké Flûte.",
+          "Elle réveille instantanément les Pokémon endormis."
+        ],
+        "givesItem": "poke-flute",
+        "setsEvent": "received-poke-flute"
+      }
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -809,24 +909,30 @@
         "pokemonId": 16,
         "minLevel": 18,
         "maxLevel": 20,
-        "rate": 30
+        "rate": 20
       },
       {
-        "pokemonId": 52,
-        "minLevel": 17,
-        "maxLevel": 19,
-        "rate": 30
+        "pokemonId": 18,
+        "minLevel": 20,
+        "maxLevel": 20,
+        "rate": 10
       },
       {
-        "pokemonId": 37,
+        "pokemonId": 56,
         "minLevel": 17,
         "maxLevel": 19,
         "rate": 20
       },
       {
-        "pokemonId": 63,
+        "pokemonId": 58,
         "minLevel": 15,
-        "maxLevel": 17,
+        "maxLevel": 18,
+        "rate": 30
+      },
+      {
+        "pokemonId": 63,
+        "minLevel": 17,
+        "maxLevel": 19,
         "rate": 20
       }
     ],
@@ -865,6 +971,15 @@
       "route-6",
       "route-5"
     ],
+    "shopItems": [
+      "hyper-ball",
+      "hyper-potion",
+      "potion-max",
+      "rappel",
+      "total-soin",
+      "corde-sortie",
+      "max-repousse"
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -886,20 +1001,20 @@
         "rate": 30
       },
       {
-        "pokemonId": 37,
+        "pokemonId": 56,
         "minLevel": 19,
         "maxLevel": 22,
-        "rate": 30
-      },
-      {
-        "pokemonId": 52,
-        "minLevel": 17,
-        "maxLevel": 20,
-        "rate": 20
+        "rate": 10
       },
       {
         "pokemonId": 58,
-        "minLevel": 18,
+        "minLevel": 17,
+        "maxLevel": 20,
+        "rate": 40
+      },
+      {
+        "pokemonId": 63,
+        "minLevel": 19,
         "maxLevel": 20,
         "rate": 20
       }
@@ -928,6 +1043,46 @@
       "route-7",
       "route-16"
     ],
+    "shopItems": [
+      "super-ball",
+      "hyper-potion",
+      "rappel",
+      "super-repousse",
+      "antidote",
+      "anti-brule",
+      "antigel",
+      "reveil",
+      "pierre-feu",
+      "pierre-eau",
+      "pierre-foudre",
+      "pierre-plante",
+      "pierre-lune"
+    ],
+    "npcs": [
+      {
+        "id": "npc-eevee-gift",
+        "name": "Homme au Manoir",
+        "dialogue": [
+          "J'ai trouvé ce Pokémon abandonné...",
+          "Voudrais-tu t'en occuper ?"
+        ],
+        "givesPokemon": {
+          "pokemonId": 133,
+          "level": 25
+        },
+        "setsEvent": "received-eevee"
+      },
+      {
+        "id": "npc-rocket-grunt",
+        "name": "Sbire Rocket",
+        "dialogue": [
+          "Le Boss s'est enfui !",
+          "Il a fait tomber ça... Je ne devrais pas être là !"
+        ],
+        "givesItem": "silph-scope",
+        "setsEvent": "received-silph-scope"
+      }
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -946,25 +1101,25 @@
         "pokemonId": 19,
         "minLevel": 18,
         "maxLevel": 22,
-        "rate": 30
+        "rate": 35
       },
       {
         "pokemonId": 21,
         "minLevel": 18,
         "maxLevel": 22,
-        "rate": 30
+        "rate": 25
+      },
+      {
+        "pokemonId": 20,
+        "minLevel": 22,
+        "maxLevel": 22,
+        "rate": 5
       },
       {
         "pokemonId": 84,
         "minLevel": 18,
-        "maxLevel": 20,
-        "rate": 25
-      },
-      {
-        "pokemonId": 143,
-        "minLevel": 30,
-        "maxLevel": 30,
-        "rate": 1
+        "maxLevel": 22,
+        "rate": 35
       }
     ],
     "trainers": [
@@ -975,9 +1130,19 @@
       "celadopole",
       "route-17"
     ],
+    "staticEncounters": [
+      {
+        "id": "snorlax-16",
+        "name": "Ronflex",
+        "pokemonId": 143,
+        "level": 30,
+        "requiredItem": "poke-flute",
+        "dialogue": "Un énorme Pokémon dort profondément..."
+      }
+    ],
     "unlockCondition": {
-      "type": "badge",
-      "badge": "badge-prisme"
+      "type": "item",
+      "itemId": "poke-flute"
     }
   },
   {
@@ -994,22 +1159,22 @@
         "rate": 30
       },
       {
-        "pokemonId": 23,
-        "minLevel": 20,
-        "maxLevel": 22,
-        "rate": 30
-      },
-      {
         "pokemonId": 84,
-        "minLevel": 20,
+        "minLevel": 22,
         "maxLevel": 22,
-        "rate": 30
+        "rate": 25
       },
       {
-        "pokemonId": 77,
+        "pokemonId": 22,
+        "minLevel": 20,
+        "maxLevel": 22,
+        "rate": 40
+      },
+      {
+        "pokemonId": 85,
         "minLevel": 24,
-        "maxLevel": 26,
-        "rate": 10
+        "maxLevel": 28,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -1037,27 +1202,27 @@
     "wildEncounters": [
       {
         "pokemonId": 21,
-        "minLevel": 20,
+        "minLevel": 22,
         "maxLevel": 22,
-        "rate": 30
-      },
-      {
-        "pokemonId": 23,
-        "minLevel": 20,
-        "maxLevel": 22,
-        "rate": 30
+        "rate": 25
       },
       {
         "pokemonId": 84,
         "minLevel": 20,
-        "maxLevel": 22,
+        "maxLevel": 24,
         "rate": 30
       },
       {
-        "pokemonId": 114,
-        "minLevel": 22,
+        "pokemonId": 22,
+        "minLevel": 20,
         "maxLevel": 24,
-        "rate": 10
+        "rate": 40
+      },
+      {
+        "pokemonId": 85,
+        "minLevel": 24,
+        "maxLevel": 28,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -1096,6 +1261,38 @@
       "route-15",
       "route-19",
       "parc-safari"
+    ],
+    "shopItems": [
+      "super-ball",
+      "hyper-ball",
+      "hyper-potion",
+      "rappel",
+      "total-soin",
+      "super-repousse",
+      "max-repousse"
+    ],
+    "npcs": [
+      {
+        "id": "npc-safari-warden",
+        "name": "Gardien du Parc",
+        "dialogue": [
+          "Hé ! Tu as retrouvé mes Dents en Or dans le Parc Safari ?",
+          "Merci ! En échange, prends cette CS Force !",
+          "Elle permet de déplacer de gros rochers."
+        ],
+        "givesItem": "hm-04",
+        "setsEvent": "received-hm04-strength"
+      },
+      {
+        "id": "npc-fishing-guru-2",
+        "name": "Maître Pêcheur - Frère",
+        "dialogue": [
+          "Mon frère est le Maître Pêcheur de Carmin, mais je suis meilleur !",
+          "Tiens, prends la Super Canne !"
+        ],
+        "givesItem": "super-rod",
+        "setsEvent": "received-super-rod"
+      }
     ],
     "unlockCondition": {
       "type": "trainers",
@@ -1196,20 +1393,26 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 69,
-        "minLevel": 22,
-        "maxLevel": 24,
-        "rate": 30
-      },
-      {
         "pokemonId": 43,
         "minLevel": 22,
-        "maxLevel": 24,
+        "maxLevel": 26,
         "rate": 30
       },
       {
-        "pokemonId": 132,
+        "pokemonId": 69,
         "minLevel": 22,
+        "maxLevel": 26,
+        "rate": 30
+      },
+      {
+        "pokemonId": 16,
+        "minLevel": 25,
+        "maxLevel": 27,
+        "rate": 20
+      },
+      {
+        "pokemonId": 48,
+        "minLevel": 24,
         "maxLevel": 24,
         "rate": 10
       },
@@ -1217,7 +1420,13 @@
         "pokemonId": 83,
         "minLevel": 24,
         "maxLevel": 26,
-        "rate": 10
+        "rate": 5
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 25,
+        "maxLevel": 25,
+        "rate": 5
       }
     ],
     "trainers": [
@@ -1238,28 +1447,50 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 69,
-        "minLevel": 22,
-        "maxLevel": 24,
-        "rate": 30
-      },
-      {
         "pokemonId": 43,
         "minLevel": 22,
-        "maxLevel": 24,
+        "maxLevel": 26,
         "rate": 30
       },
       {
-        "pokemonId": 132,
+        "pokemonId": 69,
         "minLevel": 22,
+        "maxLevel": 26,
+        "rate": 30
+      },
+      {
+        "pokemonId": 16,
+        "minLevel": 23,
+        "maxLevel": 27,
+        "rate": 20
+      },
+      {
+        "pokemonId": 48,
+        "minLevel": 24,
         "maxLevel": 24,
         "rate": 10
       },
       {
+        "pokemonId": 83,
+        "minLevel": 24,
+        "maxLevel": 24,
+        "rate": 5
+      },
+      {
+        "pokemonId": 83,
+        "minLevel": 24,
+        "maxLevel": 24,
+        "rate": 5
+      }
+    ],
+    "staticEncounters": [
+      {
+        "id": "snorlax-12",
+        "name": "Ronflex",
         "pokemonId": 143,
-        "minLevel": 30,
-        "maxLevel": 30,
-        "rate": 1
+        "level": 30,
+        "requiredItem": "poke-flute",
+        "dialogue": "Un énorme Pokémon bloque la route..."
       }
     ],
     "trainers": [
@@ -1271,8 +1502,8 @@
       "lavanville"
     ],
     "unlockCondition": {
-      "type": "gym",
-      "gymId": "celadon-gym"
+      "type": "item",
+      "itemId": "poke-flute"
     }
   },
   {
@@ -1340,32 +1571,53 @@
       {
         "pokemonId": 86,
         "minLevel": 28,
+        "maxLevel": 32,
+        "rate": 30
+      },
+      {
+        "pokemonId": 41,
+        "minLevel": 28,
         "maxLevel": 30,
-        "rate": 35
+        "rate": 20
       },
       {
         "pokemonId": 79,
-        "minLevel": 28,
-        "maxLevel": 30,
-        "rate": 35
+        "minLevel": 30,
+        "maxLevel": 32,
+        "rate": 20
       },
       {
         "pokemonId": 42,
-        "minLevel": 28,
+        "minLevel": 38,
+        "maxLevel": 38,
+        "rate": 10
+      },
+      {
+        "pokemonId": 90,
+        "minLevel": 30,
         "maxLevel": 30,
         "rate": 10
       },
       {
-        "pokemonId": 124,
-        "minLevel": 28,
-        "maxLevel": 30,
+        "pokemonId": 87,
+        "minLevel": 32,
+        "maxLevel": 34,
         "rate": 10
       },
       {
+        "pokemonId": 87,
+        "minLevel": 32,
+        "maxLevel": 34,
+        "rate": 10
+      }
+    ],
+    "staticEncounters": [
+      {
+        "id": "legendary-articuno",
+        "name": "Artikodin",
         "pokemonId": 144,
-        "minLevel": 50,
-        "maxLevel": 50,
-        "rate": 1
+        "level": 50,
+        "dialogue": "Artikodin émet un cri glacial !"
       }
     ],
     "trainers": [],
@@ -1395,6 +1647,15 @@
       "route-21",
       "pokemon-mansion"
     ],
+    "shopItems": [
+      "hyper-ball",
+      "hyper-potion",
+      "potion-max",
+      "rappel",
+      "total-soin",
+      "corde-sortie",
+      "max-repousse"
+    ],
     "unlockCondition": {
       "type": "trainers",
       "zones": [
@@ -1411,31 +1672,31 @@
     "wildEncounters": [
       {
         "pokemonId": 88,
-        "minLevel": 28,
+        "minLevel": 30,
         "maxLevel": 32,
         "rate": 30
       },
       {
         "pokemonId": 109,
         "minLevel": 28,
-        "maxLevel": 32,
+        "maxLevel": 30,
         "rate": 30
       },
       {
         "pokemonId": 58,
-        "minLevel": 30,
-        "maxLevel": 32,
+        "minLevel": 32,
+        "maxLevel": 34,
         "rate": 20
       },
       {
-        "pokemonId": 37,
-        "minLevel": 30,
-        "maxLevel": 32,
+        "pokemonId": 110,
+        "minLevel": 32,
+        "maxLevel": 34,
         "rate": 10
       },
       {
-        "pokemonId": 126,
-        "minLevel": 30,
+        "pokemonId": 89,
+        "minLevel": 34,
         "maxLevel": 34,
         "rate": 10
       }
@@ -1463,16 +1724,30 @@
     "generation": 1,
     "wildEncounters": [
       {
-        "pokemonId": 114,
-        "minLevel": 25,
-        "maxLevel": 30,
-        "rate": 40
+        "pokemonId": 16,
+        "minLevel": 21,
+        "maxLevel": 23,
+        "rate": 30
       },
       {
+        "pokemonId": 20,
+        "minLevel": 25,
+        "maxLevel": 27,
+        "rate": 30
+      },
+      {
+        "pokemonId": 114,
+        "minLevel": 21,
+        "maxLevel": 21,
+        "rate": 10
+      }
+    ],
+    "waterEncounters": [
+      {
         "pokemonId": 72,
-        "minLevel": 20,
-        "maxLevel": 30,
-        "rate": 60
+        "minLevel": 5,
+        "maxLevel": 40,
+        "rate": 100
       }
     ],
     "trainers": [
@@ -1585,26 +1860,47 @@
       {
         "pokemonId": 95,
         "minLevel": 40,
-        "maxLevel": 45,
-        "rate": 30
+        "maxLevel": 43,
+        "rate": 35
       },
       {
         "pokemonId": 67,
-        "minLevel": 40,
-        "maxLevel": 45,
-        "rate": 30
+        "minLevel": 41,
+        "maxLevel": 41,
+        "rate": 20
       },
       {
         "pokemonId": 75,
-        "minLevel": 40,
-        "maxLevel": 45,
-        "rate": 30
+        "minLevel": 42,
+        "maxLevel": 42,
+        "rate": 20
       },
       {
+        "pokemonId": 41,
+        "minLevel": 39,
+        "maxLevel": 39,
+        "rate": 10
+      },
+      {
+        "pokemonId": 42,
+        "minLevel": 44,
+        "maxLevel": 44,
+        "rate": 10
+      },
+      {
+        "pokemonId": 68,
+        "minLevel": 43,
+        "maxLevel": 45,
+        "rate": 5
+      }
+    ],
+    "staticEncounters": [
+      {
+        "id": "legendary-moltres",
+        "name": "Sulfura",
         "pokemonId": 146,
-        "minLevel": 50,
-        "maxLevel": 50,
-        "rate": 1
+        "level": 50,
+        "dialogue": "Sulfura bat des ailes avec une chaleur étouffante !"
       }
     ],
     "trainers": [
@@ -1636,6 +1932,15 @@
     "connectedZones": [
       "victory-road"
     ],
+    "shopItems": [
+      "hyper-ball",
+      "hyper-potion",
+      "potion-max",
+      "rappel",
+      "rappel-max",
+      "total-soin",
+      "max-repousse"
+    ],
     "unlockCondition": null
   },
   {
@@ -1648,6 +1953,32 @@
     "gymId": null,
     "connectedZones": [
       "victory-road"
+    ],
+    "shopItems": [
+      "hyper-ball",
+      "hyper-potion",
+      "potion-max",
+      "rappel",
+      "rappel-max",
+      "total-soin",
+      "max-repousse"
+    ],
+    "npcs": [
+      {
+        "id": "npc-fossil-lab",
+        "name": "Scientifique du Labo",
+        "dialogue": [
+          "Je peux ressusciter des fossiles !",
+          "Incroyable ! Tu avais le Vieil Ambre !",
+          "Le processus est terminé... Voici ton Ptéra !"
+        ],
+        "givesPokemon": {
+          "pokemonId": 142,
+          "level": 30
+        },
+        "requiredEvent": "received-old-amber",
+        "setsEvent": "received-aerodactyl"
+      }
     ],
     "unlockCondition": {
       "type": "trainers",
@@ -1666,28 +1997,43 @@
     "unlockCondition": null,
     "wildEncounters": [
       {
-        "pokemonId": 25,
-        "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 20
+        "pokemonId": 100,
+        "minLevel": 21,
+        "maxLevel": 23,
+        "rate": 35
       },
       {
         "pokemonId": 81,
-        "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 20
+        "minLevel": 21,
+        "maxLevel": 21,
+        "rate": 25
       },
       {
-        "pokemonId": 100,
-        "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 20
+        "pokemonId": 25,
+        "minLevel": 20,
+        "maxLevel": 24,
+        "rate": 25
+      },
+      {
+        "pokemonId": 82,
+        "minLevel": 33,
+        "maxLevel": 36,
+        "rate": 10
       },
       {
         "pokemonId": 125,
-        "minLevel": 30,
+        "minLevel": 33,
         "maxLevel": 36,
-        "rate": 10
+        "rate": 5
+      }
+    ],
+    "staticEncounters": [
+      {
+        "id": "legendary-zapdos",
+        "name": "Électhor",
+        "pokemonId": 145,
+        "level": 50,
+        "dialogue": "Électhor pousse un cri perçant !"
       }
     ],
     "trainers": [],
@@ -1708,34 +2054,67 @@
     },
     "wildEncounters": [
       {
-        "pokemonId": 64,
-        "minLevel": 50,
-        "maxLevel": 60,
-        "rate": 20
-      },
-      {
-        "pokemonId": 93,
-        "minLevel": 50,
-        "maxLevel": 60,
-        "rate": 20
-      },
-      {
         "pokemonId": 42,
-        "minLevel": 50,
-        "maxLevel": 60,
-        "rate": 20
+        "minLevel": 46,
+        "maxLevel": 46,
+        "rate": 25
       },
       {
         "pokemonId": 112,
-        "minLevel": 50,
-        "maxLevel": 60,
+        "minLevel": 46,
+        "maxLevel": 46,
+        "rate": 15
+      },
+      {
+        "pokemonId": 64,
+        "minLevel": 46,
+        "maxLevel": 46,
+        "rate": 25
+      },
+      {
+        "pokemonId": 101,
+        "minLevel": 46,
+        "maxLevel": 46,
         "rate": 10
       },
       {
-        "pokemonId": 113,
-        "minLevel": 50,
-        "maxLevel": 60,
+        "pokemonId": 65,
+        "minLevel": 49,
+        "maxLevel": 49,
         "rate": 5
+      },
+      {
+        "pokemonId": 113,
+        "minLevel": 49,
+        "maxLevel": 49,
+        "rate": 5
+      },
+      {
+        "pokemonId": 24,
+        "minLevel": 52,
+        "maxLevel": 52,
+        "rate": 5
+      },
+      {
+        "pokemonId": 26,
+        "minLevel": 53,
+        "maxLevel": 53,
+        "rate": 5
+      },
+      {
+        "pokemonId": 132,
+        "minLevel": 53,
+        "maxLevel": 53,
+        "rate": 5
+      }
+    ],
+    "staticEncounters": [
+      {
+        "id": "legendary-mewtwo",
+        "name": "Mewtwo",
+        "pokemonId": 150,
+        "level": 70,
+        "dialogue": "Mew est la source, mais moi je suis l'absolu."
       }
     ],
     "trainers": [],
@@ -1752,51 +2131,57 @@
     "type": "dungeon",
     "wildEncounters": [
       {
-        "pokemonId": 113,
-        "minLevel": 20,
-        "maxLevel": 25,
-        "rate": 15
-      },
-      {
-        "pokemonId": 128,
+        "pokemonId": 29,
         "minLevel": 22,
-        "maxLevel": 28,
-        "rate": 10
-      },
-      {
-        "pokemonId": 115,
-        "minLevel": 22,
-        "maxLevel": 28,
-        "rate": 15
-      },
-      {
-        "pokemonId": 102,
-        "minLevel": 24,
-        "maxLevel": 28,
+        "maxLevel": 22,
         "rate": 20
       },
       {
-        "pokemonId": 46,
-        "minLevel": 20,
-        "maxLevel": 24,
-        "rate": 15
+        "pokemonId": 32,
+        "minLevel": 22,
+        "maxLevel": 22,
+        "rate": 20
       },
       {
-        "pokemonId": 48,
+        "pokemonId": 102,
         "minLevel": 22,
-        "maxLevel": 26,
-        "rate": 15
+        "maxLevel": 24,
+        "rate": 20
+      },
+      {
+        "pokemonId": 111,
+        "minLevel": 24,
+        "maxLevel": 25,
+        "rate": 10
+      },
+      {
+        "pokemonId": 46,
+        "minLevel": 25,
+        "maxLevel": 25,
+        "rate": 10
+      },
+      {
+        "pokemonId": 84,
+        "minLevel": 25,
+        "maxLevel": 25,
+        "rate": 10
       },
       {
         "pokemonId": 123,
         "minLevel": 25,
-        "maxLevel": 28,
-        "rate": 5
+        "maxLevel": 25,
+        "rate": 4
       },
       {
         "pokemonId": 127,
         "minLevel": 25,
-        "maxLevel": 28,
+        "maxLevel": 25,
+        "rate": 1
+      },
+      {
+        "pokemonId": 147,
+        "minLevel": 15,
+        "maxLevel": 15,
         "rate": 5
       }
     ],

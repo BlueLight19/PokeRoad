@@ -183,7 +183,8 @@ export function emptyEvs(): BaseStats {
 export function createPokemonInstance(
   dataId: number,
   level: number,
-  moveIds?: number[]
+  moveIds?: number[],
+  isShiny: boolean = false
 ): PokemonInstance {
   const data = getPokemonData(dataId);
   const ivs = generateIVs();
@@ -244,6 +245,7 @@ export function createPokemonInstance(
     xp: xpCurrent,
     xpToNextLevel: xpNext,
     friendship: 70,
+    isShiny,
   };
 }
 
@@ -254,9 +256,10 @@ export function createPokemonWithMoves(
   dataId: number,
   level: number,
   moveIds?: number[],
-  getMoveData?: (id: number) => { pp: number }
+  getMoveData?: (id: number) => { pp: number },
+  isShiny: boolean = false
 ): PokemonInstance {
-  const instance = createPokemonInstance(dataId, level, moveIds);
+  const instance = createPokemonInstance(dataId, level, moveIds, isShiny);
 
   if (getMoveData) {
     instance.moves = instance.moves.map(m => {
