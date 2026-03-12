@@ -272,7 +272,7 @@ export function TitleScreen() {
           animation: 'fadeIn 0.8s ease 0.3s both',
           letterSpacing: '1px',
         }}>
-          Aventure Pokemon par Menus
+          Catch them all !
         </p>
 
         <div style={{
