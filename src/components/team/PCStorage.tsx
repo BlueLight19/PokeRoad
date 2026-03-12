@@ -8,9 +8,11 @@ import { BOX_CAPACITY } from '../../engine/pcStorage';
 type SelectedSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
 
 export function PCStorage() {
-  const { pc, team, moveFromPc, moveToPc, setView } = useGameStore();
+  const { pc, team, moveFromPc, moveToPc, setView, switchTeamOrder } = useGameStore();
   const [currentBoxIndex, setCurrentBoxIndex] = useState(pc.currentBoxId || 0);
   const [selected, setSelected] = useState<SelectedSource | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const currentBox = pc.boxes[currentBoxIndex];
   const boxCount = currentBox.pokemon.filter(p => p !== null).length;
@@ -71,6 +73,7 @@ export function PCStorage() {
         }}>
           {Array.from({ length: 6 }).map((_, idx) => {
             const pokemon = team[idx];
+            const isDragOver = dragOverIndex === idx && dragIndex !== idx;
             if (!pokemon) {
               return (
                 <div key={`team-empty-${idx}`} style={{
@@ -87,10 +90,36 @@ export function PCStorage() {
             const isSelected = selected?.type === 'team' && selected.index === idx;
             const hpRatio = pokemon.currentHp / pokemon.maxHp;
             const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+            const isDragging = dragIndex === idx;
 
             return (
               <div
                 key={pokemon.uid}
+                draggable
+                onDragStart={(e) => {
+                  setDragIndex(idx);
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                  setDragOverIndex(idx);
+                }}
+                onDragLeave={() => {
+                  setDragOverIndex(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (dragIndex !== null && dragIndex !== idx) {
+                    switchTeamOrder(dragIndex, idx);
+                  }
+                  setDragIndex(null);
+                  setDragOverIndex(null);
+                }}
+                onDragEnd={() => {
+                  setDragIndex(null);
+                  setDragOverIndex(null);
+                }}
                 onClick={() => setSelected(isSelected ? null : { type: 'team', index: idx })}
                 style={{
                   background: '#0f172a',
@@ -100,10 +129,11 @@ export function PCStorage() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
+                  cursor: 'grab',
                   position: 'relative',
-                  border: isSelected ? '2px solid #9C27B0' : '2px solid #333',
-                  transition: 'border-color 0.2s',
+                  border: isDragOver ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                  opacity: isDragging ? 0.5 : 1,
+                  transition: 'border-color 0.2s, opacity 0.2s',
                 }}
               >
                 <img

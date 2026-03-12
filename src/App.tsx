@@ -217,6 +217,9 @@ function App() {
                 background: '#0f0f23',
                 color: '#fff',
                 fontFamily: "'Press Start 2P', system-ui, sans-serif",
+                maxWidth: '900px',
+                margin: '0 auto',
+                padding: '0 8px',
             }}
         >
             {renderView()}

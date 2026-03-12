@@ -654,6 +654,7 @@ export function BattleScreen() {
                 {/* Move selection */}
                 <MoveSelection
                   pokemon={player}
+                  enemyDataId={enemy.dataId}
                   onSelectMove={(index) => battle.selectMove(index)}
                 />
 
@@ -699,10 +700,10 @@ const containerStyle: React.CSSProperties = {
 
 const frameStyle: React.CSSProperties = {
   width: '100%',
-  maxWidth: '520px',
+  maxWidth: '700px',
   background: '#0f1923',
   border: '3px solid #1a2a3a',
   borderRadius: '16px',
-  padding: '16px',
+  padding: '20px',
   boxShadow: '0 0 30px rgba(0,0,0,0.5), inset 0 1px 0 #1a2a3a44',
 };

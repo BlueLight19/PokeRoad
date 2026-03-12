@@ -4,11 +4,9 @@
     "name": "Repousse",
     "category": "misc",
     "price": 350,
+    "sprite": "repel",
     "description": "Repousse les Pokémon sauvages faibles pendant 100 pas.",
-    "effect": {
-      "type": "repel",
-      "repelSteps": 100
-    },
+    "effect": { "type": "repel", "repelSteps": 100 },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -17,11 +15,9 @@
     "name": "Super Repousse",
     "category": "misc",
     "price": 500,
+    "sprite": "super-repel",
     "description": "Repousse les Pokémon sauvages faibles pendant 200 pas.",
-    "effect": {
-      "type": "repel",
-      "repelSteps": 200
-    },
+    "effect": { "type": "repel", "repelSteps": 200 },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -30,11 +26,9 @@
     "name": "Max Repousse",
     "category": "misc",
     "price": 700,
+    "sprite": "max-repel",
     "description": "Repousse les Pokémon sauvages faibles pendant 250 pas.",
-    "effect": {
-      "type": "repel",
-      "repelSteps": 250
-    },
+    "effect": { "type": "repel", "repelSteps": 250 },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -43,10 +37,9 @@
     "name": "Corde Sortie",
     "category": "misc",
     "price": 550,
+    "sprite": "escape-rope",
     "description": "Permet de sortir d'une grotte ou d'un donjon.",
-    "effect": {
-      "type": "escape_rope"
-    },
+    "effect": { "type": "escape_rope" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -55,11 +48,9 @@
     "name": "Master Ball",
     "category": "pokeball",
     "price": 0,
+    "sprite": "master-ball",
     "description": "La Ball ultime. Capture à coup sûr.",
-    "effect": {
-      "type": "catch",
-      "catchMultiplier": 255
-    },
+    "effect": { "type": "catch", "catchMultiplier": 255 },
     "usableInBattle": true,
     "usableOutside": false
   },
@@ -68,18 +59,9 @@
     "name": "Total Soin",
     "category": "status_heal",
     "price": 600,
+    "sprite": "full-heal",
     "description": "Soigne tous les problèmes de statut d'un Pokémon.",
-    "effect": {
-      "type": "status_cure",
-      "curesStatus": [
-        "poison",
-        "paralysis",
-        "sleep",
-        "burn",
-        "freeze",
-        "confusion"
-      ]
-    },
+    "effect": { "type": "status_cure", "curesStatus": ["poison", "paralysis", "sleep", "burn", "freeze", "confusion"] },
     "usableInBattle": true,
     "usableOutside": true
   },
@@ -88,24 +70,207 @@
     "name": "Rappel Max",
     "category": "revive",
     "price": 4000,
+    "sprite": "max-revive",
     "description": "Ranime un Pokémon K.O. et restaure tous ses PV.",
-    "effect": {
-      "type": "revive",
-      "reviveHpPercent": 100
-    },
+    "effect": { "type": "revive", "reviveHpPercent": 100 },
     "usableInBattle": true,
     "usableOutside": true
+  },
+  {
+    "id": "super-bonbon",
+    "name": "Super Bonbon",
+    "category": "candy",
+    "price": 0,
+    "sprite": "rare-candy",
+    "description": "Augmente le niveau d'un Pokémon de 1.",
+    "effect": { "type": "rare_candy" },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pv-plus",
+    "name": "PV Plus",
+    "category": "vitamin",
+    "price": 9800,
+    "sprite": "hp-up",
+    "description": "Augmente les EVs de PV d'un Pokémon.",
+    "effect": { "type": "ev_boost", "stat": "hp", "evAmount": 10 },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "proteine",
+    "name": "Protéine",
+    "category": "vitamin",
+    "price": 9800,
+    "sprite": "protein",
+    "description": "Augmente les EVs d'Attaque d'un Pokémon.",
+    "effect": { "type": "ev_boost", "stat": "attack", "evAmount": 10 },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "fer",
+    "name": "Fer",
+    "category": "vitamin",
+    "price": 9800,
+    "sprite": "iron",
+    "description": "Augmente les EVs de Défense d'un Pokémon.",
+    "effect": { "type": "ev_boost", "stat": "defense", "evAmount": 10 },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "calcium",
+    "name": "Calcium",
+    "category": "vitamin",
+    "price": 9800,
+    "sprite": "calcium",
+    "description": "Augmente les EVs d'Attaque Spé. d'un Pokémon.",
+    "effect": { "type": "ev_boost", "stat": "spAtk", "evAmount": 10 },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "carbone",
+    "name": "Carbone",
+    "category": "vitamin",
+    "price": 9800,
+    "sprite": "carbos",
+    "description": "Augmente les EVs de Vitesse d'un Pokémon.",
+    "effect": { "type": "ev_boost", "stat": "speed", "evAmount": 10 },
+    "usableInBattle": false,
+    "usableOutside": true
+  },
+  {
+    "id": "pp-plus",
+    "name": "PP Plus",
+    "category": "misc",
+    "price": 0,
+    "sprite": "pp-up",
+    "description": "Augmente les PP max d'une capacité de 20%.",
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "attaque-plus",
+    "name": "Attaque +",
+    "category": "battle",
+    "price": 500,
+    "sprite": "x-attack",
+    "description": "Augmente l'Attaque durant le combat.",
+    "effect": { "type": "battle_stat", "stat": "attack", "stages": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "defense-plus",
+    "name": "Défense +",
+    "category": "battle",
+    "price": 550,
+    "sprite": "x-defense",
+    "description": "Augmente la Défense durant le combat.",
+    "effect": { "type": "battle_stat", "stat": "defense", "stages": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "vitesse-plus",
+    "name": "Vitesse +",
+    "category": "battle",
+    "price": 350,
+    "sprite": "x-speed",
+    "description": "Augmente la Vitesse durant le combat.",
+    "effect": { "type": "battle_stat", "stat": "speed", "stages": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "special-plus",
+    "name": "Spécial +",
+    "category": "battle",
+    "price": 350,
+    "sprite": "x-sp-atk",
+    "description": "Augmente l'Attaque Spé. durant le combat.",
+    "effect": { "type": "battle_stat", "stat": "spAtk", "stages": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "precision-plus",
+    "name": "Précision +",
+    "category": "battle",
+    "price": 950,
+    "sprite": "x-accuracy",
+    "description": "Augmente la Précision durant le combat.",
+    "effect": { "type": "battle_stat", "stat": "accuracy", "stages": 1 },
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "muscle-plus",
+    "name": "Coup Critique +",
+    "category": "battle",
+    "price": 650,
+    "sprite": "dire-hit",
+    "description": "Augmente le taux de coups critiques durant le combat.",
+    "effect": null,
+    "usableInBattle": true,
+    "usableOutside": false
+  },
+  {
+    "id": "pepite",
+    "name": "Pépite",
+    "category": "sellable",
+    "price": 5000,
+    "sprite": "nugget",
+    "description": "Une pépite d'or pur. Se vend cher.",
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "perle",
+    "name": "Perle",
+    "category": "sellable",
+    "price": 1400,
+    "sprite": "pearl",
+    "description": "Une jolie perle. Se vend bien.",
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "grande-perle",
+    "name": "Grande Perle",
+    "category": "sellable",
+    "price": 3800,
+    "sprite": "big-pearl",
+    "description": "Une grosse perle. Se vend assez cher.",
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
+  },
+  {
+    "id": "etoile",
+    "name": "Morceau d'Étoile",
+    "category": "sellable",
+    "price": 4900,
+    "sprite": "star-piece",
+    "description": "Un morceau d'étoile rouge. Se vend très cher.",
+    "effect": null,
+    "usableInBattle": false,
+    "usableOutside": false
   },
   {
     "id": "pierre-feu",
     "name": "Pierre Feu",
     "category": "evolution",
     "price": 2100,
+    "sprite": "fire-stone",
     "description": "Fait évoluer certains Pokémon de type Feu.",
-    "effect": {
-      "type": "evolution",
-      "stone": "pierre-feu"
-    },
+    "effect": { "type": "evolution", "stone": "pierre-feu" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -114,11 +279,9 @@
     "name": "Pierre Eau",
     "category": "evolution",
     "price": 2100,
+    "sprite": "water-stone",
     "description": "Fait évoluer certains Pokémon de type Eau.",
-    "effect": {
-      "type": "evolution",
-      "stone": "pierre-eau"
-    },
+    "effect": { "type": "evolution", "stone": "pierre-eau" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -127,11 +290,9 @@
     "name": "Pierre Foudre",
     "category": "evolution",
     "price": 2100,
+    "sprite": "thunder-stone",
     "description": "Fait évoluer certains Pokémon de type Électrik.",
-    "effect": {
-      "type": "evolution",
-      "stone": "pierre-foudre"
-    },
+    "effect": { "type": "evolution", "stone": "pierre-foudre" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -140,11 +301,9 @@
     "name": "Pierre Plante",
     "category": "evolution",
     "price": 2100,
+    "sprite": "leaf-stone",
     "description": "Fait évoluer certains Pokémon de type Plante.",
-    "effect": {
-      "type": "evolution",
-      "stone": "pierre-plante"
-    },
+    "effect": { "type": "evolution", "stone": "pierre-plante" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -153,11 +312,9 @@
     "name": "Pierre Lune",
     "category": "evolution",
     "price": 3000,
+    "sprite": "moon-stone",
     "description": "Fait évoluer certains Pokémon liés à la Lune.",
-    "effect": {
-      "type": "evolution",
-      "stone": "pierre-lune"
-    },
+    "effect": { "type": "evolution", "stone": "pierre-lune" },
     "usableInBattle": false,
     "usableOutside": true
   },
@@ -166,46 +323,41 @@
     "name": "Câble Link",
     "category": "evolution",
     "price": 3000,
+    "sprite": "link-cable",
     "description": "Simule un échange. Fait évoluer certains Pokémon.",
-    "effect": {
-      "type": "evolution",
-      "stone": "link-cable"
-    },
+    "effect": { "type": "evolution", "stone": "link-cable" },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "tm-28",
     "name": "CT28 Tunnel",
-    "description": "Apprend Tunnel à un Pokémon.",
     "category": "misc",
     "price": 2000,
-    "effect": {
-      "type": "teach",
-      "moveId": 91
-    },
+    "sprite": "tm-normal",
+    "description": "Apprend Tunnel à un Pokémon.",
+    "effect": { "type": "teach", "moveId": 91 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "tm-24",
     "name": "CT24 Tonnerre",
-    "description": "Apprend Tonnerre à un Pokémon.",
     "category": "misc",
     "price": 3000,
-    "effect": {
-      "type": "teach",
-      "moveId": 85
-    },
+    "sprite": "tm-normal",
+    "description": "Apprend Tonnerre à un Pokémon.",
+    "effect": { "type": "teach", "moveId": 85 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "chroma-charm",
     "name": "Charme Chroma",
-    "description": "Un charme mystérieux qui augmente vos chances (+75%) de rencontrer un Pokémon chromatique. Obtenu en complétant le Pokédex.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
+    "sprite": "shiny-charm",
+    "description": "Un charme mystérieux qui augmente vos chances (+75%) de rencontrer un Pokémon chromatique.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": false
@@ -213,9 +365,9 @@
   {
     "id": "mew-research-notes",
     "name": "Notes de Recherche",
-    "description": "Des pages jaunies couvertes de données génétiques. Mention d'un 'specimen originel'.",
     "category": "key",
     "price": 0,
+    "description": "Des pages jaunies couvertes de données génétiques. Mention d'un 'specimen originel'.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": false
@@ -223,9 +375,9 @@
   {
     "id": "ancient-radar",
     "name": "Radar Psychique",
-    "description": "Un appareil bricolé qui capte de faibles ondes psychiques.",
     "category": "key",
     "price": 0,
+    "description": "Un appareil bricolé qui capte de faibles ondes psychiques.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": false
@@ -233,9 +385,9 @@
   {
     "id": "silph-scope",
     "name": "Scope Sylphe",
-    "description": "Des lunettes spéciales permettant de voir l'invisible.",
     "category": "key",
     "price": 0,
+    "description": "Des lunettes spéciales permettant de voir l'invisible.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": false
@@ -243,9 +395,9 @@
   {
     "id": "poke-flute",
     "name": "Poké Flûte",
-    "description": "Une flûte qui réveille instantanément n'importe quel Pokémon.",
     "category": "key",
     "price": 0,
+    "description": "Une flûte qui réveille instantanément n'importe quel Pokémon.",
     "effect": null,
     "usableInBattle": true,
     "usableOutside": true
@@ -253,9 +405,9 @@
   {
     "id": "old-rod",
     "name": "Canne",
-    "description": "Une vieille canne à pêche pour attraper de petits Pokémon aquatiques.",
     "category": "key",
     "price": 0,
+    "description": "Une vieille canne à pêche pour attraper de petits Pokémon aquatiques.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": true
@@ -263,19 +415,19 @@
   {
     "id": "good-rod",
     "name": "Super Canne",
-    "description": "Une bonne canne à pêche. Permet d'attraper plus de Pokémon aquatiques.",
     "category": "key",
     "price": 0,
+    "description": "Une bonne canne à pêche. Permet d'attraper plus de Pokémon aquatiques.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "super-rod",
-    "name": "Super Canne",
-    "description": "La meilleure des cannes à pêche. Pour les vrais pêcheurs !",
+    "name": "Méga Canne",
     "category": "key",
     "price": 0,
+    "description": "La meilleure des cannes à pêche. Pour les vrais pêcheurs !",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": true
@@ -283,9 +435,9 @@
   {
     "id": "itemfinder",
     "name": "Cherch'Objet",
-    "description": "Une machine qui émet un son quand un objet invisible est proche.",
     "category": "key",
     "price": 0,
+    "description": "Une machine qui émet un son quand un objet invisible est proche.",
     "effect": null,
     "usableInBattle": false,
     "usableOutside": true
@@ -293,65 +445,55 @@
   {
     "id": "hm-01",
     "name": "CS01 Coupe",
-    "description": "Permet de couper les petits arbres qui bloquent le chemin.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
-    "effect": {
-      "type": "teach",
-      "moveId": 15
-    },
+    "sprite": "tm-normal",
+    "description": "Permet de couper les petits arbres qui bloquent le chemin.",
+    "effect": { "type": "teach", "moveId": 15 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "hm-02",
     "name": "CS02 Vol",
-    "description": "Permet de s'envoler vers n'importe quelle ville déjà visitée.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
-    "effect": {
-      "type": "teach",
-      "moveId": 19
-    },
+    "sprite": "tm-normal",
+    "description": "Permet de s'envoler vers n'importe quelle ville déjà visitée.",
+    "effect": { "type": "teach", "moveId": 19 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "hm-03",
     "name": "CS03 Surf",
-    "description": "Permet de se déplacer sur l'eau.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
-    "effect": {
-      "type": "teach",
-      "moveId": 57
-    },
+    "sprite": "tm-normal",
+    "description": "Permet de se déplacer sur l'eau.",
+    "effect": { "type": "teach", "moveId": 57 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "hm-04",
     "name": "CS04 Force",
-    "description": "Permet de déplacer de gros rochers ronds.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
-    "effect": {
-      "type": "teach",
-      "moveId": 70
-    },
+    "sprite": "tm-normal",
+    "description": "Permet de déplacer de gros rochers ronds.",
+    "effect": { "type": "teach", "moveId": 70 },
     "usableInBattle": false,
     "usableOutside": true
   },
   {
     "id": "hm-05",
     "name": "CS05 Flash",
-    "description": "Éclaire les endroits sombres comme les grottes.",
-    "category": "misc",
+    "category": "key",
     "price": 0,
-    "effect": {
-      "type": "teach",
-      "moveId": 148
-    },
+    "sprite": "tm-normal",
+    "description": "Éclaire les endroits sombres comme les grottes.",
+    "effect": { "type": "teach", "moveId": 148 },
     "usableInBattle": false,
     "usableOutside": true
   }

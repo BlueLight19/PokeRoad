@@ -1,6 +1,8 @@
-import { PokemonInstance } from '../types/pokemon';
+import { PokemonInstance, BaseStats } from '../types/pokemon';
 import { ItemData } from '../types/inventory';
 import { checkStoneEvolution, evolvePokemon } from './evolutionEngine';
+import { recalculateStats, processLevelUp, xpForLevel } from './experienceCalculator';
+import { getPokemonData } from '../utils/dataLoader';
 
 export interface ItemUseResult {
     success: boolean;
@@ -105,6 +107,106 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             return { success: true, message: "Le statut est soigne.", consumed: true };
         } else {
             return { success: false, message: "Ca n'aura aucun effet.", consumed: false };
+        }
+    }
+
+    // Full Restore (heal + cure status)
+    if (item.effect.type === 'full_restore') {
+        if (target.currentHp === 0) {
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
+        }
+        if (target.currentHp >= target.maxHp && target.status === null && target.volatile.confusion === 0) {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
+        }
+        const oldHp = target.currentHp;
+        target.currentHp = target.maxHp;
+        target.status = null;
+        target.statusTurns = 0;
+        target.volatile.confusion = 0;
+        const healed = target.currentHp - oldHp;
+        return { success: true, message: `${healed > 0 ? `${healed} PV restaurés. ` : ''}Statut soigné.`, consumed: true };
+    }
+
+    // Rare Candy (Super Bonbon)
+    if (item.effect.type === 'rare_candy') {
+        if (target.currentHp === 0) {
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
+        }
+        if (target.level >= 100) {
+            return { success: false, message: "Ce Pokémon est déjà au niveau max.", consumed: false };
+        }
+        const data = getPokemonData(target.dataId);
+        target.level += 1;
+        target.xp = xpForLevel(target.level, data.expGroup);
+        target.xpToNextLevel = xpForLevel(target.level + 1, data.expGroup);
+        const newStats = recalculateStats(target);
+        const hpDiff = newStats.hp - target.maxHp;
+        target.stats = newStats;
+        target.maxHp = newStats.hp;
+        target.currentHp = Math.min(target.maxHp, target.currentHp + hpDiff);
+        const name = target.nickname || data.name;
+        return { success: true, message: `${name} monte au niveau ${target.level} !`, consumed: true };
+    }
+
+    // EV Boost (Vitamins)
+    if (item.effect.type === 'ev_boost') {
+        if (target.currentHp === 0) {
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
+        }
+        const stat = item.effect.stat as keyof BaseStats;
+        if (!stat || !(stat in target.evs)) {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
+        }
+        const totalEvs = Object.values(target.evs).reduce((s, v) => s + v, 0);
+        if (totalEvs >= 510 || target.evs[stat] >= 255) {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
+        }
+        const gain = Math.min(item.effect.evAmount ?? 10, 255 - target.evs[stat], 510 - totalEvs);
+        target.evs[stat] += gain;
+        const newStats = recalculateStats(target);
+        const hpDiff = newStats.hp - target.maxHp;
+        target.stats = newStats;
+        target.maxHp = newStats.hp;
+        target.currentHp = Math.min(target.maxHp, target.currentHp + Math.max(0, hpDiff));
+        return { success: true, message: `Les EVs ont augmenté !`, consumed: true };
+    }
+
+    // PP Restore (Ether / Elixir)
+    if (item.effect.type === 'pp_restore') {
+        if (target.currentHp === 0) {
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
+        }
+        let restored = false;
+        if (item.effect.ppAll) {
+            // Restore all moves
+            for (const move of target.moves) {
+                if (move.currentPp < move.maxPp) {
+                    if (item.effect.ppFull) {
+                        move.currentPp = move.maxPp;
+                    } else {
+                        move.currentPp = Math.min(move.maxPp, move.currentPp + (item.effect.ppAmount ?? 10));
+                    }
+                    restored = true;
+                }
+            }
+        } else {
+            // Restore first move that needs PP (simplified - in real game player picks)
+            for (const move of target.moves) {
+                if (move.currentPp < move.maxPp) {
+                    if (item.effect.ppFull) {
+                        move.currentPp = move.maxPp;
+                    } else {
+                        move.currentPp = Math.min(move.maxPp, move.currentPp + (item.effect.ppAmount ?? 10));
+                    }
+                    restored = true;
+                    break;
+                }
+            }
+        }
+        if (restored) {
+            return { success: true, message: "Les PP ont été restaurés.", consumed: true };
+        } else {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
         }
     }
 

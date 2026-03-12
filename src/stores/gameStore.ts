@@ -418,7 +418,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     // If item requires a target
-    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost'].includes(itemData.effect?.type || '');
+    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost', 'full_restore', 'rare_candy', 'ev_boost', 'pp_restore'].includes(itemData.effect?.type || '');
 
     if (requiresTarget) {
       if (!pokemonUid) return { success: false, message: "Utiliser sur qui ?" };

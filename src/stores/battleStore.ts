@@ -237,8 +237,10 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const enemy = state.enemyTeam[state.activeEnemyIndex];
     if (!player || !enemy) return;
 
-    const playerMove = player.moves[moveIndex];
-    if (!playerMove || playerMove.currentPp <= 0) return;
+    // Player Struggle: moveIndex === -1 means all PP are 0
+    const playerUseStruggle = moveIndex === -1;
+    const playerMove = playerUseStruggle ? null : player.moves[moveIndex];
+    if (!playerUseStruggle && (!playerMove || playerMove.currentPp <= 0)) return;
 
     set({ phase: 'executing' });
 
@@ -247,15 +249,19 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const enemyUseStruggle = enemyMoveIndex === -1;
     const enemyMove = enemyUseStruggle ? null : enemy.moves[enemyMoveIndex];
 
-    // Determine order (if enemy uses Struggle, still compare speeds; use index 0 as placeholder)
-    const order = determineOrder(player, enemy, { type: 'move', moveIndex }, enemyUseStruggle ? 0 : enemyMoveIndex);
+    // Determine order (if using Struggle, still compare speeds; use index 0 as placeholder)
+    const order = determineOrder(
+      player, enemy,
+      { type: 'move', moveIndex: playerUseStruggle ? 0 : moveIndex },
+      enemyUseStruggle ? 0 : enemyMoveIndex
+    );
 
     const first = order === 'player' ? player : enemy;
     const second = order === 'player' ? enemy : player;
     const firstMove = order === 'player' ? playerMove : enemyMove;
     const secondMove = order === 'player' ? enemyMove : playerMove;
-    const firstUseStruggle = order === 'player' ? false : enemyUseStruggle;
-    const secondUseStruggle = order === 'player' ? enemyUseStruggle : false;
+    const firstUseStruggle = order === 'player' ? playerUseStruggle : enemyUseStruggle;
+    const secondUseStruggle = order === 'player' ? enemyUseStruggle : playerUseStruggle;
 
     // Execute first attack
     const firstBlocked = checkStatusBlock(first);
@@ -654,6 +660,144 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       });
 
       // Enemy still attacks after revive
+      if (state.phase === 'choosing') {
+        const enemy = state.enemyTeam[state.activeEnemyIndex];
+        if (enemy && enemy.currentHp > 0) {
+          const enemyMoveIdx = chooseEnemyMove(enemy);
+          const newLogs: BattleLogEntry[] = [];
+
+          if (enemyMoveIdx === -1) {
+            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
+            newLogs.push(...result.logs);
+          } else {
+            const enemyMove = enemy.moves[enemyMoveIdx];
+            if (enemyMove) {
+              const blocked = checkStatusBlock(enemy);
+              newLogs.push(...blocked.logs);
+              if (!blocked.blocked) {
+                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
+                newLogs.push(...result.logs);
+              }
+            }
+          }
+          newLogs.push(...applyStatusDamage(enemy));
+
+          const player = state.playerTeam[state.activePlayerIndex];
+          if (player.currentHp <= 0) {
+            const nextPlayer = state.playerTeam.findIndex(
+              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+            );
+            if (nextPlayer < 0) {
+              set({
+                phase: 'defeat',
+                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              });
+              return;
+            } else {
+              set({
+                phase: 'switching',
+                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                turnNumber: state.turnNumber + 1,
+              });
+              return;
+            }
+          }
+          set({ logs: [...get().logs, ...newLogs] });
+        }
+        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
+      }
+    }
+
+    // Full Restore (heal + cure status)
+    if (item.effect.type === 'full_restore') {
+      const idx = targetIndex ?? state.activePlayerIndex;
+      const pokemon = state.playerTeam[idx];
+      if (!pokemon || pokemon.currentHp <= 0) return;
+
+      const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+      const healAmount = pokemon.maxHp - pokemon.currentHp;
+      pokemon.currentHp = pokemon.maxHp;
+      pokemon.status = null;
+      pokemon.statusTurns = 0;
+      pokemon.volatile.confusion = 0;
+
+      set({
+        logs: [...state.logs, { message: `${name} est complètement soigné !`, type: 'info' }],
+      });
+
+      // Enemy still attacks
+      if (state.phase === 'choosing') {
+        const enemy = state.enemyTeam[state.activeEnemyIndex];
+        if (enemy && enemy.currentHp > 0) {
+          const enemyMoveIdx = chooseEnemyMove(enemy);
+          const newLogs: BattleLogEntry[] = [];
+
+          if (enemyMoveIdx === -1) {
+            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
+            newLogs.push(...result.logs);
+          } else {
+            const enemyMove = enemy.moves[enemyMoveIdx];
+            if (enemyMove) {
+              const blocked = checkStatusBlock(enemy);
+              newLogs.push(...blocked.logs);
+              if (!blocked.blocked) {
+                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
+                newLogs.push(...result.logs);
+              }
+            }
+          }
+          newLogs.push(...applyStatusDamage(enemy));
+
+          const player = state.playerTeam[state.activePlayerIndex];
+          if (player.currentHp <= 0) {
+            const nextPlayer = state.playerTeam.findIndex(
+              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+            );
+            if (nextPlayer < 0) {
+              set({
+                phase: 'defeat',
+                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              });
+              return;
+            } else {
+              set({
+                phase: 'switching',
+                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                turnNumber: state.turnNumber + 1,
+              });
+              return;
+            }
+          }
+          set({ logs: [...get().logs, ...newLogs] });
+        }
+        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
+      }
+    }
+
+    // Battle stat boost (X Attack, X Defense, etc.)
+    if (item.effect.type === 'battle_stat') {
+      const pokemon = state.playerTeam[state.activePlayerIndex];
+      if (!pokemon || pokemon.currentHp <= 0) return;
+
+      const stat = item.effect.stat as keyof typeof pokemon.statStages;
+      const stages = item.effect.stages ?? 1;
+      if (stat && stat in pokemon.statStages) {
+        const current = pokemon.statStages[stat];
+        const newVal = Math.max(-6, Math.min(6, current + stages));
+        pokemon.statStages[stat] = newVal;
+        const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+
+        const statNames: Record<string, string> = {
+          attack: 'Attaque', defense: 'Défense', spAtk: 'Attaque Spé.',
+          spDef: 'Défense Spé.', speed: 'Vitesse',
+        };
+
+        set({
+          logs: [...state.logs, { message: `${statNames[stat] || stat} de ${name} monte !`, type: 'info' }],
+        });
+      }
+
+      // Enemy still attacks
       if (state.phase === 'choosing') {
         const enemy = state.enemyTeam[state.activeEnemyIndex];
         if (enemy && enemy.currentHp > 0) {

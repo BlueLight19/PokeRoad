@@ -1,10 +1,11 @@
 import React from 'react';
-import { PokemonInstance } from '../../types/pokemon';
-import { getMoveData } from '../../utils/dataLoader';
+import { PokemonInstance, PokemonType } from '../../types/pokemon';
+import { getMoveData, getPokemonData, getTypeEffectiveness } from '../../utils/dataLoader';
 
 interface MoveSelectionProps {
   pokemon: PokemonInstance;
   onSelectMove: (index: number) => void;
+  enemyDataId?: number;
 }
 
 const typeColors: Record<string, string> = {
@@ -25,7 +26,78 @@ const typeColors: Record<string, string> = {
   dragon: '#7038F8',
 };
 
-export function MoveSelection({ pokemon, onSelectMove }: MoveSelectionProps) {
+function getEffectivenessBadge(
+  moveType: PokemonType,
+  movePower: number | null,
+  enemyDataId?: number
+): { text: string; color: string } | null {
+  if (!enemyDataId || !movePower) return null;
+
+  try {
+    const enemyData = getPokemonData(enemyDataId);
+    const effectiveness = getTypeEffectiveness(moveType, enemyData.types);
+
+    if (effectiveness === 0) return { text: 'x0', color: '#888' };
+    if (effectiveness === 0.25) return { text: 'x0.25', color: '#e06030' };
+    if (effectiveness === 0.5) return { text: 'x0.5', color: '#e09040' };
+    if (effectiveness === 1) return null;
+    if (effectiveness === 2) return { text: 'x2', color: '#50d050' };
+    if (effectiveness >= 4) return { text: 'x4', color: '#30ff30' };
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelectionProps) {
+  const allMovesEmpty = pokemon.moves.every((m) => m.currentPp <= 0);
+
+  if (allMovesEmpty) {
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gap: '6px',
+        }}
+      >
+        <button
+          onClick={() => onSelectMove(-1)}
+          style={{
+            padding: '10px 8px',
+            background: '#55222222',
+            border: '2px solid #C03028',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            textAlign: 'center',
+          }}
+        >
+          <div
+            style={{
+              color: '#fff',
+              fontSize: '10px',
+              fontFamily: "'Press Start 2P', monospace",
+              marginBottom: '4px',
+            }}
+          >
+            Lutte
+          </div>
+          <div
+            style={{
+              fontSize: '7px',
+              fontFamily: "'Press Start 2P', monospace",
+              color: '#C03028',
+              textTransform: 'uppercase',
+            }}
+          >
+            normal - Pui:50
+          </div>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -37,6 +109,7 @@ export function MoveSelection({ pokemon, onSelectMove }: MoveSelectionProps) {
       {pokemon.moves.map((moveInst, index) => {
         const move = getMoveData(moveInst.moveId);
         const haspp = moveInst.currentPp > 0;
+        const badge = getEffectivenessBadge(move.type, move.power, enemyDataId);
 
         return (
           <button
@@ -51,8 +124,24 @@ export function MoveSelection({ pokemon, onSelectMove }: MoveSelectionProps) {
               cursor: haspp ? 'pointer' : 'not-allowed',
               opacity: haspp ? 1 : 0.4,
               textAlign: 'left',
+              position: 'relative',
             }}
           >
+            {badge && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '3px',
+                  right: '4px',
+                  fontSize: '7px',
+                  fontFamily: "'Press Start 2P', monospace",
+                  color: badge.color,
+                  lineHeight: 1,
+                }}
+              >
+                {badge.text}
+              </span>
+            )}
             <div
               style={{
                 color: '#fff',

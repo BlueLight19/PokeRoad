@@ -7,8 +7,10 @@ import { StatusIcon } from '../ui/StatusIcon';
 import { Button } from '../ui/Button';
 
 export function TeamView() {
-  const { team, setView, selectedPokemonIndex, healTeam } = useGameStore();
+  const { team, setView, selectedPokemonIndex, healTeam, switchTeamOrder } = useGameStore();
   const [selected, setSelected] = React.useState<number | null>(null);
+  const [dragIndex, setDragIndex] = React.useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null);
 
   // Detailed view of a Pokémon
   if (selected !== null) {
@@ -154,10 +156,37 @@ export function TeamView() {
           const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
           const name = pokemon.nickname || data.name;
           const isFainted = pokemon.currentHp <= 0;
+          const isDragging = dragIndex === index;
+          const isDragOver = dragOverIndex === index && dragIndex !== index;
 
           return (
             <button
               key={pokemon.uid}
+              draggable
+              onDragStart={(e) => {
+                setDragIndex(index);
+                e.dataTransfer.effectAllowed = 'move';
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverIndex(index);
+              }}
+              onDragLeave={() => {
+                setDragOverIndex(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragIndex !== null && dragIndex !== index) {
+                  switchTeamOrder(dragIndex, index);
+                }
+                setDragIndex(null);
+                setDragOverIndex(null);
+              }}
+              onDragEnd={() => {
+                setDragIndex(null);
+                setDragOverIndex(null);
+              }}
               onClick={() => setSelected(index)}
               style={{
                 display: 'flex',
@@ -165,10 +194,12 @@ export function TeamView() {
                 gap: '10px',
                 padding: '10px 12px',
                 background: isFainted ? '#1a0a0a' : '#16213e',
-                border: isFainted ? '2px solid #f44336' : '2px solid #333',
+                border: isDragOver ? '2px solid #2196F3' : isFainted ? '2px solid #f44336' : '2px solid #333',
                 borderRadius: '8px',
-                cursor: 'pointer',
+                cursor: 'grab',
                 textAlign: 'left',
+                opacity: isDragging ? 0.5 : 1,
+                transition: 'border-color 0.2s, opacity 0.2s',
               }}
             >
               <img
