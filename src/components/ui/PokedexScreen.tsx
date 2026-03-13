@@ -30,7 +30,7 @@ export function PokedexScreen() {
                 </div>
             )}
 
-            <div style={{ flex: 1, overflowY: 'auto', background: '#16213e', borderRadius: '8px', padding: '8px', border: '2px solid #333' }}>
+            <div style={{ flex: 1, overflowY: 'auto', background: 'rgba(22, 33, 62, 0.8)', borderRadius: '8px', padding: '8px', border: '2px solid #333' }}>
                 {allPokemon.map(p => {
                     const seen = progress.seenPokemon.includes(p.id);
                     const caught = progress.caughtPokemon.includes(p.id);
@@ -44,7 +44,7 @@ export function PokedexScreen() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 opacity: seen ? 1 : 0.5,
-                                background: selectedId === p.id ? '#1a3a5c' : 'transparent',
+                                background: selectedId === p.id ? 'rgba(26, 58, 92, 0.7)' : 'transparent',
                                 cursor: seen ? 'pointer' : 'default'
                             }}>
                             <div style={{ width: '30px', fontFamily: "'Press Start 2P', monospace", fontSize: '8px', color: '#666' }}>
@@ -58,7 +58,7 @@ export function PokedexScreen() {
                             </div>
 
                             {selectedId === p.id && seen && (
-                                <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#0f1923', border: '2px solid #e94560', padding: '16px', borderRadius: '8px', zIndex: 100, width: '250px', boxShadow: '0 0 20px rgba(0,0,0,0.8)' }}>
+                                <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(15, 25, 35, 0.9)', border: '2px solid #e94560', padding: '16px', borderRadius: '8px', zIndex: 100, width: '250px', boxShadow: '0 0 20px rgba(0,0,0,0.8)' }}>
                                     <div style={{ textAlign: 'center', marginBottom: '12px' }}>
                                         <img src={p.spriteUrl} alt={p.name} style={{ width: '96px', height: '96px', imageRendering: 'pixelated' }} />
                                     </div>

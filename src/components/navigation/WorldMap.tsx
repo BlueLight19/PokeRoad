@@ -56,6 +56,7 @@ const ZONE_ORDER = [
 
 export function WorldMap() {
     const { player, progress, selectZone, setView, team } = useGameStore();
+    const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
 
     const zones = getAllZones();
     const orderedZones = ZONE_ORDER.map(id => zones.find(z => z.id === id)).filter(Boolean);
@@ -200,9 +201,11 @@ export function WorldMap() {
                             if (!zone) return null;
                             const isUnlocked = progress.unlockedZones.includes(zone.id);
                             const isCurrent = progress.currentZone === zone.id;
+                            const isHovered = hoveredZoneId === zone.id;
                             const zoneType = (zone as any).type;
                             const isCity = zoneType === 'city';
                             const isDungeon = zoneType === 'dungeon';
+                            const isLeague = zone.id.includes('plateau-indigo') || zone.id.includes('victory-road') || zone.id.includes('league-hall');
 
                             // Don't show locked zones that are far ahead
                             if (!isUnlocked) {
@@ -232,8 +235,8 @@ export function WorldMap() {
                                 return gymDefeated;
                             })();
 
-                            const accentColor = isCity ? '#FFD600' : isDungeon ? '#9C27B0' : '#4CAF50';
-                            const zoneIcon = isCity ? '\u2302' : isDungeon ? '\u2666' : '\u2022';
+                            const accentColor = isLeague ? '#e94560' : isCity ? '#FFD600' : isDungeon ? '#9C27B0' : '#4CAF50';
+                            const zoneIcon = isLeague ? '🏆' : isCity ? '\u2302' : isDungeon ? '\u2666' : '\u2022';
 
                             return (
                                 <div key={zone.id}>
@@ -248,6 +251,8 @@ export function WorldMap() {
                                     )}
 
                                     <button
+                                        onMouseEnter={() => isUnlocked && setHoveredZoneId(zone.id)}
+                                        onMouseLeave={() => setHoveredZoneId(null)}
                                         onClick={() => isUnlocked && selectZone(zone.id)}
                                         disabled={!isUnlocked}
                                         style={{
@@ -256,10 +261,10 @@ export function WorldMap() {
                                             gap: '12px',
                                             padding: '10px 14px',
                                             width: '100%',
-                                            background: isCurrent
+                                            background: isHovered
                                                 ? `linear-gradient(90deg, ${accentColor}22 0%, transparent 100%)`
-                                                : '#0d1117',
-                                            border: isCurrent
+                                                : 'rgba(13, 17, 23, 0.7)',
+                                            border: isHovered
                                                 ? `2px solid ${accentColor}`
                                                 : isUnlocked
                                                     ? `2px solid ${accentColor}33`
@@ -267,10 +272,11 @@ export function WorldMap() {
                                             borderRadius: '10px',
                                             cursor: isUnlocked ? 'pointer' : 'not-allowed',
                                             opacity: isUnlocked ? 1 : 0.6,
-                                            transition: 'all 0.25s ease',
+                                            transition: 'all 0.4s ease',
                                             textAlign: 'left',
                                             position: 'relative',
                                             overflow: 'hidden',
+                                            backdropFilter: 'blur(4px)',
                                         }}
                                     >
                                         {/* Current zone pulse indicator */}
@@ -301,7 +307,7 @@ export function WorldMap() {
                                             fontWeight: 'bold',
                                             color: '#fff',
                                             flexShrink: 0,
-                                            boxShadow: isCurrent ? `0 0 10px ${accentColor}44` : 'none',
+                                            boxShadow: isHovered ? `0 0 10px ${accentColor}44` : 'none',
                                         }}>
                                             {zoneIcon}
                                         </div>
@@ -309,8 +315,17 @@ export function WorldMap() {
                                         {/* Zone info */}
                                         <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
 
-                                            {/* Informations (Désormais à gauche, et plus grandes) */}
+                                            {/* Informations */}
                                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+                                                {/* Zone Type Indicator */}
+                                                {isLeague ? (
+                                                    <span style={{ color: `${accentColor}88`, fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Ligue</span>
+                                                ) : isCity ? (
+                                                    <span style={{ color: `${accentColor}88`, fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Ville</span>
+                                                ) : isDungeon ? (
+                                                    <span style={{ color: `${accentColor}88`, fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Donjon</span>
+                                                ) : null}
+
                                                 {/* Trainer progress */}
                                                 {zoneTrainers.length > 0 && (
                                                     <span style={{
@@ -318,8 +333,8 @@ export function WorldMap() {
                                                         fontSize: '9px',
                                                         fontFamily: "'Press Start 2P', monospace",
                                                     }}>
-                            {allDefeated ? '\u2713' : '\u2694'} {defeatedCount}/{zoneTrainers.length}
-                          </span>
+                                                        {allDefeated ? '\u2713' : '\u2694'} {defeatedCount}/{zoneTrainers.length}
+                                                    </span>
                                                 )}
 
                                                 {/* Wild pokemon indicator */}
@@ -329,8 +344,8 @@ export function WorldMap() {
                                                         fontSize: '9px',
                                                         fontFamily: "'Press Start 2P', monospace",
                                                     }}>
-                            ~ Sauvages
-                          </span>
+                                                        ~ Sauvages
+                                                    </span>
                                                 )}
 
                                                 {/* Gym indicator */}
@@ -340,19 +355,8 @@ export function WorldMap() {
                                                         fontSize: '9px',
                                                         fontFamily: "'Press Start 2P', monospace",
                                                     }}>
-                            {gymBadgeEarned ? '\u2605 Arene' : '! Arene'}
-                          </span>
-                                                )}
-
-                                                {/* Dungeon indicator */}
-                                                {isDungeon && !hasGym && (
-                                                    <span style={{
-                                                        color: '#9C27B088',
-                                                        fontSize: '9px',
-                                                        fontFamily: "'Press Start 2P', monospace",
-                                                    }}>
-                            Donjon
-                          </span>
+                                                        {gymBadgeEarned ? '\u2605 Arene' : '! Arene'}
+                                                    </span>
                                                 )}
 
                                                 {/* Lock indication */}
@@ -362,8 +366,8 @@ export function WorldMap() {
                                                         fontSize: '9px',
                                                         fontFamily: "'Press Start 2P', monospace",
                                                     }}>
-                            [Objet Requis]
-                          </span>
+                                                        [Objet Requis]
+                                                    </span>
                                                 )}
                                                 {!isUnlocked && (zone as any).unlockCondition?.eventId && (
                                                     <span style={{
@@ -371,12 +375,12 @@ export function WorldMap() {
                                                         fontSize: '9px',
                                                         fontFamily: "'Press Start 2P', monospace",
                                                     }}>
-                            [Bloqué]
-                          </span>
+                                                        [Bloqué]
+                                                    </span>
                                                 )}
                                             </div>
 
-                                            {/* Nom de la zone (Désormais à droite) */}
+                                            {/* Nom de la zone */}
                                             <div style={{
                                                 color: isUnlocked ? '#fff' : '#555',
                                                 fontSize: '9px',

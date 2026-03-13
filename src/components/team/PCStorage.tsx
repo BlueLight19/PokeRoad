@@ -67,7 +67,7 @@ export function PCStorage() {
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '6px',
-          background: '#1a2a3a',
+          background: 'rgba(26, 42, 58, 0.8)',
           padding: '8px',
           borderRadius: '8px',
           border: '2px solid #333',
@@ -78,7 +78,7 @@ export function PCStorage() {
             if (!pokemon) {
               return (
                 <div key={`team-empty-${idx}`} style={{
-                  background: '#0f172a',
+                  background: 'rgba(15, 23, 42, 0.5)',
                   borderRadius: '6px',
                   aspectRatio: '1',
                   opacity: 0.2,
@@ -123,7 +123,7 @@ export function PCStorage() {
                 }}
                 onClick={() => setSelected(isSelected ? null : { type: 'team', index: idx })}
                 style={{
-                  background: '#0f172a',
+                  background: 'rgba(15, 23, 42, 0.7)',
                   borderRadius: '6px',
                   aspectRatio: '1',
                   display: 'flex',
@@ -196,7 +196,7 @@ export function PCStorage() {
         display: 'grid',
         gridTemplateColumns: 'repeat(6, 1fr)',
         gap: '6px',
-        background: '#16213e',
+        background: 'rgba(22, 33, 62, 0.8)',
         padding: '8px',
         borderRadius: '8px',
         minHeight: '200px',
@@ -206,7 +206,7 @@ export function PCStorage() {
           if (!pokemon) {
             return (
               <div key={`slot-${slotId}`} style={{
-                background: '#0f172a',
+                background: 'rgba(15, 23, 42, 0.5)',
                 borderRadius: '4px',
                 aspectRatio: '1',
                 opacity: 0.2,
@@ -226,7 +226,7 @@ export function PCStorage() {
               key={pokemon.uid}
               onClick={() => setSelected(isSelected ? null : { type: 'pc', uid: pokemon.uid })}
               style={{
-                background: '#0f172a',
+                background: 'rgba(15, 23, 42, 0.7)',
                 borderRadius: '4px',
                 aspectRatio: '1',
                 display: 'flex',
@@ -307,7 +307,7 @@ function DetailPanel({
 
   return (
     <div style={{
-      background: '#0f1923',
+      background: 'rgba(15, 25, 35, 0.9)',
       border: '2px solid #9C27B0',
       borderRadius: '10px',
       padding: '12px',
@@ -362,7 +362,7 @@ function DetailPanel({
           ['PV', pokemon.maxHp],
         ] as [string, number][]).map(([label, value]) => (
           <div key={label} style={{
-            background: '#1a2a3a',
+            background: 'rgba(26, 42, 58, 0.7)',
             borderRadius: '4px',
             padding: '4px 6px',
             display: 'flex',
@@ -385,7 +385,7 @@ function DetailPanel({
             try { moveData = getMoveData(move.moveId); } catch { return null; }
             return (
               <div key={i} style={{
-                background: '#1a2a3a',
+                background: 'rgba(26, 42, 58, 0.7)',
                 borderRadius: '4px',
                 padding: '4px 6px',
               }}>

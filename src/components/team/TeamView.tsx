@@ -119,13 +119,15 @@ export function TeamView() {
                 alignItems: 'center',
                 padding: '4px 8px',
                 marginBottom: '3px',
-                background: '#16213e',
+                background: 'rgba(22, 33, 62, 0.8)',
                 borderRadius: '4px',
                 borderLeft: `3px solid ${typeColors[move.type] || '#888'}`,
               }}>
-                <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
-                  {move.name}
-                </span>
+                <div>
+                  <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
+                    {move.name} ({move.power > 0 ? `Pwr: ${move.power}` : ''} {move.accuracy > 0 ? `Acc: ${move.accuracy}` : ''})
+                  </span>
+                </div>
                 <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
                   PP {m.currentPp}/{m.maxPp}
                 </span>
@@ -168,8 +170,6 @@ export function TeamView() {
                 e.dataTransfer.effectAllowed = 'move';
               }}
               onDragOver={(e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
                 setDragOverIndex(index);
               }}
               onDragLeave={() => {
@@ -193,7 +193,7 @@ export function TeamView() {
                 alignItems: 'center',
                 gap: '10px',
                 padding: '10px 12px',
-                background: isFainted ? '#1a0a0a' : '#16213e',
+                background: isFainted ? 'rgba(26, 10, 10, 0.7)' : 'rgba(22, 33, 62, 0.8)',
                 border: isDragOver ? '2px solid #2196F3' : isFainted ? '2px solid #f44336' : '2px solid #333',
                 borderRadius: '8px',
                 cursor: 'grab',

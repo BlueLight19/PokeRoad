@@ -584,7 +584,7 @@ export function BattleScreen() {
           }} />
           <span style={{
             position: 'relative',
-            background: '#0f1923',
+            background: 'rgba(15, 25, 35, 0.8)',
             padding: '0 12px',
             color: '#555',
             fontSize: '8px',
@@ -695,13 +695,13 @@ const containerStyle: React.CSSProperties = {
   alignItems: 'flex-start',
   justifyContent: 'center',
   padding: '12px',
-  background: 'radial-gradient(ellipse at top, #0f1923 0%, #0a0a15 100%)',
+  background: 'transparent',
 };
 
 const frameStyle: React.CSSProperties = {
   width: '100%',
   maxWidth: '700px',
-  background: '#0f1923',
+  background: 'rgba(15, 25, 35, 0.8)',
   border: '3px solid #1a2a3a',
   borderRadius: '16px',
   padding: '20px',

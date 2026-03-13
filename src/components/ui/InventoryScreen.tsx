@@ -90,7 +90,6 @@ export function InventoryScreen() {
     return (
         <div style={{
             padding: '16px',
-            maxWidth: '600px',
             margin: '0 auto',
             color: '#fff',
             fontFamily: "'Press Start 2P', monospace",
@@ -109,28 +108,28 @@ export function InventoryScreen() {
 
             {message && (
                 <div style={{
-                    background: '#333',
+                    background: 'rgba(51, 51, 51, 0.8)',
                     padding: '8px',
                     borderRadius: '4px',
                     marginBottom: '12px',
                     fontSize: '10px',
                     textAlign: 'center',
                     border: '1px solid #FFD600',
+                    maxWidth: '600px',
+                    margin: '0 auto 12px',
                 }}>
                     {message}
                 </div>
             )}
 
             {!targetMode ? (
-                <>
+                <div style={{ width: 'fit-content', margin: '0 auto' }}>
                     {/* Tab bar */}
                     <div style={{
                         display: 'flex',
                         gap: '4px',
-                        overflowX: 'auto',
                         paddingBottom: '8px',
                         marginBottom: '8px',
-                        scrollbarWidth: 'thin',
                     }}>
                         {TABS.map(tab => {
                             const count = itemsByTab[tab.key].length;
@@ -145,12 +144,11 @@ export function InventoryScreen() {
                                         padding: '8px 10px',
                                         border: isActive ? '2px solid #FFD600' : '2px solid #333',
                                         borderRadius: '6px 6px 0 0',
-                                        background: isActive ? '#16213e' : '#0a0a1a',
+                                        background: isActive ? 'rgba(22, 33, 62, 0.8)' : 'rgba(10, 10, 26, 0.7)',
                                         color: isActive ? '#FFD600' : '#888',
                                         cursor: 'pointer',
                                         whiteSpace: 'nowrap',
-                                        flexShrink: 0,
-                                        borderBottom: isActive ? '2px solid #16213e' : '2px solid #333',
+                                        borderBottom: isActive ? '2px solid rgba(22, 33, 62, 0.8)' : '2px solid #333',
                                         transition: 'color 0.15s, border-color 0.15s',
                                     }}
                                 >
@@ -165,7 +163,7 @@ export function InventoryScreen() {
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '8px',
-                        background: '#16213e',
+                        background: 'rgba(22, 33, 62, 0.8)',
                         padding: '10px',
                         borderRadius: '0 8px 8px 8px',
                         minHeight: '300px',
@@ -186,7 +184,7 @@ export function InventoryScreen() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
-                                    background: '#0f0f23',
+                                    background: 'rgba(15, 15, 35, 0.7)',
                                     padding: '8px 10px',
                                     borderRadius: '6px',
                                     border: '1px solid #333',
@@ -231,9 +229,9 @@ export function InventoryScreen() {
                     <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
                         <Button variant="ghost" onClick={() => setView('world_map')}>Retour</Button>
                     </div>
-                </>
+                </div>
             ) : (
-                <div>
+                <div style={{maxWidth: '600px', margin: '0 auto'}}>
                     <div style={{
                         marginBottom: '12px',
                         textAlign: 'center',
@@ -257,7 +255,7 @@ export function InventoryScreen() {
                                     onClick={() => handleTargetSelect(pokemon.uid)}
                                     style={{
                                         padding: '10px',
-                                        background: '#16213e',
+                                        background: 'rgba(22, 33, 62, 0.8)',
                                         border: '1px solid #333',
                                         borderRadius: '8px',
                                         cursor: 'pointer',

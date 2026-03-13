@@ -239,11 +239,51 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   givePlayerPokemon: (pokemonId: number, level: number) => {
-    const pokemon = createPokemonInstance(pokemonId, level);
+    const data = getPokemonData(pokemonId);
+    const availableMoves = data.learnset
+      .filter(e => e.level <= level)
+      .map(e => getMoveData(e.moveId))
+      .reverse();
+
+    const damageMoves = availableMoves.filter(m => m.power > 0);
+    const statusMoves = availableMoves.filter(m => m.power === 0);
+
+    const selectedMoves = [];
+    // Prioritize damage moves
+    for (let i = 0; i < 2 && i < damageMoves.length; i++) {
+      selectedMoves.push(damageMoves[i]);
+    }
+    // Fill with status moves
+    for (let i = 0; selectedMoves.length < 4 && i < statusMoves.length; i++) {
+      if (!selectedMoves.some(m => m.id === statusMoves[i].id)) {
+        selectedMoves.push(statusMoves[i]);
+      }
+    }
+    // If still not 4, fill with any remaining moves
+    for (let i = 0; selectedMoves.length < 4 && i < availableMoves.length; i++) {
+      if (!selectedMoves.some(m => m.id === availableMoves[i].id)) {
+        selectedMoves.push(availableMoves[i]);
+      }
+    }
+
+    const moves = selectedMoves.map(m => m.id);
+
+    const pokemon = createPokemonInstance(pokemonId, level, moves);
     pokemon.moves = pokemon.moves.map(m => {
-      const data = getMoveData(m.moveId);
-      return { moveId: m.moveId, currentPp: data.pp, maxPp: data.pp };
+      const moveData = getMoveData(m.moveId);
+      return { moveId: m.moveId, currentPp: moveData.pp, maxPp: moveData.pp };
     });
+
+    const state = get();
+    const newProgress = { ...state.progress };
+    if (!newProgress.seenPokemon.includes(pokemonId)) {
+      newProgress.seenPokemon.push(pokemonId);
+    }
+    if (!newProgress.caughtPokemon.includes(pokemonId)) {
+      newProgress.caughtPokemon.push(pokemonId);
+    }
+    set({ progress: newProgress });
+
     get().addPokemonToTeam(pokemon);
   },
 
