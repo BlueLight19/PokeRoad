@@ -1,8 +1,0 @@
-MAJOR_CHANGES
-
-- Meilleur organisation du sac dans le main menu (en s'inspirant de celui en combat)
-- Rajouter touts les items de la gen 1 et leurs sprites
-- problème avec le struggle (mal implémentée) qui crée possiblement des bugs de tours interminables
-- Ajoutez si une attaque sera -Pas très efficace- -efficace- -super efficace- ou -faible-
-- donnez la possibilitée de "drag and drop" les pokémons dans l'onglet team et pc
-- Le jeu est trop petit dans le navigateur. Il faut le rendre plus lisible et plus grand.
