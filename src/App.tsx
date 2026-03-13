@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from './stores/gameStore';
+import { createPCStorage } from './engine/pcStorage';
 import { initializeData } from './utils/dataLoader';
 import { deleteSave } from './utils/saveManager';
 import { TitleScreen } from './components/TitleScreen';
@@ -25,6 +26,7 @@ function DevTools() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Variables d'état pour les champs de texte
     const [itemId, setItemId] = useState('super-bonbon');
@@ -84,6 +86,34 @@ function DevTools() {
         if (window.confirm("Voulez-vous vraiment effacer complètement votre partie ? Cette action est irréversible !")) {
             deleteSave();
             window.location.reload(); // Recharge la page pour revenir à l'écran titre à zéro
+        }
+    };
+
+    const handleGiveAllPokemon = async () => {
+        if (window.confirm("Attention, cela va vider votre équipe et votre PC. L'opération va être très rapide. Continuer ?")) {
+            setIsGenerating(true);
+            setIsOpen(false);
+
+            try {
+                useGameStore.setState({ team: [], pc: createPCStorage() });
+
+                for (let i = 1; i <= 151; i++) {
+                    try {
+                        const result = givePlayerPokemon(i, 100);
+                        if (result instanceof Promise) await result;
+                    } catch (e) {
+                        console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);
+                    }
+
+                    await new Promise(r => setTimeout(r, 50));
+                }
+
+                console.log("Génération terminée !");
+            } catch (error) {
+                console.error("Une erreur majeure est survenue pendant la génération :", error);
+            } finally {
+                setIsGenerating(false);
+            }
         }
     };
 
@@ -150,6 +180,13 @@ function DevTools() {
                 </div>
                 <button style={btnStyle} onClick={() => givePlayerPokemon(pokeId, pokeLevel)}>Donner Pokémon</button>
             </div>
+
+        <div style={sectionStyle}>
+            <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
+            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={handleGiveAllPokemon} disabled={isGenerating}>
+                {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
+            </button>
+        </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
