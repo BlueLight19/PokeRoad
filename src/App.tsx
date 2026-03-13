@@ -27,11 +27,11 @@ function DevTools() {
     const [errorMsg, setErrorMsg] = useState('');
 
     // Variables d'état pour les champs de texte
-    const [itemId, setItemId] = useState('master-ball');
-    const [itemQty, setItemQty] = useState(10);
+    const [itemId, setItemId] = useState('super-bonbon');
+    const [itemQty, setItemQty] = useState(1);
     const [pokeId, setPokeId] = useState(150);
-    const [pokeLevel, setPokeLevel] = useState(70);
-    const [moneyAmount, setMoneyAmount] = useState(50000);
+    const [pokeLevel, setPokeLevel] = useState(100);
+    const [moneyAmount, setMoneyAmount] = useState(10000);
 
     const addItem = useGameStore(s => s.addItem);
     const givePlayerPokemon = useGameStore(s => s.givePlayerPokemon);
@@ -214,7 +214,7 @@ function App() {
         <div
             style={{
                 minHeight: '100vh',
-                background: '#0f0f23',
+                background: 'transparent',
                 color: '#fff',
                 fontFamily: "'Press Start 2P', system-ui, sans-serif",
                 maxWidth: '900px',

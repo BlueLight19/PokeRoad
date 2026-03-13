@@ -70,6 +70,7 @@ export function PCStorage() {
           background: '#1a2a3a',
           padding: '8px',
           borderRadius: '8px',
+          border: '2px solid #333',
         }}>
           {Array.from({ length: 6 }).map((_, idx) => {
             const pokemon = team[idx];
@@ -199,6 +200,7 @@ export function PCStorage() {
         padding: '8px',
         borderRadius: '8px',
         minHeight: '200px',
+        border: '2px solid #333',
       }}>
         {currentBox.pokemon.map((pokemon, slotId) => {
           if (!pokemon) {

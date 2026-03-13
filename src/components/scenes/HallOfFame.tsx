@@ -50,9 +50,9 @@ export const HallOfFame: React.FC<HallOfFameProps> = ({ onComplete }) => {
             <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                 pointerEvents: 'none',
-                backgroundImage: 'radial-gradient(circle, white 2px, transparent 2px)',
+                backgroundImage: 'radial-gradient(circle, #FFD700 3px, transparent 3px)',
                 backgroundSize: '100px 100px',
-                opacity: 0.1,
+                opacity: 0.2,
                 animation: 'panBackground 10s linear infinite',
             }} />
             <style>{`

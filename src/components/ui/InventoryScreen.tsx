@@ -94,7 +94,7 @@ export function InventoryScreen() {
             margin: '0 auto',
             color: '#fff',
             fontFamily: "'Press Start 2P', monospace",
-            background: '#0f0f23',
+            background: 'transparent',
             minHeight: '100vh',
             boxSizing: 'border-box',
         }}>

@@ -30,7 +30,7 @@ export function PokedexScreen() {
                 </div>
             )}
 
-            <div style={{ flex: 1, overflowY: 'auto', background: '#16213e', borderRadius: '8px', padding: '8px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', background: '#16213e', borderRadius: '8px', padding: '8px', border: '2px solid #333' }}>
                 {allPokemon.map(p => {
                     const seen = progress.seenPokemon.includes(p.id);
                     const caught = progress.caughtPokemon.includes(p.id);

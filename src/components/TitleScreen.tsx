@@ -28,7 +28,7 @@ export function TitleScreen() {
         justifyContent: 'center',
         minHeight: '100vh',
         padding: '20px',
-        background: 'radial-gradient(ellipse at center, #16213e 0%, #0a0a15 100%)',
+        background: 'transparent',
       }}>
         {/* Header */}
         <div style={{
@@ -227,20 +227,26 @@ export function TitleScreen() {
       justifyContent: 'center',
       minHeight: '100vh',
       padding: '20px',
-      background: 'radial-gradient(ellipse at center, #16213e 0%, #0a0a15 100%)',
+      background: 'transparent',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Subtle background decoration */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        left: '-50%',
-        width: '200%',
-        height: '200%',
-        background: 'radial-gradient(circle at 30% 40%, #e9456008 0%, transparent 40%), radial-gradient(circle at 70% 60%, #2196F308 0%, transparent 40%)',
-        pointerEvents: 'none',
-      }} />
+        {/* Lueur rouge douce et diffuse */}
+        <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80vw',
+            maxWidth: '600px',
+            height: '80vw',
+            maxHeight: '600px',
+            background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
+            borderRadius: '50%',
+            filter: 'blur(60px)', /* C'est ce qui crée le fondu parfait sans bords */
+            pointerEvents: 'none',
+            zIndex: 0,
+        }} />
 
       <div style={{ position: 'relative', textAlign: 'center' }}>
         {/* Logo */}
@@ -305,7 +311,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        v1.0 - Kanto
+        <span id={"version"}>0.2.1 - Kanto work in progress</span>
       </div>
     </div>
   );
