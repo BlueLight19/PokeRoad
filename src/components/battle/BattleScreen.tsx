@@ -33,10 +33,10 @@ export function BattleScreen() {
           const enemyName = enemy ? (getPokemonData(enemy.dataId).name) : '';
           if (log.message.includes(enemyName)) {
             setShakeEnemy(true);
-            setTimeout(() => setShakeEnemy(false), 400);
+            setTimeout(() => setShakeEnemy(false), 500);
           } else {
             setShakePlayer(true);
-            setTimeout(() => setShakePlayer(false), 400);
+            setTimeout(() => setShakePlayer(false), 500);
           }
         }
         if (log.type === 'effective' && log.message.includes('super efficace')) {
@@ -360,7 +360,7 @@ export function BattleScreen() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
                       <div style={{ flex: 1, height: '8px', background: '#333', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '4px', transition: 'width 0.3s' }} />
+                        <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '4px', transition: 'width 0.8s ease-out' }} />
                       </div>
                       <span style={{ color: '#aaa', fontSize: '7px', fontFamily: "'Press Start 2P', monospace", minWidth: '55px', textAlign: 'right' }}>
                         {p.currentHp}/{p.maxHp}
@@ -562,7 +562,7 @@ export function BattleScreen() {
         {/* Enemy display */}
         <div style={{
           transform: shakeEnemy ? 'translateX(-5px)' : 'none',
-          animation: shakeEnemy ? 'hitShake 0.4s ease' : 'none',
+          animation: shakeEnemy ? 'hitShake 0.5s ease' : 'none',
           transition: 'transform 0.1s',
         }}>
           <PokemonDisplay pokemon={enemy} isPlayer={false} />
@@ -597,7 +597,7 @@ export function BattleScreen() {
         {/* Player display */}
         <div style={{
           transform: shakePlayer ? 'translateX(5px)' : 'none',
-          animation: shakePlayer ? 'hitShake 0.4s ease' : 'none',
+          animation: shakePlayer ? 'hitShake 0.5s ease' : 'none',
           transition: 'transform 0.1s',
         }}>
           <PokemonDisplay pokemon={player} isPlayer={true} />

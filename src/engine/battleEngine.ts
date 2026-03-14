@@ -207,7 +207,8 @@ export interface MoveExecutionResult {
 export function executeMove(
   attacker: PokemonInstance,
   defender: PokemonInstance,
-  moveInstance: MoveInstance
+  moveInstance: MoveInstance,
+  attackerBadges: string[] = []
 ): MoveExecutionResult {
   const logs: BattleLogEntry[] = [];
   const move = getMoveData(moveInstance.moveId);
@@ -293,7 +294,7 @@ export function executeMove(
     const defenderHpBefore = defender.currentHp; // Track for drain cap
 
     for (let i = 0; i < hits; i++) {
-      const result = calculateDamage(attacker, defender, move);
+      const result = calculateDamage(attacker, defender, move, attackerBadges);
       defender.currentHp = Math.max(0, defender.currentHp - result.damage);
       totalDamage += result.damage;
       hitCount++;

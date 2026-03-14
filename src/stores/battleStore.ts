@@ -229,7 +229,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     });
   },
 
-  selectMove: (moveIndex: number) => {
+  selectMove: async (moveIndex: number) => {
     const state = get();
     if (state.phase !== 'choosing') return;
 
@@ -237,233 +237,218 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const enemy = state.enemyTeam[state.activeEnemyIndex];
     if (!player || !enemy) return;
 
-    // Player Struggle: moveIndex === -1 means all PP are 0
     const playerUseStruggle = moveIndex === -1;
     const playerMove = playerUseStruggle ? null : player.moves[moveIndex];
     if (!playerUseStruggle && (!playerMove || playerMove.currentPp <= 0)) return;
 
     set({ phase: 'executing' });
 
-    const newLogs: BattleLogEntry[] = [];
-    const enemyMoveIndex = chooseEnemyMove(enemy);
-    const enemyUseStruggle = enemyMoveIndex === -1;
-    const enemyMove = enemyUseStruggle ? null : enemy.moves[enemyMoveIndex];
+    // Use clones for calculation
+    const playerClone = deepCopyPokemon(player);
+    const enemyClone = deepCopyPokemon(enemy);
+    const playerBadges = useGameStore.getState().player.badges;
 
-    // Determine order (if using Struggle, still compare speeds; use index 0 as placeholder)
+    const enemyMoveIndex = chooseEnemyMove(enemyClone);
+    const enemyUseStruggle = enemyMoveIndex === -1;
+    const enemyMove = enemyUseStruggle ? null : enemyClone.moves[enemyMoveIndex];
+
     const order = determineOrder(
-      player, enemy,
+      playerClone, enemyClone,
       { type: 'move', moveIndex: playerUseStruggle ? 0 : moveIndex },
       enemyUseStruggle ? 0 : enemyMoveIndex
     );
 
-    const first = order === 'player' ? player : enemy;
-    const second = order === 'player' ? enemy : player;
+    const steps: { 
+        log: BattleLogEntry; 
+        playerHp?: number; 
+        enemyHp?: number;
+        playerStatus?: any;
+        enemyStatus?: any;
+    }[] = [];
+
+    const first = order === 'player' ? playerClone : enemyClone;
+    const second = order === 'player' ? enemyClone : playerClone;
     const firstMove = order === 'player' ? playerMove : enemyMove;
     const secondMove = order === 'player' ? enemyMove : playerMove;
     const firstUseStruggle = order === 'player' ? playerUseStruggle : enemyUseStruggle;
     const secondUseStruggle = order === 'player' ? enemyUseStruggle : playerUseStruggle;
+    const firstBadges = order === 'player' ? playerBadges : [];
+    const secondBadges = order === 'player' ? [] : playerBadges;
 
-    // Execute first attack
+    // Helper to capture state
+    const addStep = (log: BattleLogEntry) => {
+        steps.push({
+            log,
+            playerHp: playerClone.currentHp,
+            enemyHp: enemyClone.currentHp,
+            playerStatus: playerClone.status,
+            enemyStatus: enemyClone.status,
+        });
+    };
+
+    // First attack
     const firstBlocked = checkStatusBlock(first);
-    newLogs.push(...firstBlocked.logs);
+    firstBlocked.logs.forEach(addStep);
 
     let secondFainted = false;
     if (!firstBlocked.blocked) {
       if (firstUseStruggle) {
         const result = executeStruggle(first, second);
-        newLogs.push(...result.logs);
+        result.logs.forEach(addStep);
         secondFainted = result.defenderFainted;
       } else if (firstMove) {
-        const result = executeMove(first, second, firstMove);
-        newLogs.push(...result.logs);
+        const result = executeMove(first, second, firstMove, firstBadges);
+        result.logs.forEach(addStep);
         secondFainted = result.defenderFainted;
       }
     }
 
-    // Status damage for first
-    newLogs.push(...applyStatusDamage(first));
+    applyStatusDamage(first).forEach(addStep);
 
-    // Check if first attacker fainted (from recoil or status damage) - double K.O. case
-    const firstFaintedAfterAttack = first.currentHp <= 0;
-
-    // Execute second attack (if not fainted)
+    // Second attack
     if (!secondFainted && second.currentHp > 0) {
       const secondBlocked = checkStatusBlock(second);
-      newLogs.push(...secondBlocked.logs);
+      secondBlocked.logs.forEach(addStep);
 
       if (!secondBlocked.blocked) {
         if (secondUseStruggle) {
           const result = executeStruggle(second, first);
-          newLogs.push(...result.logs);
+          result.logs.forEach(addStep);
         } else if (secondMove) {
-          const result = executeMove(second, first, secondMove);
-          newLogs.push(...result.logs);
+          const result = executeMove(second, first, secondMove, secondBadges);
+          result.logs.forEach(addStep);
         }
       }
-
-      // Status damage for second
-      newLogs.push(...applyStatusDamage(second));
+      applyStatusDamage(second).forEach(addStep);
     }
 
-    // Update state with new logs
-    const allLogs = [...state.logs, ...newLogs];
-    const newState: Partial<BattleStore> = {
-      logs: allLogs,
-      turnNumber: state.turnNumber + 1,
+    // Process steps one by one
+    for (const step of steps) {
+        set(s => {
+            const newPlayerTeam = [...s.playerTeam];
+            const newEnemyTeam = [...s.enemyTeam];
+            
+            if (step.playerHp !== undefined) newPlayerTeam[s.activePlayerIndex].currentHp = step.playerHp;
+            if (step.enemyHp !== undefined) newEnemyTeam[s.activeEnemyIndex].currentHp = step.enemyHp;
+            if (step.playerStatus !== undefined) newPlayerTeam[s.activePlayerIndex].status = step.playerStatus;
+            if (step.enemyStatus !== undefined) newEnemyTeam[s.activeEnemyIndex].status = step.enemyStatus;
+
+            return {
+                logs: [...s.logs, step.log],
+                playerTeam: newPlayerTeam,
+                enemyTeam: newEnemyTeam,
+            };
+        });
+        
+        const delay = step.log.message.length * 25 + 600;
+        await new Promise(r => setTimeout(r, delay));
+    }
+
+    // Final result checks (win/loss/switch)
+    const currentState = get();
+    const finalPlayer = currentState.playerTeam[currentState.activePlayerIndex];
+    const finalEnemy = currentState.enemyTeam[currentState.activeEnemyIndex];
+    
+    const finalNewState: Partial<BattleStore> = {
+      turnNumber: currentState.turnNumber + 1,
     };
 
-    // Check enemy fainted
-    if (enemy.currentHp <= 0) {
+    if (finalEnemy.currentHp <= 0) {
       const xpEntry = {
-        pokemonIndex: state.activePlayerIndex,
-        defeatedId: enemy.dataId,
-        defeatedLevel: enemy.level,
+        pokemonIndex: currentState.activePlayerIndex,
+        defeatedId: finalEnemy.dataId,
+        defeatedLevel: finalEnemy.level,
       };
 
-      // Double K.O. check: if player also fainted (from recoil/status), handle player faint
-      if (player.currentHp <= 0) {
-        const nextPlayer = state.playerTeam.findIndex(
-          (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+      if (finalPlayer.currentHp <= 0) {
+        const nextPlayer = currentState.playerTeam.findIndex(
+          (p, i) => i !== currentState.activePlayerIndex && p.currentHp > 0
         );
-
-        // Still grant XP for the KO
-        newState.xpGained = [...state.xpGained, xpEntry];
-
-        // Check if there are more enemy Pokémon (trainer battle)
-        const nextEnemy = state.enemyTeam.findIndex(
-          (p, i) => i > state.activeEnemyIndex && p.currentHp > 0
+        finalNewState.xpGained = [...currentState.xpGained, xpEntry];
+        const nextEnemy = currentState.enemyTeam.findIndex(
+          (p, i) => i > currentState.activeEnemyIndex && p.currentHp > 0
         );
 
         if (nextPlayer < 0) {
-          // All player Pokémon fainted - defeat
-          newState.phase = 'defeat';
-          newState.logs = [
-            ...allLogs,
-            { message: 'Tous vos Pokémon sont K.O...', type: 'info' },
-          ];
-          if (state.trainerId?.startsWith('league-')) {
+          finalNewState.phase = 'defeat';
+          finalNewState.logs = [...get().logs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }];
+          if (currentState.trainerId?.startsWith('league-')) {
             useGameStore.getState().resetLeagueProgress();
           }
-        } else if (nextEnemy >= 0 && (state.type === 'trainer' || state.type === 'gym')) {
-          // More enemies remain, player needs to switch
-          const nextName = getPokemonData(state.enemyTeam[nextEnemy].dataId).name;
-          newState.activeEnemyIndex = nextEnemy;
-          newState.phase = 'switching';
-          newState.logs = [
-            ...allLogs,
-            { message: `${state.trainerName} envoie ${nextName} !`, type: 'info' },
-            { message: 'Envoyez votre prochain Pokémon !', type: 'info' },
+        } else if (nextEnemy >= 0 && (currentState.type === 'trainer' || currentState.type === 'gym')) {
+          const nextName = getPokemonData(currentState.enemyTeam[nextEnemy].dataId).name;
+          finalNewState.activeEnemyIndex = nextEnemy;
+          finalNewState.phase = 'switching';
+          finalNewState.logs = [...get().logs, 
+            { message: `${currentState.trainerName} envoie ${nextName} !`, type: 'info' },
+            { message: 'Envoyez votre prochain Pokémon !', type: 'info' }
           ];
         } else {
-          // No more enemies - victory (despite player also fainting)
-          newState.phase = 'victory';
-          if (state.trainerId?.startsWith('league-')) {
+          finalNewState.phase = 'victory';
+          if (currentState.trainerId?.startsWith('league-')) {
             useGameStore.getState().advanceLeagueProgress();
           }
-          if (state.encounterId) {
-            useGameStore.getState().triggerEvent(state.encounterId);
+          if (currentState.encounterId) {
+            useGameStore.getState().triggerEvent(currentState.encounterId);
           }
-          newState.moneyGained = state.trainerReward;
-          newState.logs = [
-            ...allLogs,
-            {
-              message: state.type === 'wild'
-                ? 'Vous avez gagné le combat !'
-                : `Vous avez battu ${state.trainerName} !`,
-              type: 'info',
-            },
-          ];
-          if (state.trainerReward > 0) {
-            newState.logs = [
-              ...(newState.logs as BattleLogEntry[]),
-              { message: `Vous gagnez ${state.trainerReward}₽ !`, type: 'xp' },
-            ];
+          finalNewState.moneyGained = currentState.trainerReward;
+          finalNewState.logs = [...get().logs, {
+            message: currentState.type === 'wild' ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
+            type: 'info',
+          }];
+          if (currentState.trainerReward > 0) {
+            finalNewState.logs.push({ message: `Vous gagnez ${currentState.trainerReward}₽ !`, type: 'xp' });
           }
         }
       } else {
-        // Normal case: enemy fainted, player alive
-        // Check if there are more enemy Pokémon (trainer battle)
-        const nextEnemy = state.enemyTeam.findIndex(
-          (p, i) => i > state.activeEnemyIndex && p.currentHp > 0
+        const nextEnemy = currentState.enemyTeam.findIndex(
+          (p, i) => i > currentState.activeEnemyIndex && p.currentHp > 0
         );
 
-        if (nextEnemy >= 0 && (state.type === 'trainer' || state.type === 'gym')) {
-          const nextName = getPokemonData(state.enemyTeam[nextEnemy].dataId).name;
-          newState.activeEnemyIndex = nextEnemy;
-          newState.phase = 'choosing';
-          newState.xpGained = [...state.xpGained, xpEntry];
-          newState.logs = [
-            ...allLogs,
-            { message: `${state.trainerName} envoie ${nextName} !`, type: 'info' },
-          ];
+        if (nextEnemy >= 0 && (currentState.type === 'trainer' || currentState.type === 'gym')) {
+          const nextName = getPokemonData(currentState.enemyTeam[nextEnemy].dataId).name;
+          finalNewState.activeEnemyIndex = nextEnemy;
+          finalNewState.phase = 'choosing';
+          finalNewState.xpGained = [...currentState.xpGained, xpEntry];
+          finalNewState.logs = [...get().logs, { message: `${currentState.trainerName} envoie ${nextName} !`, type: 'info' }];
         } else {
-          // Victory!
-          newState.phase = 'victory';
-
-          // League Progression
-          if (state.trainerId?.startsWith('league-')) {
+          finalNewState.phase = 'victory';
+          if (currentState.trainerId?.startsWith('league-')) {
             useGameStore.getState().advanceLeagueProgress();
           }
-
-          // Static Encounter Defeat (Legendaries/Snorlax)
-          if (state.encounterId) {
-            useGameStore.getState().triggerEvent(state.encounterId);
+          if (currentState.encounterId) {
+            useGameStore.getState().triggerEvent(currentState.encounterId);
           }
-
-          newState.xpGained = [...state.xpGained, xpEntry];
-          newState.moneyGained = state.trainerReward;
-          newState.logs = [
-            ...allLogs,
-            {
-              message: state.type === 'wild'
-                ? 'Vous avez gagné le combat !'
-                : `Vous avez battu ${state.trainerName} !`,
-              type: 'info',
-            },
-          ];
-          if (state.trainerReward > 0) {
-            newState.logs = [
-              ...(newState.logs as BattleLogEntry[]),
-              { message: `Vous gagnez ${state.trainerReward}₽ !`, type: 'xp' },
-            ];
+          finalNewState.xpGained = [...currentState.xpGained, xpEntry];
+          finalNewState.moneyGained = currentState.trainerReward;
+          finalNewState.logs = [...get().logs, {
+            message: currentState.type === 'wild' ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
+            type: 'info',
+          }];
+          if (currentState.trainerReward > 0) {
+            finalNewState.logs.push({ message: `Vous gagnez ${currentState.trainerReward}₽ !`, type: 'xp' });
           }
         }
       }
-    }
-    // Check player fainted
-    else if (player.currentHp <= 0) {
-      const nextPlayer = state.playerTeam.findIndex(
-        (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+    } else if (finalPlayer.currentHp <= 0) {
+      const nextPlayer = currentState.playerTeam.findIndex(
+        (p, i) => i !== currentState.activePlayerIndex && p.currentHp > 0
       );
-
       if (nextPlayer >= 0) {
-        // Do NOT update activePlayerIndex here. 
-        // We want the user to click the next pokemon. 
-        // If we update it now, the UI sees it as "active" and disables the button.
-        newState.phase = 'switching';
-        const nextName = getPokemonData(state.playerTeam[nextPlayer].dataId).name;
-        newState.logs = [
-          ...allLogs,
-          { message: `Envoyez votre prochain Pokémon !`, type: 'info' },
-        ];
+        finalNewState.phase = 'switching';
+        finalNewState.logs = [...get().logs, { message: `Envoyez votre prochain Pokémon !`, type: 'info' }];
       } else {
-        // All fainted - defeat
-        newState.phase = 'defeat';
-        newState.logs = [
-          ...allLogs,
-          { message: 'Tous vos Pokémon sont K.O...', type: 'info' },
-        ];
-
-        // League Reset
-        if (state.trainerId?.startsWith('league-')) {
+        finalNewState.phase = 'defeat';
+        finalNewState.logs = [...get().logs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }];
+        if (currentState.trainerId?.startsWith('league-')) {
           useGameStore.getState().resetLeagueProgress();
         }
       }
     } else {
-      newState.phase = 'choosing';
+      finalNewState.phase = 'choosing';
     }
 
-    set(newState as any);
+    set(finalNewState as any);
   },
 
   selectSwitch: (teamIndex: number) => {
@@ -509,7 +494,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     });
   },
 
-  useItem: (itemId: string, targetIndex?: number) => {
+  useItem: async (itemId: string, targetIndex?: number) => {
     const state = get();
     const item = getItemData(itemId);
     if (!item.effect) return;
@@ -526,9 +511,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
       pokemon.currentHp += healAmount;
 
-      set({
-        logs: [...state.logs, { message: `${name} récupère ${healAmount} PV !`, type: 'info' }],
-      });
+      set(s => ({
+        logs: [...s.logs, { message: `${name} récupère ${healAmount} PV !`, type: 'info' }],
+      }));
 
       // Enemy still attacks
       if (state.phase === 'choosing') {
@@ -538,7 +523,6 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           const newLogs: BattleLogEntry[] = [];
 
           if (enemyMoveIdx === -1) {
-            // Struggle
             const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
             newLogs.push(...result.logs);
           } else {
@@ -555,28 +539,31 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           }
           newLogs.push(...applyStatusDamage(enemy));
 
-          // Check if player fainted after enemy attack
+          for (const log of newLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+          }
+
           const player = state.playerTeam[state.activePlayerIndex];
           if (player.currentHp <= 0) {
             const nextPlayer = state.playerTeam.findIndex(
               (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
             );
             if (nextPlayer < 0) {
-              set({
+              set(s => ({
                 phase: 'defeat',
-                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-              });
+                logs: [...s.logs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              }));
               return;
             } else {
-              set({
+              set(s => ({
                 phase: 'switching',
-                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                logs: [...s.logs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
                 turnNumber: state.turnNumber + 1,
-              });
+              }));
               return;
             }
           }
-          set({ logs: [...get().logs, ...newLogs] });
         }
         set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
       }
@@ -588,142 +575,14 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       if (!pokemon) return;
 
       const cures = item.effect.curesStatus ?? [];
-      if (pokemon.status && cures.includes(pokemon.status)) {
+      if (pokemon.status && (cures.includes(pokemon.status) || cures.includes('all'))) {
         const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
         pokemon.status = null;
         pokemon.statusTurns = 0;
-        set({
-          logs: [...state.logs, { message: `${name} est soigné !`, type: 'info' }],
-        });
+        set(s => ({
+          logs: [...s.logs, { message: `${name} est soigné !`, type: 'info' }],
+        }));
       }
-
-      // Enemy still attacks after status cure
-      if (state.phase === 'choosing') {
-        const enemy = state.enemyTeam[state.activeEnemyIndex];
-        if (enemy && enemy.currentHp > 0) {
-          const enemyMoveIdx = chooseEnemyMove(enemy);
-          const newLogs: BattleLogEntry[] = [];
-
-          if (enemyMoveIdx === -1) {
-            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
-            newLogs.push(...result.logs);
-          } else {
-            const enemyMove = enemy.moves[enemyMoveIdx];
-            if (enemyMove) {
-              const blocked = checkStatusBlock(enemy);
-              newLogs.push(...blocked.logs);
-              if (!blocked.blocked) {
-                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
-                newLogs.push(...result.logs);
-              }
-            }
-          }
-          newLogs.push(...applyStatusDamage(enemy));
-
-          const player = state.playerTeam[state.activePlayerIndex];
-          if (player.currentHp <= 0) {
-            const nextPlayer = state.playerTeam.findIndex(
-              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
-            );
-            if (nextPlayer < 0) {
-              set({
-                phase: 'defeat',
-                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-              });
-              return;
-            } else {
-              set({
-                phase: 'switching',
-                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
-                turnNumber: state.turnNumber + 1,
-              });
-              return;
-            }
-          }
-          set({ logs: [...get().logs, ...newLogs] });
-        }
-        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
-      }
-    }
-
-    if (item.effect.type === 'revive') {
-      const idx = targetIndex ?? 0;
-      const pokemon = state.playerTeam[idx];
-      if (!pokemon || pokemon.currentHp > 0) return;
-
-      const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
-      pokemon.currentHp = Math.floor(pokemon.maxHp * (item.effect.reviveHpPercent ?? 50) / 100);
-      pokemon.status = null;
-      pokemon.statusTurns = 0;
-      set({
-        logs: [...state.logs, { message: `${name} est ranimé !`, type: 'info' }],
-      });
-
-      // Enemy still attacks after revive
-      if (state.phase === 'choosing') {
-        const enemy = state.enemyTeam[state.activeEnemyIndex];
-        if (enemy && enemy.currentHp > 0) {
-          const enemyMoveIdx = chooseEnemyMove(enemy);
-          const newLogs: BattleLogEntry[] = [];
-
-          if (enemyMoveIdx === -1) {
-            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
-            newLogs.push(...result.logs);
-          } else {
-            const enemyMove = enemy.moves[enemyMoveIdx];
-            if (enemyMove) {
-              const blocked = checkStatusBlock(enemy);
-              newLogs.push(...blocked.logs);
-              if (!blocked.blocked) {
-                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
-                newLogs.push(...result.logs);
-              }
-            }
-          }
-          newLogs.push(...applyStatusDamage(enemy));
-
-          const player = state.playerTeam[state.activePlayerIndex];
-          if (player.currentHp <= 0) {
-            const nextPlayer = state.playerTeam.findIndex(
-              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
-            );
-            if (nextPlayer < 0) {
-              set({
-                phase: 'defeat',
-                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-              });
-              return;
-            } else {
-              set({
-                phase: 'switching',
-                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
-                turnNumber: state.turnNumber + 1,
-              });
-              return;
-            }
-          }
-          set({ logs: [...get().logs, ...newLogs] });
-        }
-        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
-      }
-    }
-
-    // Full Restore (heal + cure status)
-    if (item.effect.type === 'full_restore') {
-      const idx = targetIndex ?? state.activePlayerIndex;
-      const pokemon = state.playerTeam[idx];
-      if (!pokemon || pokemon.currentHp <= 0) return;
-
-      const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
-      const healAmount = pokemon.maxHp - pokemon.currentHp;
-      pokemon.currentHp = pokemon.maxHp;
-      pokemon.status = null;
-      pokemon.statusTurns = 0;
-      pokemon.volatile.confusion = 0;
-
-      set({
-        logs: [...state.logs, { message: `${name} est complètement soigné !`, type: 'info' }],
-      });
 
       // Enemy still attacks
       if (state.phase === 'choosing') {
@@ -748,33 +607,172 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           }
           newLogs.push(...applyStatusDamage(enemy));
 
+          for (const log of newLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+          }
+
           const player = state.playerTeam[state.activePlayerIndex];
           if (player.currentHp <= 0) {
             const nextPlayer = state.playerTeam.findIndex(
               (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
             );
             if (nextPlayer < 0) {
-              set({
+              set(s => ({
                 phase: 'defeat',
-                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-              });
+                logs: [...s.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              }));
               return;
             } else {
-              set({
+              set(s => ({
                 phase: 'switching',
-                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                logs: [...s.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
                 turnNumber: state.turnNumber + 1,
-              });
+              }));
               return;
             }
           }
-          set({ logs: [...get().logs, ...newLogs] });
         }
         set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
       }
     }
 
-    // Battle stat boost (X Attack, X Defense, etc.)
+    if (item.effect.type === 'revive') {
+      const idx = targetIndex ?? 0;
+      const pokemon = state.playerTeam[idx];
+      if (!pokemon || pokemon.currentHp > 0) return;
+
+      const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+      pokemon.currentHp = Math.floor(pokemon.maxHp * (item.effect.reviveHpPercent ?? 50) / 100);
+      pokemon.status = null;
+      pokemon.statusTurns = 0;
+      set(s => ({
+        logs: [...s.logs, { message: `${name} est ranimé !`, type: 'info' }],
+      }));
+
+      // Enemy still attacks
+      if (state.phase === 'choosing') {
+        const enemy = state.enemyTeam[state.activeEnemyIndex];
+        if (enemy && enemy.currentHp > 0) {
+          const enemyMoveIdx = chooseEnemyMove(enemy);
+          const newLogs: BattleLogEntry[] = [];
+
+          if (enemyMoveIdx === -1) {
+            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
+            newLogs.push(...result.logs);
+          } else {
+            const enemyMove = enemy.moves[enemyMoveIdx];
+            if (enemyMove) {
+              const blocked = checkStatusBlock(enemy);
+              newLogs.push(...blocked.logs);
+              if (!blocked.blocked) {
+                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
+                newLogs.push(...result.logs);
+              }
+            }
+          }
+          newLogs.push(...applyStatusDamage(enemy));
+
+          for (const log of newLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+          }
+
+          const player = state.playerTeam[state.activePlayerIndex];
+          if (player.currentHp <= 0) {
+            const nextPlayer = state.playerTeam.findIndex(
+              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+            );
+            if (nextPlayer < 0) {
+              set(s => ({
+                phase: 'defeat',
+                logs: [...s.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              }));
+              return;
+            } else {
+              set(s => ({
+                phase: 'switching',
+                logs: [...s.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                turnNumber: state.turnNumber + 1,
+              }));
+              return;
+            }
+          }
+        }
+        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
+      }
+    }
+
+    // Full Restore (heal + cure status)
+    if (item.effect.type === 'full_restore') {
+      const idx = targetIndex ?? state.activePlayerIndex;
+      const pokemon = state.playerTeam[idx];
+      if (!pokemon || pokemon.currentHp <= 0) return;
+
+      const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+      pokemon.currentHp = pokemon.maxHp;
+      pokemon.status = null;
+      pokemon.statusTurns = 0;
+      pokemon.volatile.confusion = 0;
+
+      set(s => ({
+        logs: [...s.logs, { message: `${name} est complètement soigné !`, type: 'info' }],
+      }));
+
+      // Enemy still attacks
+      if (state.phase === 'choosing') {
+        const enemy = state.enemyTeam[state.activeEnemyIndex];
+        if (enemy && enemy.currentHp > 0) {
+          const enemyMoveIdx = chooseEnemyMove(enemy);
+          const newLogs: BattleLogEntry[] = [];
+
+          if (enemyMoveIdx === -1) {
+            const result = executeStruggle(enemy, state.playerTeam[state.activePlayerIndex]);
+            newLogs.push(...result.logs);
+          } else {
+            const enemyMove = enemy.moves[enemyMoveIdx];
+            if (enemyMove) {
+              const blocked = checkStatusBlock(enemy);
+              newLogs.push(...blocked.logs);
+              if (!blocked.blocked) {
+                const result = executeMove(enemy, state.playerTeam[state.activePlayerIndex], enemyMove);
+                newLogs.push(...result.logs);
+              }
+            }
+          }
+          newLogs.push(...applyStatusDamage(enemy));
+
+          for (const log of newLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+          }
+
+          const player = state.playerTeam[state.activePlayerIndex];
+          if (player.currentHp <= 0) {
+            const nextPlayer = state.playerTeam.findIndex(
+              (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
+            );
+            if (nextPlayer < 0) {
+              set(s => ({
+                phase: 'defeat',
+                logs: [...s.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              }));
+              return;
+            } else {
+              set(s => ({
+                phase: 'switching',
+                logs: [...s.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                turnNumber: state.turnNumber + 1,
+              }));
+              return;
+            }
+          }
+        }
+        set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
+      }
+    }
+
+    // Battle stat boost
     if (item.effect.type === 'battle_stat') {
       const pokemon = state.playerTeam[state.activePlayerIndex];
       if (!pokemon || pokemon.currentHp <= 0) return;
@@ -792,9 +790,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           spDef: 'Défense Spé.', speed: 'Vitesse',
         };
 
-        set({
-          logs: [...state.logs, { message: `${statNames[stat] || stat} de ${name} monte !`, type: 'info' }],
-        });
+        set(s => ({
+          logs: [...s.logs, { message: `${statNames[stat] || stat} de ${name} monte !`, type: 'info' }],
+        }));
       }
 
       // Enemy still attacks
@@ -820,50 +818,52 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           }
           newLogs.push(...applyStatusDamage(enemy));
 
+          for (const log of newLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+          }
+
           const player = state.playerTeam[state.activePlayerIndex];
           if (player.currentHp <= 0) {
             const nextPlayer = state.playerTeam.findIndex(
               (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
             );
             if (nextPlayer < 0) {
-              set({
+              set(s => ({
                 phase: 'defeat',
-                logs: [...get().logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-              });
+                logs: [...s.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+              }));
               return;
             } else {
-              set({
+              set(s => ({
                 phase: 'switching',
-                logs: [...get().logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+                logs: [...s.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
                 turnNumber: state.turnNumber + 1,
-              });
+              }));
               return;
             }
           }
-          set({ logs: [...get().logs, ...newLogs] });
         }
         set({ phase: 'choosing', turnNumber: state.turnNumber + 1 });
       }
     }
   },
 
-  attemptFlee: () => {
+  attemptFlee: async () => {
     const state = get();
     if (state.type !== 'wild' && state.type !== 'safari') {
-      set({ logs: [...state.logs, { message: 'Impossible de fuir un combat de dresseur !', type: 'info' }] });
+      set(s => ({ logs: [...s.logs, { message: 'Impossible de fuir un combat de dresseur !', type: 'info' }] }));
       return;
     }
 
-    // Safari flee always succeeds (player runs away)
     if (state.type === 'safari') {
-      set({
+      set(s => ({
         phase: 'fled',
-        logs: [...state.logs, { message: 'Vous avez pris la fuite !', type: 'info' }],
-      });
+        logs: [...s.logs, { message: 'Vous avez pris la fuite !', type: 'info' }],
+      }));
       return;
     }
 
-    // Simple flee formula: 50% + 10% per speed advantage
     const player = state.playerTeam[state.activePlayerIndex];
     const enemy = state.enemyTeam[state.activeEnemyIndex];
     if (!player || !enemy) return;
@@ -871,12 +871,11 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const fleeChance = Math.min(0.95, 0.5 + (player.stats.speed - enemy.stats.speed) * 0.01);
 
     if (Math.random() < fleeChance) {
-      set({
+      set(s => ({
         phase: 'fled',
-        logs: [...state.logs, { message: 'Vous avez pris la fuite !', type: 'info' }],
-      });
+        logs: [...s.logs, { message: 'Vous avez pris la fuite !', type: 'info' }],
+      }));
     } else {
-      // Enemy attacks
       const enemyMoveIdx = chooseEnemyMove(enemy);
       const newLogs: BattleLogEntry[] = [{ message: 'Fuite impossible !', type: 'info' }];
 
@@ -896,38 +895,42 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
       newLogs.push(...applyStatusDamage(enemy));
 
-      // Check if player fainted
+      for (const log of newLogs) {
+        set(s => ({ logs: [...s.logs, log] }));
+        await new Promise(r => setTimeout(r, log.message.length * 25 + 700));
+      }
+
       if (player.currentHp <= 0) {
         const nextPlayer = state.playerTeam.findIndex(
           (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
         );
         if (nextPlayer < 0) {
-          set({
+          set(s => ({
             phase: 'defeat',
-            logs: [...state.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-          });
+            logs: [...s.logs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+          }));
           return;
         } else {
-          set({
+          set(s => ({
             phase: 'switching',
-            logs: [...state.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+            logs: [...s.logs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
             turnNumber: state.turnNumber + 1,
-          });
+          }));
           return;
         }
       }
 
       set({
-        logs: [...state.logs, ...newLogs],
+        phase: 'choosing',
         turnNumber: state.turnNumber + 1,
       });
     }
   },
 
-  attemptCapture: (ballId: string) => {
+  attemptCapture: async (ballId: string) => {
     const state = get();
     if (state.type !== 'wild') {
-      set({ logs: [...state.logs, { message: 'Impossible de capturer un Pokémon dresseur !', type: 'info' }] });
+      set(s => ({ logs: [...s.logs, { message: 'Impossible de capturer un Pokémon dresseur !', type: 'info' }] }));
       return;
     }
 
@@ -938,7 +941,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const multiplier = ball.effect?.catchMultiplier ?? 1;
 
     const result = attemptCatch(enemy, multiplier);
-    const newLogs: BattleLogEntry[] = [];
+    const newLogs: BattleLogEntry[] = [{ message: `Vous lancez une ${ball.name} !`, type: 'catch' }];
 
     const shakeMsgs = ['...', '...', '...', '...'];
     for (let i = 0; i < result.shakes && i < 4; i++) {
@@ -950,60 +953,75 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (result.success) {
       const enemyName = getPokemonData(enemy.dataId).name;
       newLogs.push({ message: `${enemyName} a été capturé !`, type: 'catch' });
-      set({
+      
+      for (const log of newLogs) {
+        set(s => ({ logs: [...s.logs, log] }));
+        await new Promise(r => setTimeout(r, 700));
+      }
+      
+      set(s => ({
         phase: 'caught',
-        logs: [...state.logs, ...newLogs],
         caughtPokemon: enemy,
-      });
+      }));
 
       if (state.encounterId) {
         useGameStore.getState().triggerEvent(state.encounterId);
       }
     } else {
-      // Enemy attacks after failed capture
+      for (const log of newLogs) {
+        set(s => ({ logs: [...s.logs, log] }));
+        await new Promise(r => setTimeout(r, 700));
+      }
+
       const player = state.playerTeam[state.activePlayerIndex];
+      const enemyAttackLogs: BattleLogEntry[] = [];
       if (player && enemy.currentHp > 0) {
         const enemyMoveIdx = chooseEnemyMove(enemy);
 
         if (enemyMoveIdx === -1) {
-          const result = executeStruggle(enemy, player);
-          newLogs.push(...result.logs);
+          const res = executeStruggle(enemy, player);
+          enemyAttackLogs.push(...res.logs);
         } else {
           const enemyMove = enemy.moves[enemyMoveIdx];
           if (enemyMove) {
             const blocked = checkStatusBlock(enemy);
-            newLogs.push(...blocked.logs);
+            enemyAttackLogs.push(...blocked.logs);
             if (!blocked.blocked) {
               const execResult = executeMove(enemy, player, enemyMove);
-              newLogs.push(...execResult.logs);
+              enemyAttackLogs.push(...execResult.logs);
             }
           }
         }
-        newLogs.push(...applyStatusDamage(enemy));
+        enemyAttackLogs.push(...applyStatusDamage(enemy));
+
+        for (const log of enemyAttackLogs) {
+            set(s => ({ logs: [...s.logs, log] }));
+            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+        }
 
         if (player.currentHp <= 0) {
           const nextPlayer = state.playerTeam.findIndex(
             (p, i) => i !== state.activePlayerIndex && p.currentHp > 0
           );
           if (nextPlayer < 0) {
-            set({
+            set(s => ({
               phase: 'defeat',
-              logs: [...state.logs, ...newLogs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
-            });
+              logs: [...s.logs, { message: 'Tous vos Pokémon sont K.O...', type: 'info' }],
+            }));
             return;
           } else {
-            set({
+            set(s => ({
               phase: 'switching',
-              logs: [...state.logs, ...newLogs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
+              logs: [...s.logs, { message: 'Envoyez votre prochain Pokémon !', type: 'info' }],
               turnNumber: state.turnNumber + 1,
-            });
+            }));
             return;
           }
         }
       }
 
       set({
-        logs: [...state.logs, ...newLogs],
+        phase: 'choosing',
         turnNumber: state.turnNumber + 1,
       });
     }

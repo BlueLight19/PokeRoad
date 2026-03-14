@@ -75,6 +75,7 @@ export interface GameState {
   // Inventory
   addItem: (itemId: string, qty: number) => void;
   removeItem: (itemId: string, qty: number) => void;
+  sellItemAction: (itemId: string, qty: number) => void;
   getItemQuantity: (itemId: string) => number;
   useItemAction: (itemId: string, pokemonUid?: string) => { success: boolean; message: string };
 
@@ -395,6 +396,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
+  sellItemAction: (itemId: string, qty: number) => {
+    const itemData = getItemData(itemId);
+    if (!itemData) return;
+    
+    const currentQty = get().getItemQuantity(itemId);
+    const sellQty = Math.min(qty, currentQty);
+    if (sellQty <= 0) return;
+
+    const sellPrice = Math.floor((itemData.price || 0) / 2) * sellQty;
+    
+    get().removeItem(itemId, sellQty);
+    get().addMoney(sellPrice);
+    get().saveGameState();
+  },
+
   useItemAction: (itemId: string, pokemonUid?: string) => {
     const state = get();
     // Check quantity
@@ -424,6 +440,12 @@ export const useGameStore = create<GameState>((set, get) => ({
 
       const moveId = itemData.effect.moveId;
       const moveData = getMoveData(moveId);
+      const pokemonData = getPokemonData(pokemon.dataId);
+
+      // Check TM compatibility
+      if (pokemonData.tmLearnset && !pokemonData.tmLearnset.includes(moveId)) {
+        return { success: false, message: `${pokemon.nickname || pokemonData.name} ne peut pas apprendre ${moveData.name} !` };
+      }
 
       // Check if already known
       if (pokemon.moves.some(m => m.moveId === moveId)) {
@@ -469,15 +491,63 @@ export const useGameStore = create<GameState>((set, get) => ({
       const result = useItem(itemData, pokemon);
       if (result.success && result.consumed) {
         get().removeItem(itemId, 1);
-        set({ team: [...state.team] }); // Update UI
 
-        // Check evolution
-        if (result.newPokemonId) {
-          // Evolution handled inside useItem? 
-          // evolvePokemon updates the instance.
-          // But we might want to show a modal or animation.
-          // For now, straightforward update.
+        // Check level up results (Rare Candy)
+        if (result.levelUpResult) {
+          const lResult = result.levelUpResult;
+          const pokemonIdx = state.team.findIndex(p => p.uid === pokemonUid);
+
+          let currentPendingMove = get().pendingMoveLearn;
+          const currentMoveQueue = [...get().pendingMoveQueue];
+          let currentPendingEvo = get().pendingEvolution;
+          const currentEvoQueue = [...get().pendingEvolutionQueue];
+
+          // Handle moves
+          if (lResult.learnableMoves.length > 0) {
+            for (const moveId of lResult.learnableMoves) {
+              if (pokemon.moves.some(m => m.moveId === moveId)) continue;
+              if (pokemon.moves.length < 4) {
+                const moveData = getMoveData(moveId);
+                pokemon.moves.push({ moveId, currentPp: moveData.pp, maxPp: moveData.pp });
+              } else {
+                const moveEntry = { pokemonIndex: pokemonIdx, moveId };
+                if (!currentPendingMove) {
+                  currentPendingMove = moveEntry;
+                } else {
+                  currentMoveQueue.push(moveEntry);
+                }
+              }
+            }
+          }
+
+          // Handle evolution
+          if (lResult.canEvolve && lResult.evolutionId) {
+            const evoEntry = { pokemonIndex: pokemonIdx, targetId: lResult.evolutionId };
+            if (!currentPendingEvo) {
+              currentPendingEvo = evoEntry;
+            } else {
+              currentEvoQueue.push(evoEntry);
+            }
+          }
+
+          set({
+            pendingMoveLearn: currentPendingMove,
+            pendingMoveQueue: currentMoveQueue,
+            pendingEvolution: currentPendingEvo,
+            pendingEvolutionQueue: currentEvoQueue,
+          });
         }
+
+        // Create fresh references for modified pokemon to trigger React re-renders
+        const newTeam = [...state.team];
+        newTeam[newTeam.findIndex(p => p.uid === pokemonUid)] = {
+          ...pokemon,
+          moves: pokemon.moves.map(m => ({ ...m })),
+          stats: { ...pokemon.stats },
+          evs: { ...pokemon.evs },
+        };
+        set({ team: newTeam });
+        get().saveGameState();
       }
       return { success: result.success, message: result.message };
     }
@@ -885,7 +955,29 @@ export const useGameStore = create<GameState>((set, get) => ({
       const newTeam = [...team];
       const pokemon = newTeam[pendingEvolution.pokemonIndex];
       if (pokemon) {
-        evolvePokemon(pokemon, pendingEvolution.targetId);
+        const result = evolvePokemon(pokemon, pendingEvolution.targetId);
+        
+        // Handle new moves from evolution
+        if (result.learnableMoves.length > 0) {
+          const movesToQueue = result.learnableMoves.map(moveId => ({
+            pokemonIndex: pendingEvolution.pokemonIndex,
+            moveId
+          }));
+          
+          const existingQueue = get().pendingMoveQueue;
+          const currentPending = get().pendingMoveLearn;
+          
+          if (!currentPending) {
+            set({
+              pendingMoveLearn: movesToQueue[0],
+              pendingMoveQueue: [...existingQueue, ...movesToQueue.slice(1)]
+            });
+          } else {
+            set({
+              pendingMoveQueue: [...existingQueue, ...movesToQueue]
+            });
+          }
+        }
       }
       // Process next evolution from queue
       if (pendingEvolutionQueue.length > 0) {

@@ -51,6 +51,7 @@ export interface PokemonData {
   baseExp: number;
   evYield: Partial<BaseStats>;
   spriteUrl: string;
+  tmLearnset?: number[];
 }
 
 export interface MoveData {

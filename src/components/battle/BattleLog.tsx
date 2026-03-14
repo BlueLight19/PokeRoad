@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { BattleLogEntry } from '../../types/battle';
 
 interface BattleLogProps {
@@ -60,41 +60,70 @@ export function BattleLog({ logs }: BattleLogProps) {
       }} />
 
       {displayLogs.map((log, i) => {
+        const logIndex = logs.length - displayLogs.length + i;
         const isNew = i === displayLogs.length - 1;
+        
         return (
-          <div
-            key={logs.length - displayLogs.length + i}
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '6px',
-              padding: '3px 0',
-              opacity: isNew ? 1 : 0.7 + (i / displayLogs.length) * 0.3,
-              animation: isNew ? 'slideUp 0.2s ease' : 'none',
-            }}
-          >
-            <span style={{
-              color: logColors[log.type] || '#ccd6dd',
-              fontSize: '8px',
-              lineHeight: '1.8',
-              flexShrink: 0,
-            }}>
-              {logIcons[log.type] || '\u25B8'}
-            </span>
-            <span
-              style={{
-                color: logColors[log.type] || '#ccd6dd',
-                fontSize: '9px',
-                fontFamily: "'Press Start 2P', monospace",
-                lineHeight: '1.8',
-              }}
-            >
-              {log.message}
-            </span>
-          </div>
+          <TypewriterMessage 
+            key={logIndex}
+            log={log}
+            isNew={isNew}
+          />
         );
       })}
       <div ref={endRef} />
     </div>
   );
+}
+
+function TypewriterMessage({ log, isNew }: { log: BattleLogEntry, isNew: boolean }) {
+    const [currentText, setCurrentText] = useState(isNew ? "" : log.message);
+
+    useEffect(() => {
+        if (!isNew) {
+            setCurrentText(log.message);
+            return;
+        }
+
+        let current = 0;
+        const interval = setInterval(() => {
+            current++;
+            setCurrentText(log.message.slice(0, current));
+            if (current >= log.message.length) clearInterval(interval);
+        }, 25);
+
+        return () => clearInterval(interval);
+    }, [log.message, isNew]);
+
+    return (
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '6px',
+                padding: '3px 0',
+                opacity: isNew ? 1 : 0.7,
+                animation: isNew ? 'slideUp 0.2s ease' : 'none',
+            }}
+        >
+            <span style={{
+                color: logColors[log.type] || '#ccd6dd',
+                fontSize: '8px',
+                lineHeight: '1.8',
+                flexShrink: 0,
+            }}>
+                {logIcons[log.type] || '\u25B8'}
+            </span>
+            <span
+                style={{
+                    color: logColors[log.type] || '#ccd6dd',
+                    fontSize: '9px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    lineHeight: '1.8',
+                }}
+            >
+                {currentText}
+            </span>
+        </div>
+    );
 }

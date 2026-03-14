@@ -7,6 +7,7 @@ export interface EvolutionResult {
   newDataId: number;
   oldName: string;
   newName: string;
+  learnableMoves: number[];
 }
 
 /**
@@ -31,11 +32,23 @@ export function evolvePokemon(pokemon: PokemonInstance, targetId: number): Evolu
   // Update XP thresholds (exp group may change)
   pokemon.xpToNextLevel = xpForLevel(pokemon.level + 1, newData.expGroup);
 
+  // Check for moves learned at current level by new form
+  const learnableMoves: number[] = [];
+  for (const entry of newData.learnset) {
+    if (entry.level <= pokemon.level) {
+      // Check if already knows it
+      if (!pokemon.moves.some(m => m.moveId === entry.moveId)) {
+        learnableMoves.push(entry.moveId);
+      }
+    }
+  }
+
   return {
     evolved: true,
     newDataId: targetId,
     oldName,
     newName: newData.name,
+    learnableMoves,
   };
 }
 

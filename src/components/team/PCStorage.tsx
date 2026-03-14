@@ -5,14 +5,15 @@ import { Button } from '../ui/Button';
 import { PokemonInstance } from '../../types/pokemon';
 import { BOX_CAPACITY } from '../../engine/pcStorage';
 
-type SelectedSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
+type DragSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
 
 export function PCStorage() {
   const { pc, team, moveFromPc, moveToPc, setView, switchTeamOrder } = useGameStore();
   const [currentBoxIndex, setCurrentBoxIndex] = useState(pc.currentBoxId || 0);
   const [selected, setSelected] = useState<SelectedSource | null>(null);
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dragSource, setDragSource] = useState<DragSource | null>(null);
+  const [dragOverTeamIndex, setDragOverTeamIndex] = useState<number | null>(null);
+  const [isDragOverPc, setIsDragOverPc] = useState(false);
 
   const currentBox = pc.boxes[currentBoxIndex];
   const boxCount = currentBox.pokemon.filter(p => p !== null).length;
@@ -38,30 +39,42 @@ export function PCStorage() {
     }
   }
 
-  const handleDeposit = () => {
-    if (!selectedPokemon || selected?.type !== 'team') return;
+  const handleDeposit = (uid: string) => {
     if (team.length <= 1) return;
-    moveToPc(selectedPokemon.uid);
+    moveToPc(uid);
     setSelected(null);
   };
 
-  const handleWithdraw = () => {
-    if (!selectedPokemon || selected?.type !== 'pc') return;
+  const handleWithdraw = (uid: string) => {
     if (team.length >= 6) return;
-    moveFromPc(selectedPokemon.uid);
+    moveFromPc(uid);
     setSelected(null);
   };
 
   return (
     <div style={{ padding: '16px', maxWidth: '600px', margin: '0 auto' }}>
       <h2 style={{ color: '#9C27B0', fontSize: '14px', fontFamily: "'Press Start 2P', monospace", marginBottom: '16px', textAlign: 'center' }}>
-        PC de Leo
+        PC de Léo
       </h2>
 
       {/* Team section */}
-      <div style={{ marginBottom: '16px' }}>
+      <div 
+        style={{ marginBottom: '16px' }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (dragSource?.type === 'pc') {
+            handleWithdraw(dragSource.uid);
+          }
+          setDragSource(null);
+          setDragOverTeamIndex(null);
+        }}
+      >
         <div style={{ color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
-          Equipe ({team.length}/6)
+          Équipe ({team.length}/6)
         </div>
         <div style={{
           display: 'grid',
@@ -74,7 +87,8 @@ export function PCStorage() {
         }}>
           {Array.from({ length: 6 }).map((_, idx) => {
             const pokemon = team[idx];
-            const isDragOver = dragOverIndex === idx && dragIndex !== idx;
+            const isDragOver = dragOverTeamIndex === idx && dragSource?.type === 'team' && dragSource.index !== idx;
+            
             if (!pokemon) {
               return (
                 <div key={`team-empty-${idx}`} style={{
@@ -91,35 +105,37 @@ export function PCStorage() {
             const isSelected = selected?.type === 'team' && selected.index === idx;
             const hpRatio = pokemon.currentHp / pokemon.maxHp;
             const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
-            const isDragging = dragIndex === idx;
+            const isDragging = dragSource?.type === 'team' && dragSource.index === idx;
 
             return (
               <div
                 key={pokemon.uid}
                 draggable
                 onDragStart={(e) => {
-                  setDragIndex(idx);
+                  setDragSource({ type: 'team', index: idx });
                   e.dataTransfer.effectAllowed = 'move';
                 }}
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.dataTransfer.dropEffect = 'move';
-                  setDragOverIndex(idx);
+                  setDragOverTeamIndex(idx);
                 }}
                 onDragLeave={() => {
-                  setDragOverIndex(null);
+                  setDragOverTeamIndex(null);
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  if (dragIndex !== null && dragIndex !== idx) {
-                    switchTeamOrder(dragIndex, idx);
+                  if (dragSource?.type === 'team' && dragSource.index !== idx) {
+                    switchTeamOrder(dragSource.index, idx);
+                  } else if (dragSource?.type === 'pc') {
+                    handleWithdraw(dragSource.uid);
                   }
-                  setDragIndex(null);
-                  setDragOverIndex(null);
+                  setDragSource(null);
+                  setDragOverTeamIndex(null);
                 }}
                 onDragEnd={() => {
-                  setDragIndex(null);
-                  setDragOverIndex(null);
+                  setDragSource(null);
+                  setDragOverTeamIndex(null);
                 }}
                 onClick={() => setSelected(isSelected ? null : { type: 'team', index: idx })}
                 style={{
@@ -177,8 +193,8 @@ export function PCStorage() {
           pokemon={selectedPokemon}
           source={selected!}
           teamLength={team.length}
-          onDeposit={handleDeposit}
-          onWithdraw={handleWithdraw}
+          onDeposit={() => handleDeposit(selectedPokemon!.uid)}
+          onWithdraw={() => handleWithdraw(selectedPokemon!.uid)}
           onClose={() => setSelected(null)}
         />
       )}
@@ -192,16 +208,36 @@ export function PCStorage() {
         <Button variant="secondary" size="sm" onClick={handleNextBox}>&gt;</Button>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(6, 1fr)',
-        gap: '6px',
-        background: 'rgba(22, 33, 62, 0.8)',
-        padding: '8px',
-        borderRadius: '8px',
-        minHeight: '200px',
-        border: '2px solid #333',
-      }}>
+      <div 
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          setIsDragOverPc(true);
+        }}
+        onDragLeave={() => setIsDragOverPc(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (dragSource?.type === 'team') {
+            const pokemon = team[dragSource.index];
+            if (pokemon) {
+              handleDeposit(pokemon.uid);
+            }
+          }
+          setDragSource(null);
+          setIsDragOverPc(false);
+        }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: '6px',
+          background: 'rgba(22, 33, 62, 0.8)',
+          padding: '8px',
+          borderRadius: '8px',
+          minHeight: '200px',
+          border: isDragOverPc && dragSource?.type === 'team' ? '2px solid #2196F3' : '2px solid #333',
+          transition: 'border-color 0.2s',
+        }}
+      >
         {currentBox.pokemon.map((pokemon, slotId) => {
           if (!pokemon) {
             return (
@@ -220,10 +256,19 @@ export function PCStorage() {
           const isSelected = selected?.type === 'pc' && selected.uid === pokemon.uid;
           const hpRatio = pokemon.currentHp / pokemon.maxHp;
           const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+          const isDragging = dragSource?.type === 'pc' && dragSource.uid === pokemon.uid;
 
           return (
             <div
               key={pokemon.uid}
+              draggable
+              onDragStart={(e) => {
+                setDragSource({ type: 'pc', uid: pokemon.uid });
+                e.dataTransfer.effectAllowed = 'move';
+              }}
+              onDragEnd={() => {
+                setDragSource(null);
+              }}
               onClick={() => setSelected(isSelected ? null : { type: 'pc', uid: pokemon.uid })}
               style={{
                 background: 'rgba(15, 23, 42, 0.7)',
@@ -233,10 +278,11 @@ export function PCStorage() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
+                cursor: 'grab',
                 position: 'relative',
                 border: isSelected ? '2px solid #9C27B0' : '2px solid #333',
-                transition: 'border-color 0.2s',
+                opacity: isDragging ? 0.5 : 1,
+                transition: 'border-color 0.2s, opacity 0.2s',
               }}
             >
               <img

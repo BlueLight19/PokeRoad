@@ -179,7 +179,7 @@ export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelect
                 {moveInst.currentPp}/{moveInst.maxPp}
               </span>
             </div>
-            {move.power && (
+            {move.category !== 'status' && move.power && (
               <div
                 style={{
                   fontSize: '7px',
@@ -188,7 +188,19 @@ export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelect
                   marginTop: '2px',
                 }}
               >
-                Pui:{move.power} Pre:{move.accuracy ?? '∞'}
+                {move.category === 'physical' ? 'PHY' : 'SPE'} - Pui:{move.power} Pre:{move.accuracy ?? '∞'}
+              </div>
+            )}
+            {move.category === 'status' && (
+              <div
+                style={{
+                  fontSize: '7px',
+                  fontFamily: "'Press Start 2P', monospace",
+                  color: '#888',
+                  marginTop: '2px',
+                }}
+              >
+                STATUT - Pre:{move.accuracy ?? '∞'}
               </div>
             )}
           </button>

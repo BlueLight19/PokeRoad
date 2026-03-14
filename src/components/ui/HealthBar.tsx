@@ -31,7 +31,7 @@ export function HealthBar({ current, max, showText = true, height = 12 }: Health
             width: `${ratio * 100}%`,
             height: '100%',
             background: `linear-gradient(180deg, ${color}, ${color}88)`,
-            transition: 'width 0.4s ease, background 0.4s ease',
+            transition: 'width 0.8s ease-out, background 0.8s ease',
             borderRadius: '3px',
           }}
         />

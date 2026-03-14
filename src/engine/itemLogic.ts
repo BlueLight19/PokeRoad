@@ -1,7 +1,7 @@
 import { PokemonInstance, BaseStats } from '../types/pokemon';
 import { ItemData } from '../types/inventory';
 import { checkStoneEvolution, evolvePokemon } from './evolutionEngine';
-import { recalculateStats, processLevelUp, xpForLevel } from './experienceCalculator';
+import { recalculateStats, processLevelUp, xpForLevel, LevelUpResult } from './experienceCalculator';
 import { getPokemonData } from '../utils/dataLoader';
 
 export interface ItemUseResult {
@@ -9,6 +9,7 @@ export interface ItemUseResult {
     message: string;
     consumed: boolean;
     newPokemonId?: number;
+    levelUpResult?: LevelUpResult;
 }
 
 export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult {
@@ -26,7 +27,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             const result = evolvePokemon(target, evolutionId);
             return {
                 success: true,
-                message: `${result.oldName} evolue en ${result.newName} !`,
+                message: `${result.oldName} évolue en ${result.newName} !`,
                 consumed: true,
                 newPokemonId: evolutionId
             };
@@ -38,10 +39,10 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
     // Healing
     if (item.effect.type === 'heal') {
         if (target.currentHp >= target.maxHp) {
-            return { success: false, message: "Ca n'aura aucun effet.", consumed: false };
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
         }
         if (target.currentHp === 0) {
-            return { success: false, message: "Ce Pokemon est K.O.", consumed: false };
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
         }
 
         // Support both healAmount (standard) and healFull
@@ -49,7 +50,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             const oldHp = target.currentHp;
             target.currentHp = target.maxHp;
             const healed = target.currentHp - oldHp;
-            return { success: true, message: `${healed} PV restaures.`, consumed: true };
+            return { success: true, message: `${healed} PV restaurés.`, consumed: true };
         }
 
         const amount = item.effect.healAmount || 0;
@@ -57,13 +58,13 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         target.currentHp = Math.min(target.maxHp, target.currentHp + amount);
         const healed = target.currentHp - oldHp;
 
-        return { success: true, message: `${healed} PV restaures.`, consumed: true };
+        return { success: true, message: `${healed} PV restaurés.`, consumed: true };
     }
 
     // Revive
     if (item.effect.type === 'revive') {
         if (target.currentHp > 0) {
-            return { success: false, message: "Ce Pokemon n'est pas K.O.", consumed: false };
+            return { success: false, message: "Ce Pokémon n'est pas K.O.", consumed: false };
         }
 
         const percent = item.effect.reviveHpPercent || 50;
@@ -72,13 +73,13 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         target.statusTurns = 0;
         target.volatile = { confusion: 0, flinch: false, leechSeed: false, bound: 0 };
 
-        return { success: true, message: "Le Pokemon est ravive !", consumed: true };
+        return { success: true, message: "Le Pokémon est ravivé !", consumed: true };
     }
 
     // Status Heal
     if (item.effect.type === 'status_cure') {
         if (target.currentHp === 0) {
-            return { success: false, message: "Ce Pokemon est K.O.", consumed: false };
+            return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
         }
 
         const curesStatus = item.effect.curesStatus || [];
@@ -104,9 +105,9 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         }
 
         if (cured) {
-            return { success: true, message: "Le statut est soigne.", consumed: true };
+            return { success: true, message: "Le statut est soigné.", consumed: true };
         } else {
-            return { success: false, message: "Ca n'aura aucun effet.", consumed: false };
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
         }
     }
 
@@ -135,17 +136,33 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         if (target.level >= 100) {
             return { success: false, message: "Ce Pokémon est déjà au niveau max.", consumed: false };
         }
+        
         const data = getPokemonData(target.dataId);
-        target.level += 1;
-        target.xp = xpForLevel(target.level, data.expGroup);
-        target.xpToNextLevel = xpForLevel(target.level + 1, data.expGroup);
-        const newStats = recalculateStats(target);
-        const hpDiff = newStats.hp - target.maxHp;
-        target.stats = newStats;
-        target.maxHp = newStats.hp;
-        target.currentHp = Math.min(target.maxHp, target.currentHp + hpDiff);
-        const name = target.nickname || data.name;
-        return { success: true, message: `${name} monte au niveau ${target.level} !`, consumed: true };
+        
+        // Create a temporary clone with boosted XP to check results
+        const nextLevel = target.level + 1;
+        const targetXp = xpForLevel(nextLevel, data.expGroup);
+        const tempClone = { ...target, xp: targetXp };
+        
+        const result = processLevelUp(tempClone);
+        if (result) {
+            target.level = result.newLevel;
+            target.xp = targetXp;
+            target.stats = result.newStats;
+            target.maxHp = result.newMaxHp;
+            target.currentHp = result.newMaxHp; 
+            target.xpToNextLevel = result.newXpToNextLevel;
+            
+            const name = target.nickname || data.name;
+            return { 
+                success: true, 
+                message: `${name} monte au niveau ${target.level} !`, 
+                consumed: true,
+                levelUpResult: result
+            };
+        }
+        
+        return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
     }
 
     // EV Boost (Vitamins)

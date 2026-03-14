@@ -124,9 +124,14 @@ export function TeamView() {
                 borderLeft: `3px solid ${typeColors[move.type] || '#888'}`,
               }}>
                 <div>
-                  <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
-                    {move.name} ({move.power > 0 ? `Pwr: ${move.power}` : ''} {move.accuracy > 0 ? `Acc: ${move.accuracy}` : ''})
-                  </span>
+                  <div style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '4px' }}>
+                    {move.name}
+                  </div>
+                  <div style={{ color: '#aaa', fontSize: '7px', fontFamily: "'Press Start 2P', monospace" }}>
+                    {move.type.toUpperCase()} | {move.category.toUpperCase()} 
+                    {move.power ? ` | Pwr: ${move.power}` : ''} 
+                    {move.accuracy ? ` | Acc: ${move.accuracy}` : ' | Acc: ∞'}
+                  </div>
                 </div>
                 <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
                   PP {m.currentPp}/{m.maxPp}

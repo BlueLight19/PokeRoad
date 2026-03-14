@@ -75,7 +75,7 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
             imageRendering: 'pixelated',
             transform: isPlayer ? 'scaleX(-1)' : 'none',
             filter: isFainted ? 'grayscale(1) brightness(0.5)' : 'none',
-            transition: 'filter 0.5s ease',
+            transition: 'filter 0.8s ease',
             position: 'relative',
           }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

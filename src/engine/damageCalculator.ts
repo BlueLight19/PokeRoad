@@ -4,15 +4,14 @@ import { getPokemonData, getTypeEffectiveness } from '../utils/dataLoader';
 import { getEffectiveStat } from './statCalculator';
 
 /**
- * Pokémon damage formula (Gen III+):
+ * Pokémon damage formula:
  * Damage = ((((2*Level/5 + 2) * Power * Atk/Def) / 50) + 2) * Modifiers
- *
- * Modifiers = STAB * TypeEffectiveness * Critical * Random(0.85-1.00)
  */
 export function calculateDamage(
   attacker: PokemonInstance,
   defender: PokemonInstance,
-  move: MoveData
+  move: MoveData,
+  attackerBadges: string[] = []
 ): DamageResult {
   // Status moves do no damage
   if (move.category === 'status' || move.power === null) {
@@ -22,11 +21,15 @@ export function calculateDamage(
   const attackerData = getPokemonData(attacker.dataId);
   const defenderData = getPokemonData(defender.dataId);
 
-  // Critical hit check (1/16 chance)
-  const isCritical = Math.random() < (1 / 16);
+  // Critical hit check (Gen 1 style: based on base speed)
+  // Base chance: BaseSpeed / 512. For simplicity, we'll use a slightly boosted version or 1/16 if data missing.
+  const baseSpeed = attackerData.baseStats.speed;
+  let critThreshold = baseSpeed / 512;
+  // High crit moves have 8x multiplier in Gen 1
+  if (move.effect?.type === 'high_crit') critThreshold *= 8;
+  const isCritical = Math.random() < Math.min(0.99, critThreshold);
 
   // Physical vs Special split
-  // Critical hits ignore attacker's negative attack stages and defender's positive defense stages
   const atkStat = move.category === 'physical' ? 'attack' : 'spAtk';
   const defStat = move.category === 'physical' ? 'defense' : 'spDef';
 
@@ -34,21 +37,35 @@ export function calculateDamage(
   let def: number;
 
   if (isCritical) {
-    // Use raw stat if attacker has negative stages, otherwise use effective stat
-    atk = attacker.statStages[atkStat] < 0
-      ? attacker.stats[atkStat]
-      : getEffectiveStat(attacker, atkStat);
-    // Use raw stat if defender has positive stages, otherwise use effective stat
-    def = defender.statStages[defStat] > 0
-      ? defender.stats[defStat]
-      : getEffectiveStat(defender, defStat);
+    // Critical hits ignore stat stages in Gen 1 if they are detrimental
+    atk = attacker.statStages[atkStat] < 0 ? attacker.stats[atkStat] : getEffectiveStat(attacker, atkStat);
+    def = defender.statStages[defStat] > 0 ? defender.stats[defStat] : getEffectiveStat(defender, defStat);
   } else {
     atk = getEffectiveStat(attacker, atkStat);
     def = getEffectiveStat(defender, defStat);
   }
 
+  // Badge Boosts (Gen 1: 1.125x boost to stats)
+  if (attackerBadges.length > 0) {
+    if (attackerBadges.includes('badge-roche') && atkStat === 'attack') atk = Math.floor(atk * 1.125);
+    if (attackerBadges.includes('badge-foudre') && defStat === 'defense') def = Math.floor(def * 1.125); // wait, badge-foudre is defense
+    if (attackerBadges.includes('badge-prisme') && atkStat === 'spAtk') atk = Math.floor(atk * 1.125); // special
+    if (attackerBadges.includes('badge-ame') && defStat === 'spDef') def = Math.floor(def * 1.125); // soul badge usually speed, but cascade is speed
+    // Correct Gen 1 Badge Boosts:
+    // Boulder (Roche): Attack
+    // Cascade: Speed (not used in damage directly but in order)
+    // Thunder (Foudre): Defense
+    // Rainbow (Prisme): Special (Special Attack AND Special Defense in Gen 1)
+    if (attackerBadges.includes('badge-roche') && atkStat === 'attack') atk = Math.floor(atk * 1.125);
+    if (attackerBadges.includes('badge-foudre') && defStat === 'defense') def = Math.floor(def * 1.125);
+    if (attackerBadges.includes('badge-prisme')) {
+        if (atkStat === 'spAtk') atk = Math.floor(atk * 1.125);
+        if (defStat === 'spDef') def = Math.floor(def * 1.125);
+    }
+  }
+
   // Base damage
-  const levelFactor = ((2 * attacker.level) / 5 + 2);
+  const levelFactor = Math.floor((2 * attacker.level) / 5 + 2);
   let baseDamage = Math.floor((levelFactor * move.power * atk / def) / 50) + 2;
 
   // STAB (Same Type Attack Bonus)
@@ -61,16 +78,15 @@ export function calculateDamage(
   const effectiveness = getTypeEffectiveness(move.type, defenderData.types as PokemonType[]);
   baseDamage = Math.floor(baseDamage * effectiveness);
 
-  // Critical hit multiplier (1.5x)
+  // Critical hit multiplier
   if (isCritical) {
-    baseDamage = Math.floor(baseDamage * 1.5);
+    // Gen 1 Crits are 2x (or near 2x)
+    baseDamage = Math.floor(baseDamage * 2);
   }
 
   // Random factor (85-100%)
   const randomFactor = 0.85 + Math.random() * 0.15;
   baseDamage = Math.floor(baseDamage * randomFactor);
-
-  // Burn penalty is already applied in getEffectiveStat for attack
 
   // Minimum 1 damage for damaging moves
   if (baseDamage < 1) baseDamage = 1;
