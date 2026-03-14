@@ -126,20 +126,50 @@ export function CityMenu() {
   }
 
   return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
-      <h2
-        style={{
-          color: '#FFD600',
-          fontSize: '16px',
-          fontFamily: "'Press Start 2P', monospace",
-          marginBottom: '20px',
-          textAlign: 'center',
-        }}
-      >
-        {zone.name}
-      </h2>
+    <div style={{ padding: '24px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{
+          width: '100%',
+          maxWidth: '600px',
+          background: 'rgba(13, 17, 23, 0.85)',
+          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+          borderRadius: '24px',
+          border: '3px solid #1a2a3a',
+          padding: '24px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      }}>
+        {/* Header Card */}
+        <div style={{
+            background: 'linear-gradient(135deg, #1a1a2e 0%, #0f1923 100%)',
+            borderRadius: '16px',
+            border: '2px solid #FFD600',
+            padding: '20px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 15px rgba(255, 214, 0, 0.15)',
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            <div style={{
+                position: 'absolute',
+                top: 0, left: 0, width: '100%', height: '4px',
+                background: 'linear-gradient(90deg, transparent, #FFD600, transparent)'
+            }} />
+            <h2 style={{
+                color: '#FFD600',
+                fontSize: '18px',
+                fontFamily: "'Press Start 2P', monospace",
+                margin: 0,
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+            }}>
+                {zone.name}
+            </h2>
+            <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
+                Ville de Kanto
+            </div>
+        </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {/* NPCs */}
         {npcs.map(npc => {
           if (npc.requiredEvent && !progress.events[npc.requiredEvent]) return null;
@@ -445,6 +475,7 @@ export function CityMenu() {
             Retour
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

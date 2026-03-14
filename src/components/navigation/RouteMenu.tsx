@@ -148,37 +148,69 @@ export function RouteMenu() {
   }
 
   return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
-      <h2
-        style={{
-          color: '#4CAF50',
-          fontSize: '16px',
-          fontFamily: "'Press Start 2P', monospace",
-          marginBottom: '20px',
-          textAlign: 'center',
-        }}
-      >
-        {zone.name}
-      </h2>
+    <div style={{ padding: '24px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{
+          width: '100%',
+          maxWidth: '600px',
+          background: 'rgba(13, 17, 23, 0.85)',
+          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+          borderRadius: '24px',
+          border: '3px solid #1a2a3a',
+          padding: '24px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      }}>
+        {/* Header Card */}
+        <div style={{
+            background: 'linear-gradient(135deg, #1a2e1a 0%, #0f190f 100%)',
+            borderRadius: '16px',
+            border: '2px solid #4CAF50',
+            padding: '20px',
+            marginBottom: '24px',
+            boxShadow: '0 4px 15px rgba(76, 175, 80, 0.15)',
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            <div style={{
+                position: 'absolute',
+                top: 0, left: 0, width: '100%', height: '4px',
+                background: 'linear-gradient(90deg, transparent, #4CAF50, transparent)'
+            }} />
+            <h2 style={{
+                color: '#4CAF50',
+                fontSize: '18px',
+                fontFamily: "'Press Start 2P', monospace",
+                margin: 0,
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+            }}>
+                {zone.name}
+            </h2>
+            <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
+                Zone Sauvage
+            </div>
+        </div>
 
       {useGameStore.getState().safariState && (
         <div style={{
-          background: '#FFD700',
+          background: 'linear-gradient(90deg, #FFD700, #FFA000)',
           color: '#000',
-          padding: '10px',
-          borderRadius: '8px',
-          marginBottom: '10px',
+          padding: '12px 16px',
+          borderRadius: '12px',
+          marginBottom: '20px',
           fontFamily: "'Press Start 2P', monospace",
-          fontSize: '10px',
+          fontSize: '12px',
           display: 'flex',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)'
         }}>
-          <span>Balls: {useGameStore.getState().safariState?.balls}</span>
-          <span>Pas: {useGameStore.getState().safariState?.steps}</span>
+          <span>Safari Balls: {useGameStore.getState().safariState?.balls}</span>
+          <span>Pas restants: {useGameStore.getState().safariState?.steps}</span>
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
         {/* NPCs */}
         {npcs.map(npc => {
@@ -449,18 +481,13 @@ export function RouteMenu() {
           })
         }
 
-        {/* Quit Safari or Back */}
+        {/* Back button */}
         <div style={{ marginTop: '12px' }}>
-          {useGameStore.getState().safariState ? (
-            <Button variant="danger" onClick={useGameStore.getState().quitSafari}>
-              Quitter le Safari
-            </Button>
-          ) : (
-            <Button variant="ghost" onClick={() => setView('world_map')}>
-              Retour
-            </Button>
-          )}
+          <Button variant="ghost" onClick={() => setView('world_map')}>
+            Retour
+          </Button>
         </div>
+      </div>
       </div>
     </div>
   );
