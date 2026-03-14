@@ -4350,7 +4350,40 @@
       "spDef": 65,
       "speed": 45
     },
-    "learnset": "Grolem",
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 111
+      },
+      {
+        "level": 11,
+        "moveId": 111
+      },
+      {
+        "level": 16,
+        "moveId": 88
+      },
+      {
+        "level": 21,
+        "moveId": 120
+      },
+      {
+        "level": 29,
+        "moveId": 106
+      },
+      {
+        "level": 36,
+        "moveId": 89
+      },
+      {
+        "level": 43,
+        "moveId": 121
+      }
+    ],
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
