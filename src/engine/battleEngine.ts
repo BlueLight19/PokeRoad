@@ -13,6 +13,20 @@ import { getMoveData, getPokemonData } from '../utils/dataLoader';
 
 export function applyStatusDamage(pokemon: PokemonInstance): BattleLogEntry[] {
   const logs: BattleLogEntry[] = [];
+  const originalPush = logs.push.bind(logs);
+  logs.push = (...items: BattleLogEntry[]) => {
+    for (const item of items) {
+      if (!item.state) {
+        item.state = {
+          attackerHp: pokemon.currentHp,
+          attackerStatus: pokemon.status,
+        };
+      }
+      originalPush(item);
+    }
+    return logs.length;
+  };
+
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
 
   if (pokemon.status === 'poison') {
@@ -32,6 +46,20 @@ export function applyStatusDamage(pokemon: PokemonInstance): BattleLogEntry[] {
 
 export function checkStatusBlock(pokemon: PokemonInstance): { blocked: boolean; logs: BattleLogEntry[] } {
   const logs: BattleLogEntry[] = [];
+  const originalPush = logs.push.bind(logs);
+  logs.push = (...items: BattleLogEntry[]) => {
+    for (const item of items) {
+      if (!item.state) {
+        item.state = {
+          attackerHp: pokemon.currentHp,
+          attackerStatus: pokemon.status,
+        };
+      }
+      originalPush(item);
+    }
+    return logs.length;
+  };
+
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
 
   // Flinch (Peur)
@@ -213,6 +241,22 @@ export function executeMove(
   attackerBadges: string[] = []
 ): MoveExecutionResult {
   const logs: BattleLogEntry[] = [];
+  const originalPush = logs.push.bind(logs);
+  logs.push = (...items: BattleLogEntry[]) => {
+    for (const item of items) {
+      if (!item.state) {
+        item.state = {
+          attackerHp: attacker.currentHp,
+          defenderHp: defender.currentHp,
+          attackerStatus: attacker.status,
+          defenderStatus: defender.status,
+        };
+      }
+      originalPush(item);
+    }
+    return logs.length;
+  };
+
   const move = getMoveData(moveInstance.moveId);
   const attackerName = attacker.nickname || getPokemonData(attacker.dataId).name;
   const defenderName = defender.nickname || getPokemonData(defender.dataId).name;
@@ -425,6 +469,22 @@ export function executeStruggle(
   defender: PokemonInstance
 ): MoveExecutionResult {
   const logs: BattleLogEntry[] = [];
+  const originalPush = logs.push.bind(logs);
+  logs.push = (...items: BattleLogEntry[]) => {
+    for (const item of items) {
+      if (!item.state) {
+        item.state = {
+          attackerHp: attacker.currentHp,
+          defenderHp: defender.currentHp,
+          attackerStatus: attacker.status,
+          defenderStatus: defender.status,
+        };
+      }
+      originalPush(item);
+    }
+    return logs.length;
+  };
+
   const attackerName = attacker.nickname || getPokemonData(attacker.dataId).name;
   const defenderName = defender.nickname || getPokemonData(defender.dataId).name;
 

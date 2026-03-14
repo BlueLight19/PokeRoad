@@ -29,6 +29,13 @@ export interface BattleState {
 export interface BattleLogEntry {
   message: string;
   type: 'info' | 'damage' | 'status' | 'effective' | 'critical' | 'catch' | 'xp';
+  // Optional state captured at the exact moment the log is generated
+  state?: {
+    attackerHp?: number;
+    defenderHp?: number;
+    attackerStatus?: any;
+    defenderStatus?: any;
+  };
 }
 
 export interface TrainerBattleData {
