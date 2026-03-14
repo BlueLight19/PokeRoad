@@ -15,6 +15,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
     font-size: 14px;
     position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 body::before {

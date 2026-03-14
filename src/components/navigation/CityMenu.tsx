@@ -466,7 +466,7 @@ function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogue
         clearInterval(interval);
         setIsTyping(false);
       }
-    }, 30);
+    }, 10);
     return () => clearInterval(interval);
   }, [fullText]);
 
