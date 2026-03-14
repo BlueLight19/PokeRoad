@@ -1,0 +1,149 @@
+Gemini a dit
+Après analyse croisée de vos fichiers pokemon.json et moves.json et comparaison avec les jeux originaux de la Génération 1 (Rouge/Bleu), il s'avère qu'une grande majorité du Pokédex (104 Pokémon sur 151) nécessite un correctif.
+
+Le problème principal vient d'un décalage des IDs des attaques. Beaucoup de Pokémon se voient attribuer un ID d'attaque qui ne correspond pas au bon move dans votre fichier moves.json.
+
+✅ Les Pokémon CORRECTS (47 sur 151)
+Ceux-ci apprennent exactement les bonnes attaques aux bons niveaux et ne nécessitent aucun fix :
+Salamèche, Reptincel, Carapuce, Carabaffe, Tortank, Chrysacier, Coconfort, Roucool, Roucoups, Roucarnage, Abo, Arbok, Goupix, Feunard, Nosferapti, Nosferalto, Taupiqueur, Triopikeur, Miaouss, Persian, Caninos, Arcanin, Tartard, Abra, Machoc, Machopeur, Mackogneur, Chétiflor, Boustiflor, Empiflor, Ponyta, Galopa, Ramoloss, Flagadoss, Canarticho, Doduo, Dodrio, Otaria, Lamantine, Voltorbe, Electrode, Magicarpe, Métamorph, Evoli.
+
+❌ Les Pokémon À FIXER (104 sur 151)
+Voici la liste exhaustive de tous ceux qui ont des erreurs d'apprentissage (mauvaise attaque, mauvais niveau ou table d'attaques incomplète), classés par famille d'évolution :
+
+Starters Plante & Feu
+
+Bulbizarre, Herbizarre, Florizarre (1, 2, 3) : Apprennent Tranch'Herbe (ID 73) au niveau 7 au lieu de Vampigraine (ID 71), et Poudre Toxik (ID 76) au niveau 13 au lieu de Fouet Lianes (ID 22). Florizarre possède même un ID 169 qui n'existe pas dans votre fichier d'attaques.
+
+Dracaufeu (6) : Apprend Lance-Flammes au niv 36 et Danse-Flamme au niv 81, ce qui ne correspond pas à la Gen 1 (il devrait apprendre Tranche au niv 36).
+
+Insectes du début du jeu
+
+Chenipan, Papilusion (10, 12) : Chenipan apprend Danse-Flamme (ID 81) au lieu de Sécrétion. Papilusion apprend Ultrason (ID 48) au lieu de Choc Mental.
+
+Aspicot, Dardargnan (13, 15) : Aspicot apprend Danse-Flamme (ID 81). Dardargnan apprend Lutte (ID 165) au lieu de Hâte.
+
+Routes de Kanto (Rongeurs, Oiseaux, Fées)
+
+Rattata, Rattatac (19, 20) : Apprennent Croc Fatal (ID 162) très tôt au lieu de Croc de Mort (ID 158).
+
+Piafabec, Rapasdepic (21, 22) : Piafabec apprend Téléport (ID 100) au niv 22 au lieu de Bec Vrille.
+
+Pikachu, Raichu (25, 26) : Pikachu apprend Tonnerre (ID 85) par niveau, ce qui est faux dans Rouge/Bleu.
+
+Sabelette, Sablaireau (27, 28) : Les attaques Combo-Griffe (154) et Météores (129) sont inversées.
+
+Nidoran♀, Nidorina, Nidoqueen (29, 30, 31) : La lignée apprend Double-Dard (ID 41) au lieu de Double Pied. Nidoqueen n'a pas Mimi-Queue de base.
+
+Nidoran♂, Nidorino, Nidoking (32, 33, 34) : Apprennent Double-Dard (ID 41) au lieu de Double Pied. Nidoking a Griffe au lieu de Dard-Venin de base.
+
+Mélofée, Mélodelfe (35, 36) : Apprennent Double Pied (ID 24) au lieu de Torgnoles.
+
+Rondoudou, Grodoudou (39, 40) : Apprennent Armure (ID 106) au lieu de Boul'Armure.
+
+Plantes, Insectes & Eau divers
+
+Mystherbe, Ortide, Rafflesia (43, 44, 45) : Des attaques invalides sont assignées (ID 169).
+
+Paras, Parasect (46, 47) : Apprennent Vampigraine (ID 71) au lieu de Vampirisme (ID 141).
+
+Mimitoss, Aéromite (48, 49) : Apprennent Choc Mental (ID 93) au lieu de Rafale Psy.
+
+Psykokwak, Akwakwak (54, 55) : Apprennent Combo-Griffe (ID 154) aux mauvais niveaux.
+
+Ptitard, Têtarte (60, 61) : Apprennent Triplattaque (ID 161) au lieu de Torgnoles.
+
+Tentacool, Tentacruel (72, 73) : Apprennent Protection (ID 115) au lieu de Bouclier.
+
+Kokiyas, Crustabri (90, 91) : Kokiyas apprend Entrave (ID 50) au lieu d'Ultrason.
+
+Krabby, Krabboss (98, 99) : Apprennent Repli (ID 110) au lieu de Pince-Masse.
+
+Poissirène, Poissoroy (118, 119) : Apprennent Furie (ID 31) au lieu d'Ultrason.
+
+Stari, Staross (120, 121) : Apprennent Météores (ID 129) au lieu de Soin.
+
+Léviator (130) : Apprend Hâte (ID 82) au lieu de Draco-Rage.
+
+Lokhlass (131) : Apprend Hurlement (ID 46) au lieu de Berceuse.
+
+Évolutions d'Évoli
+
+Aquali, Voltali, Pyroli (134, 135, 136) : Les trois apprennent Jet de Sable (ID 28) au niveau 31 au lieu de leur attaque élémentaire de base (Pistolet à O / Éclair / Flammèche).
+
+Pokémon des Cavernes / Roche & Poison
+
+Férosinge, Colossinge (56, 57) : Apprennent Grincement (ID 103) au lieu de Frappe Atlas.
+
+Racaillou, Gravalanch, Grolem (74, 75, 76) : Apprennent Armure (ID 106) au lieu de Boul'Armure.
+
+Magnéti, Magnéton (81, 82) : Apprennent Cage-Éclair (ID 86) au lieu d'Ultrason.
+
+Tadmorv, Grotadmorv (88, 89) : Apprennent Acide (ID 51) au lieu de Gaz Toxik.
+
+Fantominus, Spectrum, Ectoplasma (92, 93, 94) : Apprennent Hypnose (ID 95) trop tard (au lieu d'Ombre Nocturne).
+
+Onix (95) : Apprend Explosion (ID 153) au lieu de Souplesse.
+
+Smogo, Smogogo (109, 110) : Apprennent Détricanon (ID 124) au lieu de Brouillard.
+
+Rhinocorne, Rhinoféros (111, 112) : Apprennent Double Pied (ID 24) au lieu de Mimi-Queue.
+
+Pokémon Psy & divers de milieu/fin de jeu
+
+Kadabra, Alakazam (64, 65) : Apprennent Psyko (ID 94) au lieu d'Entrave, et Vague Psy (ID 149) au lieu de Psyko.
+
+Soporifik, Hypnomade (96, 97) : Apprennent Psyko (ID 94) au lieu de Yoga.
+
+Noeunoeuf, Noadkoko (102, 103) : Apprennent Tranch'Herbe (ID 73) au lieu de Vampigraine.
+
+Osselait, Ossatueur (104, 105) : Apprennent Mimi-Queue (ID 39) au lieu de Massd'Os.
+
+Kicklee (106) : Apprend Pied Voltige (ID 136) en boucle.
+
+Tygnon (107) : Apprend Poing Comète (ID 4) au lieu d'Ultimapoing.
+
+Excelangue (108) : Apprend Souplesse (ID 21) au lieu de Ligotage.
+
+Leveinard (113) : Apprend Métronome (ID 118) au lieu de Torgnoles.
+
+Saquedeneu (114) : Apprend Sécrétion (ID 79) au lieu de Ligotage.
+
+Kangourex (115) : Apprend Double Pied (ID 24) au lieu de Morsure.
+
+M. Mime (122) : Apprend Buée Noire (ID 114) au lieu de Bouclier.
+
+Insécateur (123) : Apprend Spore (ID 147) au lieu de Reflet.
+
+Lippoutou (124) : Apprend Poing Glace (ID 8) au lieu de Torgnoles.
+
+Elektek (125) : Apprend Poing de Feu (ID 7) au lieu de Poing Éclair.
+
+Magmar (126) : Apprend Déflagration (ID 126) au lieu de Purédpois.
+
+Scarabrute (127) : Apprend Force Poigne (ID 11) au niveau 30 au lieu de Frappe Atlas.
+
+Tauros (128) : Apprend Double Pied (ID 24) au lieu d'Écrasement.
+
+Porygon (137) : Apprend Choc Mental (ID 93) au lieu de Rafale Psy.
+
+Fossiles, Draconiques & Légendaires
+
+Amonita, Amonistar (138, 139) : Apprennent Armure (ID 106) au lieu de Koud'Korne.
+
+Kabuto, Kabutops (140, 141) : Apprennent Armure (ID 106) au lieu de Griffe.
+
+Ptera (142) : Apprend Vive-Attaque (ID 98) au lieu d'Ultrason.
+
+Ronflex (143) : Apprend Constriction (ID 132) au lieu d'Amnésie.
+
+Artikodin (144) : Apprend Blizzard (ID 59) au lieu de Laser Glace.
+
+Electhor (145) : Apprend Fatal-Foudre (ID 87) au lieu de Bec Vrille.
+
+Sulfura (146) : Apprend Flammèche (ID 52) au lieu de Danse-Flamme.
+
+Minidraco, Draco, Dracolosse (147, 148, 149) : Apprennent Constriction (ID 132) au lieu de Ligotage.
+
+Mewtwo (150) : Apprend Hâte (ID 97) au lieu de Psyko.
+
+Mew (151) : Ne possède aucune de ses attaques de montée en niveau caractéristiques (Morphing, Ultimapoing, Métronome, Psyko). Son tableau d'apprentissage est vide à part Écras'Face au niveau 1.

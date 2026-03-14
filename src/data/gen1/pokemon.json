@@ -3,222 +3,656 @@
     "id": 1,
     "name": "Bulbizarre",
     "generation": 1,
-    "types": [ "plante", "poison" ],
-    "baseStats": { "hp": 45, "attack": 49, "defense": 49, "spAtk": 65, "spDef": 65, "speed": 45 },
-    "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 45 },
-      { "level": 7, "moveId": 71 },
-      { "level": 13, "moveId": 22 },
-      { "level": 20, "moveId": 76 },
-      { "level": 27, "moveId": 73 },
-      { "level": 34, "moveId": 72 },
-      { "level": 41, "moveId": 75 },
-      { "level": 48, "moveId": 74 }
+    "types": [
+      "plante",
+      "poison"
     ],
-    "evolutions": [ { "method": "level", "level": 16, "evolvesInto": 2 } ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 49,
+      "spAtk": 65,
+      "spDef": 65,
+      "speed": 45
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 7,
+        "moveId": 71
+      },
+      {
+        "level": 13,
+        "moveId": 22
+      },
+      {
+        "level": 20,
+        "moveId": 76
+      },
+      {
+        "level": 27,
+        "moveId": 73
+      },
+      {
+        "level": 34,
+        "moveId": 72
+      },
+      {
+        "level": 41,
+        "moveId": 75
+      },
+      {
+        "level": 48,
+        "moveId": 74
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 16,
+        "evolvesInto": 2
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 64,
-    "evYield": { "spAtk": 1 },
-    "tmLearnset": [14, 92, 34, 36, 38, 91, 85, 15, 19, 57, 70, 148],
+    "evYield": {
+      "spAtk": 1
+    },
+    "tmLearnset": [
+      14,
+      92,
+      34,
+      36,
+      38,
+      91,
+      85,
+      15,
+      19,
+      57,
+      70,
+      148
+    ],
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
   },
   {
     "id": 2,
     "name": "Herbizarre",
     "generation": 1,
-    "types": [ "plante", "poison" ],
-    "baseStats": { "hp": 60, "attack": 62, "defense": 63, "spAtk": 80, "spDef": 80, "speed": 60 },
-    "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 45 },
-      { "level": 1, "moveId": 71 },
-      { "level": 7, "moveId": 71 },
-      { "level": 13, "moveId": 22 },
-      { "level": 22, "moveId": 76 },
-      { "level": 30, "moveId": 73 },
-      { "level": 38, "moveId": 72 },
-      { "level": 46, "moveId": 75 },
-      { "level": 54, "moveId": 74 }
+    "types": [
+      "plante",
+      "poison"
     ],
-    "evolutions": [ { "method": "level", "level": 32, "evolvesInto": 3 } ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 63,
+      "spAtk": 80,
+      "spDef": 80,
+      "speed": 60
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 1,
+        "moveId": 71
+      },
+      {
+        "level": 7,
+        "moveId": 71
+      },
+      {
+        "level": 13,
+        "moveId": 22
+      },
+      {
+        "level": 22,
+        "moveId": 76
+      },
+      {
+        "level": 30,
+        "moveId": 73
+      },
+      {
+        "level": 38,
+        "moveId": 72
+      },
+      {
+        "level": 46,
+        "moveId": 75
+      },
+      {
+        "level": 54,
+        "moveId": 74
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 32,
+        "evolvesInto": 3
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 142,
-    "evYield": { "spAtk": 1, "spDef": 1 },
+    "evYield": {
+      "spAtk": 1,
+      "spDef": 1
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"
   },
   {
     "id": 3,
     "name": "Florizarre",
     "generation": 1,
-    "types": [ "plante", "poison" ],
-    "baseStats": { "hp": 80, "attack": 82, "defense": 83, "spAtk": 100, "spDef": 100, "speed": 80 },
+    "types": [
+      "plante",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 83,
+      "spAtk": 100,
+      "spDef": 100,
+      "speed": 80
+    },
     "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 45 },
-      { "level": 1, "moveId": 71 },
-      { "level": 1, "moveId": 22 },
-      { "level": 7, "moveId": 71 },
-      { "level": 13, "moveId": 22 },
-      { "level": 22, "moveId": 76 },
-      { "level": 30, "moveId": 73 },
-      { "level": 43, "moveId": 72 },
-      { "level": 55, "moveId": 75 },
-      { "level": 65, "moveId": 74 }
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 1,
+        "moveId": 71
+      },
+      {
+        "level": 1,
+        "moveId": 22
+      },
+      {
+        "level": 7,
+        "moveId": 71
+      },
+      {
+        "level": 13,
+        "moveId": 22
+      },
+      {
+        "level": 22,
+        "moveId": 76
+      },
+      {
+        "level": 30,
+        "moveId": 73
+      },
+      {
+        "level": 43,
+        "moveId": 72
+      },
+      {
+        "level": 55,
+        "moveId": 75
+      },
+      {
+        "level": 65,
+        "moveId": 74
+      }
     ],
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 236,
-    "evYield": { "spAtk": 2, "spDef": 1 },
+    "evYield": {
+      "spAtk": 2,
+      "spDef": 1
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png"
   },
   {
     "id": 4,
     "name": "Salamèche",
     "generation": 1,
-    "types": [ "feu" ],
-    "baseStats": { "hp": 39, "attack": 52, "defense": 43, "spAtk": 60, "spDef": 50, "speed": 65 },
-    "learnset": [
-      { "level": 1, "moveId": 10 },
-      { "level": 1, "moveId": 45 },
-      { "level": 9, "moveId": 52 },
-      { "level": 15, "moveId": 43 },
-      { "level": 22, "moveId": 99 },
-      { "level": 30, "moveId": 163 },
-      { "level": 38, "moveId": 53 },
-      { "level": 46, "moveId": 81 }
+    "types": [
+      "feu"
     ],
-    "evolutions": [ { "method": "level", "level": 16, "evolvesInto": 5 } ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "spAtk": 60,
+      "spDef": 50,
+      "speed": 65
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 10
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 9,
+        "moveId": 52
+      },
+      {
+        "level": 15,
+        "moveId": 43
+      },
+      {
+        "level": 22,
+        "moveId": 99
+      },
+      {
+        "level": 30,
+        "moveId": 163
+      },
+      {
+        "level": 38,
+        "moveId": 53
+      },
+      {
+        "level": 46,
+        "moveId": 81
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 16,
+        "evolvesInto": 5
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 62,
-    "evYield": { "speed": 1 },
-    "tmLearnset": [5, 7, 92, 34, 36, 38, 91, 15, 19, 57, 70, 148],
+    "evYield": {
+      "speed": 1
+    },
+    "tmLearnset": [
+      5,
+      7,
+      92,
+      34,
+      36,
+      38,
+      91,
+      15,
+      19,
+      57,
+      70,
+      148
+    ],
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png"
   },
   {
     "id": 5,
     "name": "Reptincel",
     "generation": 1,
-    "types": [ "feu" ],
-    "baseStats": { "hp": 58, "attack": 64, "defense": 58, "spAtk": 80, "spDef": 65, "speed": 80 },
-    "learnset": [
-      { "level": 1, "moveId": 10 },
-      { "level": 1, "moveId": 45 },
-      { "level": 1, "moveId": 52 },
-      { "level": 9, "moveId": 52 },
-      { "level": 15, "moveId": 43 },
-      { "level": 24, "moveId": 99 },
-      { "level": 33, "moveId": 163 },
-      { "level": 42, "moveId": 53 },
-      { "level": 56, "moveId": 81 }
+    "types": [
+      "feu"
     ],
-    "evolutions": [ { "method": "level", "level": 36, "evolvesInto": 6 } ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "spAtk": 80,
+      "spDef": 65,
+      "speed": 80
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 10
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 1,
+        "moveId": 52
+      },
+      {
+        "level": 9,
+        "moveId": 52
+      },
+      {
+        "level": 15,
+        "moveId": 43
+      },
+      {
+        "level": 24,
+        "moveId": 99
+      },
+      {
+        "level": 33,
+        "moveId": 163
+      },
+      {
+        "level": 42,
+        "moveId": 53
+      },
+      {
+        "level": 56,
+        "moveId": 81
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 36,
+        "evolvesInto": 6
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 142,
-    "evYield": { "speed": 1, "spAtk": 1 },
+    "evYield": {
+      "speed": 1,
+      "spAtk": 1
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png"
   },
   {
     "id": 6,
     "name": "Dracaufeu",
     "generation": 1,
-    "types": [ "feu", "vol" ],
-    "baseStats": { "hp": 78, "attack": 84, "defense": 78, "spAtk": 109, "spDef": 85, "speed": 100 },
+    "types": [
+      "feu",
+      "vol"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "spAtk": 109,
+      "spDef": 85,
+      "speed": 100
+    },
     "learnset": [
-      { "level": 1, "moveId": 10 },
-      { "level": 1, "moveId": 45 },
-      { "level": 1, "moveId": 52 },
-      { "level": 1, "moveId": 99 },
-      { "level": 9, "moveId": 52 },
-      { "level": 15, "moveId": 43 },
-      { "level": 24, "moveId": 99 },
-      { "level": 36, "moveId": 53 },
-      { "level": 46, "moveId": 163 },
-      { "level": 55, "moveId": 81 }
+      {
+        "level": 1,
+        "moveId": 10
+      },
+      {
+        "level": 1,
+        "moveId": 45
+      },
+      {
+        "level": 1,
+        "moveId": 52
+      },
+      {
+        "level": 1,
+        "moveId": 99
+      },
+      {
+        "level": 9,
+        "moveId": 52
+      },
+      {
+        "level": 15,
+        "moveId": 43
+      },
+      {
+        "level": 24,
+        "moveId": 99
+      },
+      {
+        "level": 36,
+        "moveId": 163
+      },
+      {
+        "level": 46,
+        "moveId": 53
+      },
+      {
+        "level": 55,
+        "moveId": 81
+      }
     ],
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 240,
-    "evYield": { "spAtk": 3 },
+    "evYield": {
+      "spAtk": 3
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png"
   },
   {
     "id": 7,
     "name": "Carapuce",
     "generation": 1,
-    "types": [ "eau" ],
-    "baseStats": { "hp": 44, "attack": 48, "defense": 65, "spAtk": 50, "spDef": 64, "speed": 43 },
-    "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 39 },
-      { "level": 8, "moveId": 145 },
-      { "level": 15, "moveId": 55 },
-      { "level": 22, "moveId": 44 },
-      { "level": 28, "moveId": 110 },
-      { "level": 35, "moveId": 130 },
-      { "level": 42, "moveId": 56 }
+    "types": [
+      "eau"
     ],
-    "evolutions": [ { "method": "level", "level": 16, "evolvesInto": 8 } ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 48,
+      "defense": 65,
+      "spAtk": 50,
+      "spDef": 64,
+      "speed": 43
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 39
+      },
+      {
+        "level": 8,
+        "moveId": 145
+      },
+      {
+        "level": 15,
+        "moveId": 55
+      },
+      {
+        "level": 22,
+        "moveId": 44
+      },
+      {
+        "level": 28,
+        "moveId": 110
+      },
+      {
+        "level": 35,
+        "moveId": 130
+      },
+      {
+        "level": 42,
+        "moveId": 56
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 16,
+        "evolvesInto": 8
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 63,
-    "evYield": { "defense": 1 },
-    "tmLearnset": [5, 7, 92, 34, 36, 38, 91, 15, 19, 57, 70, 148],
+    "evYield": {
+      "defense": 1
+    },
+    "tmLearnset": [
+      5,
+      7,
+      92,
+      34,
+      36,
+      38,
+      91,
+      15,
+      19,
+      57,
+      70,
+      148
+    ],
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png"
   },
   {
     "id": 8,
     "name": "Carabaffe",
     "generation": 1,
-    "types": [ "eau" ],
-    "baseStats": { "hp": 59, "attack": 63, "defense": 80, "spAtk": 65, "spDef": 80, "speed": 58 },
-    "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 39 },
-      { "level": 1, "moveId": 145 },
-      { "level": 8, "moveId": 145 },
-      { "level": 15, "moveId": 55 },
-      { "level": 24, "moveId": 44 },
-      { "level": 31, "moveId": 110 },
-      { "level": 39, "moveId": 130 },
-      { "level": 47, "moveId": 56 }
+    "types": [
+      "eau"
     ],
-    "evolutions": [ { "method": "level", "level": 36, "evolvesInto": 9 } ],
+    "baseStats": {
+      "hp": 59,
+      "attack": 63,
+      "defense": 80,
+      "spAtk": 65,
+      "spDef": 80,
+      "speed": 58
+    },
+    "learnset": [
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 39
+      },
+      {
+        "level": 1,
+        "moveId": 145
+      },
+      {
+        "level": 8,
+        "moveId": 145
+      },
+      {
+        "level": 15,
+        "moveId": 55
+      },
+      {
+        "level": 24,
+        "moveId": 44
+      },
+      {
+        "level": 31,
+        "moveId": 110
+      },
+      {
+        "level": 39,
+        "moveId": 130
+      },
+      {
+        "level": 47,
+        "moveId": 56
+      }
+    ],
+    "evolutions": [
+      {
+        "method": "level",
+        "level": 36,
+        "evolvesInto": 9
+      }
+    ],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 142,
-    "evYield": { "defense": 1, "spDef": 1 },
+    "evYield": {
+      "defense": 1,
+      "spDef": 1
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png"
   },
   {
     "id": 9,
     "name": "Tortank",
     "generation": 1,
-    "types": [ "eau" ],
-    "baseStats": { "hp": 79, "attack": 83, "defense": 100, "spAtk": 85, "spDef": 105, "speed": 78 },
+    "types": [
+      "eau"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 83,
+      "defense": 100,
+      "spAtk": 85,
+      "spDef": 105,
+      "speed": 78
+    },
     "learnset": [
-      { "level": 1, "moveId": 33 },
-      { "level": 1, "moveId": 39 },
-      { "level": 1, "moveId": 145 },
-      { "level": 1, "moveId": 55 },
-      { "level": 8, "moveId": 145 },
-      { "level": 15, "moveId": 55 },
-      { "level": 24, "moveId": 44 },
-      { "level": 31, "moveId": 110 },
-      { "level": 42, "moveId": 130 },
-      { "level": 52, "moveId": 56 }
+      {
+        "level": 1,
+        "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 39
+      },
+      {
+        "level": 1,
+        "moveId": 145
+      },
+      {
+        "level": 1,
+        "moveId": 55
+      },
+      {
+        "level": 8,
+        "moveId": 145
+      },
+      {
+        "level": 15,
+        "moveId": 55
+      },
+      {
+        "level": 24,
+        "moveId": 44
+      },
+      {
+        "level": 31,
+        "moveId": 110
+      },
+      {
+        "level": 42,
+        "moveId": 130
+      },
+      {
+        "level": 52,
+        "moveId": 56
+      }
     ],
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 239,
-    "evYield": { "spDef": 3 },
+    "evYield": {
+      "spDef": 3
+    },
     "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png"
   },
   {
@@ -243,7 +677,7 @@
       },
       {
         "level": 1,
-        "moveId": 81
+        "moveId": 79
       }
     ],
     "evolutions": [
@@ -316,7 +750,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 48
+        "moveId": 93
       },
       {
         "level": 10,
@@ -376,7 +810,7 @@
       },
       {
         "level": 1,
-        "moveId": 81
+        "moveId": 79
       }
     ],
     "evolutions": [
@@ -474,7 +908,7 @@
       },
       {
         "level": 35,
-        "moveId": 165
+        "moveId": 97
       }
     ],
     "evolutions": [],
@@ -694,7 +1128,7 @@
       },
       {
         "level": 14,
-        "moveId": 162
+        "moveId": 158
       },
       {
         "level": 23,
@@ -750,7 +1184,7 @@
       },
       {
         "level": 14,
-        "moveId": 162
+        "moveId": 158
       },
       {
         "level": 27,
@@ -758,7 +1192,7 @@
       },
       {
         "level": 41,
-        "moveId": 162
+        "moveId": 158
       }
     ],
     "evolutions": [],
@@ -805,7 +1239,7 @@
       },
       {
         "level": 22,
-        "moveId": 100
+        "moveId": 65
       },
       {
         "level": 29,
@@ -866,7 +1300,7 @@
       },
       {
         "level": 25,
-        "moveId": 100
+        "moveId": 65
       },
       {
         "level": 34,
@@ -1033,10 +1467,6 @@
         "moveId": 98
       },
       {
-        "level": 26,
-        "moveId": 85
-      },
-      {
         "level": 33,
         "moveId": 87
       },
@@ -1079,10 +1509,6 @@
       {
         "level": 1,
         "moveId": 84
-      },
-      {
-        "level": 1,
-        "moveId": 85
       },
       {
         "level": 1,
@@ -1136,11 +1562,11 @@
       },
       {
         "level": 31,
-        "moveId": 154
+        "moveId": 129
       },
       {
         "level": 38,
-        "moveId": 129
+        "moveId": 154
       },
       {
         "level": 45,
@@ -1196,11 +1622,11 @@
       },
       {
         "level": 36,
-        "moveId": 154
+        "moveId": 129
       },
       {
         "level": 47,
-        "moveId": 129
+        "moveId": 154
       },
       {
         "level": 58,
@@ -1262,7 +1688,7 @@
       },
       {
         "level": 43,
-        "moveId": 41
+        "moveId": 24
       }
     ],
     "evolutions": [
@@ -1326,7 +1752,7 @@
       },
       {
         "level": 50,
-        "moveId": 41
+        "moveId": 24
       }
     ],
     "evolutions": [
@@ -1368,6 +1794,10 @@
       {
         "level": 1,
         "moveId": 33
+      },
+      {
+        "level": 1,
+        "moveId": 39
       },
       {
         "level": 23,
@@ -1429,7 +1859,7 @@
       },
       {
         "level": 43,
-        "moveId": 41
+        "moveId": 24
       }
     ],
     "evolutions": [
@@ -1493,7 +1923,7 @@
       },
       {
         "level": 50,
-        "moveId": 41
+        "moveId": 24
       }
     ],
     "evolutions": [
@@ -1584,7 +2014,7 @@
       },
       {
         "level": 18,
-        "moveId": 24
+        "moveId": 3
       },
       {
         "level": 24,
@@ -1640,7 +2070,7 @@
       },
       {
         "level": 1,
-        "moveId": 24
+        "moveId": 3
       },
       {
         "level": 1,
@@ -1789,7 +2219,7 @@
       },
       {
         "level": 19,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 24,
@@ -1849,7 +2279,7 @@
       },
       {
         "level": 1,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 1,
@@ -2016,7 +2446,7 @@
       },
       {
         "level": 33,
-        "moveId": 169
+        "moveId": 74
       },
       {
         "level": 46,
@@ -2077,7 +2507,7 @@
       },
       {
         "level": 38,
-        "moveId": 169
+        "moveId": 74
       },
       {
         "level": 52,
@@ -2122,7 +2552,7 @@
       },
       {
         "level": 1,
-        "moveId": 169
+        "moveId": 74
       },
       {
         "level": 15,
@@ -2169,7 +2599,7 @@
       },
       {
         "level": 20,
-        "moveId": 71
+        "moveId": 141
       },
       {
         "level": 27,
@@ -2226,7 +2656,7 @@
       },
       {
         "level": 1,
-        "moveId": 71
+        "moveId": 141
       },
       {
         "level": 27,
@@ -2278,7 +2708,7 @@
       },
       {
         "level": 19,
-        "moveId": 93
+        "moveId": 60
       },
       {
         "level": 24,
@@ -2641,11 +3071,11 @@
         "moveId": 93
       },
       {
-        "level": 39,
+        "level": 43,
         "moveId": 154
       },
       {
-        "level": 43,
+        "level": 52,
         "moveId": 56
       }
     ],
@@ -2764,7 +3194,7 @@
       },
       {
         "level": 33,
-        "moveId": 103
+        "moveId": 69
       },
       {
         "level": 39,
@@ -2832,7 +3262,7 @@
       },
       {
         "level": 37,
-        "moveId": 103
+        "moveId": 69
       },
       {
         "level": 46,
@@ -2980,7 +3410,7 @@
       },
       {
         "level": 25,
-        "moveId": 161
+        "moveId": 3
       },
       {
         "level": 31,
@@ -3048,7 +3478,7 @@
       },
       {
         "level": 26,
-        "moveId": 161
+        "moveId": 3
       },
       {
         "level": 35,
@@ -3183,7 +3613,7 @@
       },
       {
         "level": 27,
-        "moveId": 94
+        "moveId": 50
       },
       {
         "level": 31,
@@ -3191,7 +3621,7 @@
       },
       {
         "level": 38,
-        "moveId": 149
+        "moveId": 94
       },
       {
         "level": 42,
@@ -3238,7 +3668,7 @@
       },
       {
         "level": 1,
-        "moveId": 94
+        "moveId": 50
       },
       {
         "level": 1,
@@ -3246,7 +3676,7 @@
       },
       {
         "level": 27,
-        "moveId": 94
+        "moveId": 50
       },
       {
         "level": 31,
@@ -3254,7 +3684,7 @@
       },
       {
         "level": 38,
-        "moveId": 149
+        "moveId": 94
       },
       {
         "level": 42,
@@ -3679,7 +4109,7 @@
       },
       {
         "level": 33,
-        "moveId": 115
+        "moveId": 112
       },
       {
         "level": 40,
@@ -3756,7 +4186,7 @@
       },
       {
         "level": 35,
-        "moveId": 115
+        "moveId": 112
       },
       {
         "level": 43,
@@ -3799,7 +4229,7 @@
       },
       {
         "level": 12,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 16,
@@ -3860,7 +4290,7 @@
       },
       {
         "level": 1,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 1,
@@ -5378,7 +5808,7 @@
       },
       {
         "level": 1,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 1,
@@ -5691,7 +6121,7 @@
       },
       {
         "level": 29,
-        "moveId": 86
+        "moveId": 48
       },
       {
         "level": 35,
@@ -5756,7 +6186,7 @@
       },
       {
         "level": 29,
-        "moveId": 86
+        "moveId": 48
       },
       {
         "level": 38,
@@ -6092,7 +6522,7 @@
       },
       {
         "level": 30,
-        "moveId": 51
+        "moveId": 139
       },
       {
         "level": 33,
@@ -6152,11 +6582,11 @@
       },
       {
         "level": 1,
-        "moveId": 51
+        "moveId": 139
       },
       {
         "level": 30,
-        "moveId": 51
+        "moveId": 139
       },
       {
         "level": 33,
@@ -6211,7 +6641,7 @@
       },
       {
         "level": 18,
-        "moveId": 50
+        "moveId": 48
       },
       {
         "level": 23,
@@ -6268,7 +6698,7 @@
       },
       {
         "level": 1,
-        "moveId": 50
+        "moveId": 48
       },
       {
         "level": 1,
@@ -6319,7 +6749,7 @@
       },
       {
         "level": 27,
-        "moveId": 95
+        "moveId": 101
       },
       {
         "level": 35,
@@ -6368,7 +6798,7 @@
       },
       {
         "level": 29,
-        "moveId": 95
+        "moveId": 101
       },
       {
         "level": 38,
@@ -6416,7 +6846,7 @@
       },
       {
         "level": 29,
-        "moveId": 95
+        "moveId": 101
       },
       {
         "level": 38,
@@ -6471,7 +6901,7 @@
       },
       {
         "level": 33,
-        "moveId": 153
+        "moveId": 21
       },
       {
         "level": 43,
@@ -6535,7 +6965,7 @@
       },
       {
         "level": 32,
-        "moveId": 94
+        "moveId": 96
       },
       {
         "level": 37,
@@ -6607,7 +7037,7 @@
       },
       {
         "level": 37,
-        "moveId": 94
+        "moveId": 96
       },
       {
         "level": 43,
@@ -6661,7 +7091,7 @@
       },
       {
         "level": 35,
-        "moveId": 110
+        "moveId": 152
       },
       {
         "level": 40,
@@ -6729,7 +7159,7 @@
       },
       {
         "level": 42,
-        "moveId": 110
+        "moveId": 152
       },
       {
         "level": 49,
@@ -6898,7 +7328,7 @@
       },
       {
         "level": 28,
-        "moveId": 73
+        "moveId": 71
       },
       {
         "level": 32,
@@ -6959,7 +7389,7 @@
       },
       {
         "level": 1,
-        "moveId": 73
+        "moveId": 71
       },
       {
         "level": 28,
@@ -6997,7 +7427,7 @@
       },
       {
         "level": 1,
-        "moveId": 39
+        "moveId": 125
       },
       {
         "level": 25,
@@ -7057,7 +7487,7 @@
       },
       {
         "level": 1,
-        "moveId": 39
+        "moveId": 125
       },
       {
         "level": 1,
@@ -7111,15 +7541,15 @@
       },
       {
         "level": 33,
-        "moveId": 136
+        "moveId": 27
       },
       {
         "level": 38,
-        "moveId": 136
+        "moveId": 26
       },
       {
         "level": 43,
-        "moveId": 136
+        "moveId": 116
       },
       {
         "level": 48,
@@ -7127,7 +7557,7 @@
       },
       {
         "level": 53,
-        "moveId": 136
+        "moveId": 25
       }
     ],
     "evolutions": [],
@@ -7173,7 +7603,7 @@
       },
       {
         "level": 48,
-        "moveId": 4
+        "moveId": 5
       }
     ],
     "evolutions": [],
@@ -7211,7 +7641,7 @@
       },
       {
         "level": 15,
-        "moveId": 21
+        "moveId": 35
       },
       {
         "level": 23,
@@ -7261,11 +7691,11 @@
       },
       {
         "level": 32,
-        "moveId": 124
+        "moveId": 108
       },
       {
         "level": 37,
-        "moveId": 124
+        "moveId": 108
       },
       {
         "level": 40,
@@ -7317,15 +7747,15 @@
       },
       {
         "level": 1,
-        "moveId": 124
+        "moveId": 108
       },
       {
         "level": 32,
-        "moveId": 124
+        "moveId": 108
       },
       {
         "level": 39,
-        "moveId": 124
+        "moveId": 108
       },
       {
         "level": 43,
@@ -7372,7 +7802,7 @@
       },
       {
         "level": 35,
-        "moveId": 24
+        "moveId": 39
       },
       {
         "level": 40,
@@ -7429,7 +7859,7 @@
       },
       {
         "level": 1,
-        "moveId": 24
+        "moveId": 39
       },
       {
         "level": 30,
@@ -7437,7 +7867,7 @@
       },
       {
         "level": 35,
-        "moveId": 24
+        "moveId": 39
       },
       {
         "level": 40,
@@ -7483,7 +7913,7 @@
       },
       {
         "level": 1,
-        "moveId": 118
+        "moveId": 3
       },
       {
         "level": 12,
@@ -7545,7 +7975,7 @@
       },
       {
         "level": 24,
-        "moveId": 79
+        "moveId": 35
       },
       {
         "level": 27,
@@ -7565,7 +7995,7 @@
       },
       {
         "level": 39,
-        "moveId": 79
+        "moveId": 35
       },
       {
         "level": 45,
@@ -7603,7 +8033,7 @@
       },
       {
         "level": 1,
-        "moveId": 24
+        "moveId": 44
       },
       {
         "level": 26,
@@ -7772,7 +8202,7 @@
       },
       {
         "level": 19,
-        "moveId": 31
+        "moveId": 48
       },
       {
         "level": 24,
@@ -7832,11 +8262,11 @@
       },
       {
         "level": 1,
-        "moveId": 31
+        "moveId": 48
       },
       {
         "level": 19,
-        "moveId": 31
+        "moveId": 48
       },
       {
         "level": 24,
@@ -7894,7 +8324,7 @@
       },
       {
         "level": 27,
-        "moveId": 129
+        "moveId": 105
       },
       {
         "level": 32,
@@ -7959,7 +8389,7 @@
       },
       {
         "level": 1,
-        "moveId": 129
+        "moveId": 105
       },
       {
         "level": 1,
@@ -8010,7 +8440,7 @@
       },
       {
         "level": 1,
-        "moveId": 114
+        "moveId": 112
       },
       {
         "level": 15,
@@ -8073,7 +8503,7 @@
       },
       {
         "level": 24,
-        "moveId": 147
+        "moveId": 104
       },
       {
         "level": 29,
@@ -8124,7 +8554,7 @@
       },
       {
         "level": 23,
-        "moveId": 8
+        "moveId": 3
       },
       {
         "level": 31,
@@ -8178,7 +8608,7 @@
       },
       {
         "level": 34,
-        "moveId": 7
+        "moveId": 9
       },
       {
         "level": 37,
@@ -8224,7 +8654,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 126
+        "moveId": 123
       },
       {
         "level": 36,
@@ -8244,7 +8674,7 @@
       },
       {
         "level": 52,
-        "moveId": 126
+        "moveId": 123
       },
       {
         "level": 55,
@@ -8282,7 +8712,7 @@
       },
       {
         "level": 30,
-        "moveId": 11
+        "moveId": 69
       },
       {
         "level": 36,
@@ -8332,7 +8762,7 @@
       },
       {
         "level": 21,
-        "moveId": 24
+        "moveId": 23
       },
       {
         "level": 28,
@@ -8432,7 +8862,7 @@
       },
       {
         "level": 32,
-        "moveId": 82
+        "moveId": 80
       },
       {
         "level": 41,
@@ -8479,7 +8909,7 @@
       },
       {
         "level": 16,
-        "moveId": 46
+        "moveId": 47
       },
       {
         "level": 20,
@@ -8641,7 +9071,7 @@
       },
       {
         "level": 31,
-        "moveId": 28
+        "moveId": 55
       },
       {
         "level": 37,
@@ -8711,7 +9141,7 @@
       },
       {
         "level": 31,
-        "moveId": 28
+        "moveId": 84
       },
       {
         "level": 37,
@@ -8781,7 +9211,7 @@
       },
       {
         "level": 31,
-        "moveId": 28
+        "moveId": 52
       },
       {
         "level": 37,
@@ -8847,7 +9277,7 @@
       },
       {
         "level": 23,
-        "moveId": 93
+        "moveId": 60
       },
       {
         "level": 28,
@@ -8898,7 +9328,7 @@
       },
       {
         "level": 34,
-        "moveId": 106
+        "moveId": 30
       },
       {
         "level": 39,
@@ -8959,7 +9389,7 @@
       },
       {
         "level": 34,
-        "moveId": 106
+        "moveId": 30
       },
       {
         "level": 39,
@@ -9002,7 +9432,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 106
+        "moveId": 10
       },
       {
         "level": 1,
@@ -9059,7 +9489,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 106
+        "moveId": 10
       },
       {
         "level": 1,
@@ -9118,7 +9548,7 @@
       },
       {
         "level": 33,
-        "moveId": 98
+        "moveId": 48
       },
       {
         "level": 38,
@@ -9164,7 +9594,7 @@
       },
       {
         "level": 1,
-        "moveId": 132
+        "moveId": 133
       },
       {
         "level": 35,
@@ -9215,7 +9645,7 @@
       },
       {
         "level": 1,
-        "moveId": 59
+        "moveId": 58
       },
       {
         "level": 51,
@@ -9266,7 +9696,7 @@
       },
       {
         "level": 51,
-        "moveId": 87
+        "moveId": 65
       },
       {
         "level": 55,
@@ -9309,7 +9739,7 @@
       },
       {
         "level": 1,
-        "moveId": 52
+        "moveId": 81
       },
       {
         "level": 51,
@@ -9351,7 +9781,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 132
+        "moveId": 35
       },
       {
         "level": 1,
@@ -9411,7 +9841,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 132
+        "moveId": 35
       },
       {
         "level": 1,
@@ -9476,7 +9906,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 132
+        "moveId": 35
       },
       {
         "level": 1,
@@ -9566,7 +9996,7 @@
       },
       {
         "level": 81,
-        "moveId": 97
+        "moveId": 94
       }
     ],
     "evolutions": [],
@@ -9597,6 +10027,19 @@
       {
         "level": 1,
         "moveId": 1
+      },
+      { "level": 10, "moveId": 144 },
+      {
+        "level": 20,
+        "moveId": 5
+      },
+      {
+        "level": 30,
+        "moveId": 118
+      },
+      {
+        "level": 40,
+        "moveId": 94
       }
     ],
     "evolutions": [],

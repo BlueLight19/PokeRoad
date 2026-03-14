@@ -1,7 +1,0 @@
-HOTFIXES :
-
-- Jeu un poil trop lent, le réaccéléré sans ruiné le flow
-- Boutique vente n'affiche rien
-- l'effet dégats (secousse) se fait après la perte de vie et pas en même temps
-- faire que les pokémon on chacun sa place dans la boite PC qu'on peux trier manuellement
-- Dialogue avec les pnj toujours très moche et un poil trop rapide
