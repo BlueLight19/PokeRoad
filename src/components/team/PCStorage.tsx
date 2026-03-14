@@ -5,14 +5,16 @@ import { Button } from '../ui/Button';
 import { PokemonInstance } from '../../types/pokemon';
 import { BOX_CAPACITY } from '../../engine/pcStorage';
 
-type DragSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
+type DragSource = { type: 'team'; index: number } | { type: 'pc'; uid: string; boxId: number; slotId: number };
+type SelectedSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
 
 export function PCStorage() {
-  const { pc, team, moveFromPc, moveToPc, setView, switchTeamOrder } = useGameStore();
+  const { pc, team, moveFromPc, moveToPc, setView, switchTeamOrder, movePokemonInPC } = useGameStore();
   const [currentBoxIndex, setCurrentBoxIndex] = useState(pc.currentBoxId || 0);
   const [selected, setSelected] = useState<SelectedSource | null>(null);
   const [dragSource, setDragSource] = useState<DragSource | null>(null);
   const [dragOverTeamIndex, setDragOverTeamIndex] = useState<number | null>(null);
+  const [dragOverPcSlot, setDragOverPcSlot] = useState<number | null>(null);
   const [isDragOverPc, setIsDragOverPc] = useState(false);
 
   const currentBox = pc.boxes[currentBoxIndex];
@@ -214,7 +216,7 @@ export function PCStorage() {
           e.dataTransfer.dropEffect = 'move';
           setIsDragOverPc(true);
         }}
-        onDragLeave={() => setIsDragOverPc(false)}
+        onDragLeave={() => { setIsDragOverPc(false); setDragOverPcSlot(null); }}
         onDrop={(e) => {
           e.preventDefault();
           if (dragSource?.type === 'team') {
@@ -225,6 +227,7 @@ export function PCStorage() {
           }
           setDragSource(null);
           setIsDragOverPc(false);
+          setDragOverPcSlot(null);
         }}
         style={{
           display: 'grid',
@@ -239,15 +242,39 @@ export function PCStorage() {
         }}
       >
         {currentBox.pokemon.map((pokemon, slotId) => {
+          const isDragOver = dragOverPcSlot === slotId;
+
           if (!pokemon) {
             return (
-              <div key={`slot-${slotId}`} style={{
-                background: 'rgba(15, 23, 42, 0.5)',
-                borderRadius: '4px',
-                aspectRatio: '1',
-                opacity: 0.2,
-                border: '2px solid transparent',
-              }} />
+              <div
+                key={`slot-${slotId}`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                  setDragOverPcSlot(slotId);
+                }}
+                onDragLeave={() => setDragOverPcSlot(null)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (dragSource?.type === 'pc') {
+                    movePokemonInPC(dragSource.boxId, dragSource.slotId, currentBoxIndex, slotId);
+                  } else if (dragSource?.type === 'team') {
+                    const teamPokemon = team[dragSource.index];
+                    if (teamPokemon) handleDeposit(teamPokemon.uid);
+                  }
+                  setDragSource(null);
+                  setDragOverPcSlot(null);
+                }}
+                style={{
+                  background: 'rgba(15, 23, 42, 0.5)',
+                  borderRadius: '4px',
+                  aspectRatio: '1',
+                  opacity: isDragOver ? 0.6 : 0.2,
+                  border: isDragOver ? '2px solid #2196F3' : '2px solid transparent',
+                  transition: 'border-color 0.2s, opacity 0.2s',
+                }}
+              />
             );
           }
 
@@ -263,11 +290,29 @@ export function PCStorage() {
               key={pokemon.uid}
               draggable
               onDragStart={(e) => {
-                setDragSource({ type: 'pc', uid: pokemon.uid });
+                setDragSource({ type: 'pc', uid: pokemon.uid, boxId: currentBoxIndex, slotId });
                 e.dataTransfer.effectAllowed = 'move';
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverPcSlot(slotId);
+              }}
+              onDragLeave={() => setDragOverPcSlot(null)}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (dragSource?.type === 'pc') {
+                  movePokemonInPC(dragSource.boxId, dragSource.slotId, currentBoxIndex, slotId);
+                } else if (dragSource?.type === 'team') {
+                  handleWithdraw(dragSource.uid);
+                }
+                setDragSource(null);
+                setDragOverPcSlot(null);
               }}
               onDragEnd={() => {
                 setDragSource(null);
+                setDragOverPcSlot(null);
               }}
               onClick={() => setSelected(isSelected ? null : { type: 'pc', uid: pokemon.uid })}
               style={{
@@ -280,7 +325,7 @@ export function PCStorage() {
                 justifyContent: 'center',
                 cursor: 'grab',
                 position: 'relative',
-                border: isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                border: isDragOver && !isDragging ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
                 opacity: isDragging ? 0.5 : 1,
                 transition: 'border-color 0.2s, opacity 0.2s',
               }}

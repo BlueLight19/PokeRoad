@@ -115,10 +115,11 @@ export function processLevelUp(pokemon: PokemonInstance): LevelUpResult | null {
   if (pokemon.xp < nextLevelXp) return null;
 
   let newLevel = pokemon.level + 1;
-  // Check for multiple level ups
+  // Check for multiple level ups (hard cap at 100)
   while (newLevel < 100 && pokemon.xp >= xpForLevel(newLevel + 1, data.expGroup)) {
     newLevel++;
   }
+  newLevel = Math.min(100, newLevel);
 
   // Temporarily set level for stat calculation
   const tempPokemon = { ...pokemon, level: newLevel };

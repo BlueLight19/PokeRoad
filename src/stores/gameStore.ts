@@ -32,6 +32,7 @@ import {
   depositPokemon,
   withdrawPokemon,
   findPokemonInPC,
+  movePokemon,
   PCStorage,
 } from '../engine/pcStorage';
 import { evolvePokemon } from '../engine/evolutionEngine';
@@ -71,6 +72,7 @@ export interface GameState {
   releasePokemon: (uid: string) => void;
   moveToPc: (uid: string) => void;
   moveFromPc: (uid: string) => void;
+  movePokemonInPC: (fromBoxId: number, fromSlotId: number, toBoxId: number, toSlotId: number) => void;
 
   // Inventory
   addItem: (itemId: string, qty: number) => void;
@@ -341,6 +343,15 @@ export const useGameStore = create<GameState>((set, get) => ({
         team: [...state.team, pokemon],
         pc: { ...state.pc }
       });
+    }
+  },
+
+  movePokemonInPC: (fromBoxId: number, fromSlotId: number, toBoxId: number, toSlotId: number) => {
+    const state = get();
+    const success = movePokemon(state.pc, fromBoxId, fromSlotId, toBoxId, toSlotId);
+    if (success) {
+      set({ pc: { ...state.pc } });
+      get().saveGameState();
     }
   },
 
@@ -929,11 +940,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   startSafari: () => {
     const state = get();
     if (state.player.money < 500) return;
-    state.spendMoney(500);
+    const success = get().spendMoney(500);
+    if (!success) return;
     set({
-      safariState: { steps: 30, balls: 30 }, // 30 "actions" or steps? Plan said 30 actions. 
-      // Steps usually 500. But for this text-based/click-based movement, maybe 30 actions (search) is better?
-      // "Search" action decrements steps.
+      safariState: { steps: 30, balls: 30 },
       selectedZone: 'parc-safari',
       currentView: 'route_menu'
     });
@@ -1019,15 +1029,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       };
 
       // Consume TM if applicable
-      if (pendingMoveLearn.sourceItem) {
+      const sourceItem = pendingMoveLearn.sourceItem;
+      if (sourceItem) {
         const { inventory } = get();
-        const currentQty = inventory.find(i => i.itemId === pendingMoveLearn.sourceItem)?.quantity || 0;
+        const currentQty = inventory.find(i => i.itemId === sourceItem)?.quantity || 0;
         if (currentQty > 0) {
-          // We need to decrease quantity. 
-          // NOTE: We can't call set() inside this function easily without recreating the inventory array properly.
-          // But we can reuse the logic or just map it.
           const newInventory = inventory
-            .map(i => i.itemId === pendingMoveLearn.sourceItem ? { ...i, quantity: i.quantity - 1 } : i)
+            .map(i => i.itemId === sourceItem ? { ...i, quantity: i.quantity - 1 } : i)
             .filter(i => i.quantity > 0);
           set({ inventory: newInventory });
         }

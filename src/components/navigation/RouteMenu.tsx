@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getTrainerData } from '../../utils/dataLoader';
@@ -139,28 +139,11 @@ export function RouteMenu() {
 
   if (activeNpc) {
     return (
-      <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <h2 style={{ color: '#FFD600', fontSize: '16px', fontFamily: "'Press Start 2P', monospace", marginBottom: '20px', textAlign: 'center' }}>
-          {activeNpc.name}
-        </h2>
-        <div style={{
-          flex: 1,
-          background: '#0a0a15',
-          border: '2px solid #333',
-          borderRadius: '8px',
-          padding: '16px',
-          color: '#fff',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '12px',
-          lineHeight: '1.6',
-          marginBottom: '20px',
-        }}>
-          {activeNpc.dialogue[dialogueIndex]}
-        </div>
-        <Button onClick={advanceDialogue} style={{ width: '100%' }}>
-          {dialogueIndex < activeNpc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
-        </Button>
-      </div>
+      <NpcDialogue
+        npc={activeNpc}
+        dialogueIndex={dialogueIndex}
+        onAdvance={advanceDialogue}
+      />
     );
   }
 
@@ -479,6 +462,107 @@ export function RouteMenu() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogueIndex: number; onAdvance: () => void }) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
+  const fullText = npc.dialogue[dialogueIndex];
+
+  useEffect(() => {
+    setDisplayedText('');
+    setIsTyping(true);
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      setDisplayedText(fullText.slice(0, current));
+      if (current >= fullText.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 30);
+    return () => clearInterval(interval);
+  }, [fullText]);
+
+  const handleClick = () => {
+    if (isTyping) {
+      setDisplayedText(fullText);
+      setIsTyping(false);
+    } else {
+      onAdvance();
+    }
+  };
+
+  return (
+    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
+      {/* NPC name tag */}
+      <div style={{
+        background: 'linear-gradient(90deg, #FFD600, #FFA000)',
+        padding: '6px 16px',
+        borderRadius: '8px 8px 0 0',
+        display: 'inline-block',
+        alignSelf: 'flex-start',
+      }}>
+        <span style={{ color: '#000', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+          {npc.name}
+        </span>
+      </div>
+
+      {/* Dialogue box */}
+      <div
+        onClick={handleClick}
+        style={{
+          flex: 1,
+          background: '#0f1923',
+          border: '3px solid #FFD600',
+          borderRadius: '0 12px 12px 12px',
+          padding: '20px',
+          color: '#fff',
+          fontFamily: "'Press Start 2P', monospace",
+          fontSize: '10px',
+          lineHeight: '2',
+          marginBottom: '16px',
+          cursor: 'pointer',
+          minHeight: '120px',
+          position: 'relative',
+          boxShadow: '0 0 15px rgba(255, 214, 0, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        {displayedText}
+        {!isTyping && (
+          <span style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '14px',
+            fontSize: '8px',
+            color: '#FFD600',
+            animation: 'pulse 1s infinite alternate',
+          }}>
+            {dialogueIndex < npc.dialogue.length - 1 ? '▼' : '✕'}
+          </span>
+        )}
+      </div>
+
+      {/* Progress dots */}
+      {npc.dialogue.length > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '12px' }}>
+          {npc.dialogue.map((_, i) => (
+            <div key={i} style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: i === dialogueIndex ? '#FFD600' : i < dialogueIndex ? '#666' : '#333',
+              transition: 'background 0.3s',
+            }} />
+          ))}
+        </div>
+      )}
+
+      <Button onClick={handleClick} style={{ width: '100%' }}>
+        {isTyping ? 'Passer' : dialogueIndex < npc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
+      </Button>
     </div>
   );
 }

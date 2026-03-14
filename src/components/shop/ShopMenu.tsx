@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getCityShopItems, getShopItems } from '../../utils/dataLoader';
+import { getCityShopItems, getShopItems, getItemData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 
 export function ShopMenu() {

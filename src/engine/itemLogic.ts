@@ -146,11 +146,12 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         
         const result = processLevelUp(tempClone);
         if (result) {
+            const hpDiff = result.newMaxHp - target.maxHp;
             target.level = result.newLevel;
             target.xp = targetXp;
             target.stats = result.newStats;
             target.maxHp = result.newMaxHp;
-            target.currentHp = result.newMaxHp; 
+            target.currentHp = Math.min(target.maxHp, target.currentHp + hpDiff);
             target.xpToNextLevel = result.newXpToNextLevel;
             
             const name = target.nickname || data.name;

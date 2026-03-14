@@ -14,6 +14,7 @@ import {
   fullHealTeam,
 } from '../engine/battleEngine';
 import { attemptCatch } from '../engine/catchCalculator';
+import { getEffectiveStat } from '../engine/statCalculator';
 import { createPokemonInstance } from '../engine/experienceCalculator';
 import { getMoveData, getPokemonData, getItemData } from '../utils/dataLoader';
 import { WildEncounter, TrainerData, GymData } from '../types/game';
@@ -340,7 +341,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
             };
         });
         
-        const delay = step.log.message.length * 25 + 600;
+        const delay = step.log.message.length * 15 + 300;
         await new Promise(r => setTimeout(r, delay));
     }
 
@@ -541,7 +542,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -609,7 +610,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -675,7 +676,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -744,7 +745,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -820,7 +821,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -868,7 +869,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const enemy = state.enemyTeam[state.activeEnemyIndex];
     if (!player || !enemy) return;
 
-    const fleeChance = Math.min(0.95, 0.5 + (player.stats.speed - enemy.stats.speed) * 0.01);
+    const playerSpeed = getEffectiveStat(player, 'speed');
+    const enemySpeed = getEffectiveStat(enemy, 'speed');
+    const fleeChance = Math.min(0.95, 0.5 + (playerSpeed - enemySpeed) * 0.01);
 
     if (Math.random() < fleeChance) {
       set(s => ({
@@ -897,7 +900,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
       for (const log of newLogs) {
         set(s => ({ logs: [...s.logs, log] }));
-        await new Promise(r => setTimeout(r, log.message.length * 25 + 700));
+        await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
       }
 
       if (player.currentHp <= 0) {
@@ -996,7 +999,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
         for (const log of enemyAttackLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 25 + 500));
+            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
         }
 
         if (player.currentHp <= 0) {

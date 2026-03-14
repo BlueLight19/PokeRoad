@@ -46,8 +46,10 @@ export function checkStatusBlock(pokemon: PokemonInstance): { blocked: boolean; 
     pokemon.volatile.confusion--;
     logs.push({ message: `${name} est confus !`, type: 'status' });
     if (Math.random() < 0.5) {
-      // Hurt self: Power 40 physical hit
-      const damage = Math.floor((((2 * pokemon.level / 5 + 2) * 40 * pokemon.stats.attack / pokemon.stats.defense) / 50) + 2);
+      // Hurt self: Power 40 physical hit (uses effective stats for attack/defense)
+      const confAtk = getEffectiveStat(pokemon, 'attack');
+      const confDef = getEffectiveStat(pokemon, 'defense');
+      const damage = Math.floor((((2 * pokemon.level / 5 + 2) * 40 * confAtk / confDef) / 50) + 2);
       pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
       logs.push({ message: `Il se blesse dans sa confusion !`, type: 'damage' });
       return { blocked: true, logs };
@@ -102,7 +104,7 @@ export function tryApplyStatus(
   if (!move.effect.status) return logs;
 
   const chance = move.effect.chance ?? 100;
-  if (Math.random() * 100 >= chance) return logs;
+  if (Math.random() * 100 > chance) return logs;
 
   // Handle Confusion (Volatile)
   // Cast to specific comparison because string might be 'confusion' coming from JSON
@@ -154,7 +156,7 @@ export function tryApplyStatChange(
   if (!move.effect || move.effect.type !== 'stat') return logs;
 
   const chance = move.effect.chance ?? 100;
-  if (Math.random() * 100 >= chance) return logs;
+  if (Math.random() * 100 > chance) return logs;
 
   // Stat Stage Modification
   const stat = move.effect.stat;
@@ -234,7 +236,7 @@ export function executeMove(
   // Accuracy check
   if (move.accuracy !== null) {
     const roll = Math.random() * 100;
-    if (roll >= move.accuracy) {
+    if (roll > move.accuracy) {
       logs.push({ message: `${attackerName} rate son attaque !`, type: 'info' });
       attacker.volatile.charging = undefined; // Reset charge if miss? Usually yes.
       return { logs, defenderFainted: false };

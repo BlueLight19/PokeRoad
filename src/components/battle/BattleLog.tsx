@@ -90,7 +90,7 @@ function TypewriterMessage({ log, isNew }: { log: BattleLogEntry, isNew: boolean
             current++;
             setCurrentText(log.message.slice(0, current));
             if (current >= log.message.length) clearInterval(interval);
-        }, 25);
+        }, 15);
 
         return () => clearInterval(interval);
     }, [log.message, isNew]);

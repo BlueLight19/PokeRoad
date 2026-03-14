@@ -46,16 +46,8 @@ export function calculateDamage(
   }
 
   // Badge Boosts (Gen 1: 1.125x boost to stats)
+  // Boulder (Roche): Attack, Cascade: Speed, Thunder (Foudre): Defense, Rainbow (Prisme): Special
   if (attackerBadges.length > 0) {
-    if (attackerBadges.includes('badge-roche') && atkStat === 'attack') atk = Math.floor(atk * 1.125);
-    if (attackerBadges.includes('badge-foudre') && defStat === 'defense') def = Math.floor(def * 1.125); // wait, badge-foudre is defense
-    if (attackerBadges.includes('badge-prisme') && atkStat === 'spAtk') atk = Math.floor(atk * 1.125); // special
-    if (attackerBadges.includes('badge-ame') && defStat === 'spDef') def = Math.floor(def * 1.125); // soul badge usually speed, but cascade is speed
-    // Correct Gen 1 Badge Boosts:
-    // Boulder (Roche): Attack
-    // Cascade: Speed (not used in damage directly but in order)
-    // Thunder (Foudre): Defense
-    // Rainbow (Prisme): Special (Special Attack AND Special Defense in Gen 1)
     if (attackerBadges.includes('badge-roche') && atkStat === 'attack') atk = Math.floor(atk * 1.125);
     if (attackerBadges.includes('badge-foudre') && defStat === 'defense') def = Math.floor(def * 1.125);
     if (attackerBadges.includes('badge-prisme')) {

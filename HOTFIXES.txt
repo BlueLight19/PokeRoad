@@ -1,8 +1,7 @@
 HOTFIXES :
 
-- Les pokémon n'évoluent pas avec les super bonbon et n'apprenent pas non plus de nouvelles attaques
-- Il manque toute les CT de la gen 1
-- Le drag and drop de l'équipe vers le pc et inversément ne fonctionne pas
-- Tout les pokémon peuvent apprendre toute les ct et pas seulement celles qu'ils peuvent réelement apprendre.
-- Il faut une possibilité de vendre à la boutique
-- Il faudrait un peu plus de latence dans le jeu. Que les tours se jouent un peu moins vite pour permettre au joueur de mieux comprendre ce qu'il se passe. Il faudrait que le text s'affiche de façon progressive animé pour ralentir un peu
+- Jeu un poil trop lent, le réaccéléré sans ruiné le flow
+- Boutique vente n'affiche rien
+- l'effet dégats (secousse) se fait après la perte de vie et pas en même temps
+- faire que les pokémon on chacun sa place dans la boite PC qu'on peux trier manuellement
+- Dialogue avec les pnj toujours très moche et un poil trop rapide
