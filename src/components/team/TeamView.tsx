@@ -175,6 +175,7 @@ export function TeamView() {
                 e.dataTransfer.effectAllowed = 'move';
               }}
               onDragOver={(e) => {
+                e.preventDefault()
                 setDragOverIndex(index);
               }}
               onDragLeave={() => {
