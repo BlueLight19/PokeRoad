@@ -4350,7 +4350,7 @@
       "spDef": 65,
       "speed": 45
     },
-    "learnset": Grolem,
+    "learnset": "Grolem",
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
