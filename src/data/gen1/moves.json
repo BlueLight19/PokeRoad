@@ -2423,5 +2423,77 @@
       "type": "recoil",
       "amount": 50
     }
+  },
+  {
+    "id": 166,
+    "name": "Vol-Vie",
+    "type": "plante",
+    "category": "special",
+    "power": 20,
+    "accuracy": 100,
+    "pp": 25,
+    "priority": 0,
+    "target": "enemy",
+    "effect": {
+      "type": "drain",
+      "amount": 50
+    }
+  },
+  {
+    "id": 167,
+    "name": "Méga-Sangsue",
+    "type": "plante",
+    "category": "special",
+    "power": 40,
+    "accuracy": 100,
+    "pp": 15,
+    "priority": 0,
+    "target": "enemy",
+    "effect": {
+      "type": "drain",
+      "amount": 50
+    }
+  },
+  {
+    "id": 168,
+    "name": "Danse-Fleur",
+    "type": "plante",
+    "category": "special",
+    "power": 70,
+    "accuracy": 100,
+    "pp": 20,
+    "priority": 0,
+    "target": "enemy",
+    "effect": {
+      "type": "rampage"
+    }
+  },
+  {
+    "id": 169,
+    "name": "Bomb'Oeuf",
+    "type": "normal",
+    "category": "physical",
+    "power": 100,
+    "accuracy": 75,
+    "pp": 10,
+    "priority": 0,
+    "target": "enemy",
+    "effect": null
+  },
+  {
+    "id": 170,
+    "name": "Télékinésie",
+    "type": "psy",
+    "category": "status",
+    "power": null,
+    "accuracy": 80,
+    "pp": 15,
+    "priority": 0,
+    "target": "enemy",
+    "effect": {
+      "type": "stat",
+      "stat": "accuracy",
+      "stages": -1
+    }
   }
 ]

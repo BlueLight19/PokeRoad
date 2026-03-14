@@ -753,28 +753,28 @@
         "moveId": 93
       },
       {
-        "level": 10,
+        "level": 12,
         "moveId": 93
       },
       {
-        "level": 12,
+        "level": 15,
         "moveId": 76
       },
       {
-        "level": 12,
+        "level": 16,
         "moveId": 77
       },
       {
-        "level": 12,
+        "level": 17,
         "moveId": 75
       },
       {
         "level": 21,
-        "moveId": 60
+        "moveId": 48
       },
       {
-        "level": 34,
-        "moveId": 94
+        "level": 32,
+        "moveId": 60
       }
     ],
     "evolutions": [],
@@ -1136,7 +1136,7 @@
       },
       {
         "level": 34,
-        "moveId": 163
+        "moveId": 162
       }
     ],
     "evolutions": [
@@ -1192,7 +1192,7 @@
       },
       {
         "level": 41,
-        "moveId": 158
+        "moveId": 162
       }
     ],
     "evolutions": [],
@@ -1231,15 +1231,15 @@
       },
       {
         "level": 9,
-        "moveId": 31
+        "moveId": 43
       },
       {
         "level": 15,
-        "moveId": 119
+        "moveId": 31
       },
       {
         "level": 22,
-        "moveId": 65
+        "moveId": 119
       },
       {
         "level": 29,
@@ -1300,7 +1300,7 @@
       },
       {
         "level": 25,
-        "moveId": 65
+        "moveId": 119
       },
       {
         "level": 34,
@@ -1467,12 +1467,16 @@
         "moveId": 98
       },
       {
+        "level": 26,
+        "moveId": 129
+      },
+      {
         "level": 33,
-        "moveId": 87
+        "moveId": 82
       },
       {
         "level": 43,
-        "moveId": 113
+        "moveId": 87
       }
     ],
     "evolutions": [
@@ -1512,11 +1516,11 @@
       },
       {
         "level": 1,
-        "moveId": 98
+        "moveId": 86
       },
       {
-        "level": 50,
-        "moveId": 87
+        "level": 1,
+        "moveId": 45
       }
     ],
     "evolutions": [],
@@ -1567,10 +1571,6 @@
       {
         "level": 38,
         "moveId": 154
-      },
-      {
-        "level": 45,
-        "moveId": 31
       }
     ],
     "evolutions": [
@@ -1627,10 +1627,6 @@
       {
         "level": 47,
         "moveId": 154
-      },
-      {
-        "level": 58,
-        "moveId": 31
       }
     ],
     "evolutions": [],
@@ -2018,19 +2014,19 @@
       },
       {
         "level": 24,
-        "moveId": 118
+        "moveId": 107
       },
       {
         "level": 31,
-        "moveId": 134
+        "moveId": 118
       },
       {
         "level": 39,
-        "moveId": 106
+        "moveId": 111
       },
       {
         "level": 48,
-        "moveId": 149
+        "moveId": 113
       }
     ],
     "evolutions": [
@@ -2070,11 +2066,15 @@
       },
       {
         "level": 1,
-        "moveId": 3
+        "moveId": 107
       },
       {
         "level": 1,
         "moveId": 118
+      },
+      {
+        "level": 1,
+        "moveId": 3
       }
     ],
     "evolutions": [],
@@ -2426,7 +2426,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 71
+        "moveId": 166
       },
       {
         "level": 15,
@@ -2446,7 +2446,7 @@
       },
       {
         "level": 33,
-        "moveId": 74
+        "moveId": 168
       },
       {
         "level": 46,
@@ -2487,7 +2487,7 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 71
+        "moveId": 166
       },
       {
         "level": 15,
@@ -2507,7 +2507,7 @@
       },
       {
         "level": 38,
-        "moveId": 74
+        "moveId": 168
       },
       {
         "level": 52,
@@ -2552,11 +2552,15 @@
       },
       {
         "level": 1,
-        "moveId": 74
+        "moveId": 168
       },
       {
         "level": 15,
         "moveId": 76
+      },
+      {
+        "level": 17,
+        "moveId": 77
       },
       {
         "level": 19,
@@ -2707,10 +2711,6 @@
         "moveId": 50
       },
       {
-        "level": 19,
-        "moveId": 60
-      },
-      {
         "level": 24,
         "moveId": 76
       },
@@ -2724,6 +2724,10 @@
       },
       {
         "level": 35,
+        "moveId": 60
+      },
+      {
+        "level": 38,
         "moveId": 75
       },
       {
@@ -2772,14 +2776,6 @@
         "moveId": 50
       },
       {
-        "level": 1,
-        "moveId": 60
-      },
-      {
-        "level": 1,
-        "moveId": 76
-      },
-      {
         "level": 24,
         "moveId": 76
       },
@@ -2793,10 +2789,14 @@
       },
       {
         "level": 38,
-        "moveId": 75
+        "moveId": 60
       },
       {
         "level": 43,
+        "moveId": 75
+      },
+      {
+        "level": 50,
         "moveId": 94
       }
     ],
@@ -3135,15 +3135,15 @@
         "moveId": 50
       },
       {
-        "level": 36,
+        "level": 39,
         "moveId": 93
       },
       {
-        "level": 43,
+        "level": 48,
         "moveId": 154
       },
       {
-        "level": 48,
+        "level": 59,
         "moveId": 56
       }
     ],
@@ -3481,15 +3481,15 @@
         "moveId": 3
       },
       {
-        "level": 35,
+        "level": 33,
         "moveId": 34
       },
       {
-        "level": 44,
+        "level": 41,
         "moveId": 133
       },
       {
-        "level": 53,
+        "level": 49,
         "moveId": 56
       }
     ],
@@ -3612,8 +3612,20 @@
         "moveId": 93
       },
       {
-        "level": 27,
+        "level": 1,
         "moveId": 50
+      },
+      {
+        "level": 16,
+        "moveId": 93
+      },
+      {
+        "level": 20,
+        "moveId": 50
+      },
+      {
+        "level": 27,
+        "moveId": 60
       },
       {
         "level": 31,
@@ -3630,8 +3642,9 @@
     ],
     "evolutions": [
       {
-        "method": "trade",
-        "evolvesInto": 65
+            "method": "stone",
+            "stone": "link-cable",
+            "evolvesInto": 65
       }
     ],
     "catchRate": 100,
@@ -3691,13 +3704,7 @@
         "moveId": 115
       }
     ],
-    "evolutions": [
-      {
-        "method": "stone",
-        "stone": "link-cable",
-        "evolvesInto": 65
-      }
-    ],
+        "evolutions": [],
     "catchRate": 50,
     "expGroup": "mediumSlow",
     "baseExp": 225,
@@ -3809,8 +3816,9 @@
     ],
     "evolutions": [
       {
-        "method": "trade",
-        "evolvesInto": 68
+            "method": "stone",
+            "stone": "link-cable",
+            "evolvesInto": 68
       }
     ],
     "catchRate": 90,
@@ -3870,13 +3878,7 @@
         "moveId": 66
       }
     ],
-    "evolutions": [
-      {
-        "method": "stone",
-        "stone": "link-cable",
-        "evolvesInto": 68
-      }
-    ],
+        "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
     "baseExp": 227,
@@ -4228,7 +4230,7 @@
         "moveId": 33
       },
       {
-        "level": 12,
+        "level": 11,
         "moveId": 111
       },
       {
@@ -4241,7 +4243,7 @@
       },
       {
         "level": 26,
-        "moveId": 111
+        "moveId": 106
       },
       {
         "level": 31,
@@ -4293,20 +4295,20 @@
         "moveId": 111
       },
       {
-        "level": 1,
-        "moveId": 88
+        "level": 11,
+        "moveId": 111
       },
       {
         "level": 16,
         "moveId": 88
       },
       {
-        "level": 22,
+        "level": 21,
         "moveId": 120
       },
       {
         "level": 29,
-        "moveId": 111
+        "moveId": 106
       },
       {
         "level": 36,
@@ -4321,1459 +4323,6 @@
       {
         "method": "stone",
         "stone": "link-cable",
-        "evolvesInto": 76
-      }
-    ],
-    "catchRate": 120,
-    "expGroup": "mediumSlow",
-    "baseExp": 137,
-    "evYield": {
-      "defense": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/75.png"
-  },
-  {
-    "id": 51,
-    "name": "Triopikeur",
-    "generation": 1,
-    "types": [
-      "sol"
-    ],
-    "baseStats": {
-      "hp": 35,
-      "attack": 80,
-      "defense": 50,
-      "spAtk": 50,
-      "spDef": 70,
-      "speed": 120
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 45
-      },
-      {
-        "level": 1,
-        "moveId": 91
-      },
-      {
-        "level": 24,
-        "moveId": 28
-      },
-      {
-        "level": 31,
-        "moveId": 163
-      },
-      {
-        "level": 40,
-        "moveId": 89
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 50,
-    "expGroup": "mediumFast",
-    "baseExp": 159,
-    "evYield": {
-      "speed": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png"
-  },
-  {
-    "id": 52,
-    "name": "Miaouss",
-    "generation": 1,
-    "types": [
-      "normal"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 45,
-      "defense": 35,
-      "spAtk": 40,
-      "spDef": 40,
-      "speed": 90
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 45
-      },
-      {
-        "level": 12,
-        "moveId": 44
-      },
-      {
-        "level": 17,
-        "moveId": 6
-      },
-      {
-        "level": 24,
-        "moveId": 103
-      },
-      {
-        "level": 33,
-        "moveId": 154
-      },
-      {
-        "level": 44,
-        "moveId": 163
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 28,
-        "evolvesInto": 53
-      }
-    ],
-    "catchRate": 255,
-    "expGroup": "mediumFast",
-    "baseExp": 58,
-    "evYield": {
-      "speed": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png"
-  },
-  {
-    "id": 53,
-    "name": "Persian",
-    "generation": 1,
-    "types": [
-      "normal"
-    ],
-    "baseStats": {
-      "hp": 65,
-      "attack": 70,
-      "defense": 60,
-      "spAtk": 65,
-      "spDef": 65,
-      "speed": 115
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 45
-      },
-      {
-        "level": 1,
-        "moveId": 44
-      },
-      {
-        "level": 1,
-        "moveId": 103
-      },
-      {
-        "level": 12,
-        "moveId": 44
-      },
-      {
-        "level": 17,
-        "moveId": 6
-      },
-      {
-        "level": 24,
-        "moveId": 103
-      },
-      {
-        "level": 37,
-        "moveId": 154
-      },
-      {
-        "level": 51,
-        "moveId": 163
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 90,
-    "expGroup": "mediumFast",
-    "baseExp": 154,
-    "evYield": {
-      "speed": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png"
-  },
-  {
-    "id": 54,
-    "name": "Psykokwak",
-    "generation": 1,
-    "types": [
-      "eau"
-    ],
-    "baseStats": {
-      "hp": 50,
-      "attack": 52,
-      "defense": 48,
-      "spAtk": 65,
-      "spDef": 50,
-      "speed": 55
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 28,
-        "moveId": 39
-      },
-      {
-        "level": 31,
-        "moveId": 50
-      },
-      {
-        "level": 36,
-        "moveId": 93
-      },
-      {
-        "level": 39,
-        "moveId": 154
-      },
-      {
-        "level": 43,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 33,
-        "evolvesInto": 55
-      }
-    ],
-    "catchRate": 190,
-    "expGroup": "mediumFast",
-    "baseExp": 64,
-    "evYield": {
-      "spAtk": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png"
-  },
-  {
-    "id": 55,
-    "name": "Akwakwak",
-    "generation": 1,
-    "types": [
-      "eau"
-    ],
-    "baseStats": {
-      "hp": 80,
-      "attack": 82,
-      "defense": 78,
-      "spAtk": 95,
-      "spDef": 80,
-      "speed": 85
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 39
-      },
-      {
-        "level": 1,
-        "moveId": 50
-      },
-      {
-        "level": 1,
-        "moveId": 93
-      },
-      {
-        "level": 28,
-        "moveId": 39
-      },
-      {
-        "level": 31,
-        "moveId": 50
-      },
-      {
-        "level": 36,
-        "moveId": 93
-      },
-      {
-        "level": 43,
-        "moveId": 154
-      },
-      {
-        "level": 48,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 75,
-    "expGroup": "mediumFast",
-    "baseExp": 175,
-    "evYield": {
-      "spAtk": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png"
-  },
-  {
-    "id": 56,
-    "name": "Férosinge",
-    "generation": 1,
-    "types": [
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 80,
-      "defense": 35,
-      "spAtk": 35,
-      "spDef": 45,
-      "speed": 70
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 43
-      },
-      {
-        "level": 15,
-        "moveId": 2
-      },
-      {
-        "level": 21,
-        "moveId": 154
-      },
-      {
-        "level": 27,
-        "moveId": 116
-      },
-      {
-        "level": 33,
-        "moveId": 103
-      },
-      {
-        "level": 39,
-        "moveId": 37
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 28,
-        "evolvesInto": 57
-      }
-    ],
-    "catchRate": 190,
-    "expGroup": "mediumFast",
-    "baseExp": 61,
-    "evYield": {
-      "attack": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/56.png"
-  },
-  {
-    "id": 57,
-    "name": "Colossinge",
-    "generation": 1,
-    "types": [
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 65,
-      "attack": 105,
-      "defense": 60,
-      "spAtk": 60,
-      "spDef": 70,
-      "speed": 95
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 10
-      },
-      {
-        "level": 1,
-        "moveId": 43
-      },
-      {
-        "level": 1,
-        "moveId": 2
-      },
-      {
-        "level": 1,
-        "moveId": 154
-      },
-      {
-        "level": 15,
-        "moveId": 2
-      },
-      {
-        "level": 21,
-        "moveId": 154
-      },
-      {
-        "level": 27,
-        "moveId": 116
-      },
-      {
-        "level": 37,
-        "moveId": 103
-      },
-      {
-        "level": 46,
-        "moveId": 37
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 75,
-    "expGroup": "mediumFast",
-    "baseExp": 159,
-    "evYield": {
-      "attack": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/57.png"
-  },
-  {
-    "id": 58,
-    "name": "Caninos",
-    "generation": 1,
-    "types": [
-      "feu"
-    ],
-    "baseStats": {
-      "hp": 55,
-      "attack": 70,
-      "defense": 45,
-      "spAtk": 70,
-      "spDef": 50,
-      "speed": 60
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 44
-      },
-      {
-        "level": 1,
-        "moveId": 45
-      },
-      {
-        "level": 18,
-        "moveId": 52
-      },
-      {
-        "level": 23,
-        "moveId": 43
-      },
-      {
-        "level": 30,
-        "moveId": 36
-      },
-      {
-        "level": 39,
-        "moveId": 82
-      },
-      {
-        "level": 50,
-        "moveId": 53
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "stone",
-        "stone": "pierre-feu",
-        "evolvesInto": 59
-      }
-    ],
-    "catchRate": 190,
-    "expGroup": "slow",
-    "baseExp": 70,
-    "evYield": {
-      "attack": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png"
-  },
-  {
-    "id": 59,
-    "name": "Arcanin",
-    "generation": 1,
-    "types": [
-      "feu"
-    ],
-    "baseStats": {
-      "hp": 90,
-      "attack": 110,
-      "defense": 80,
-      "spAtk": 100,
-      "spDef": 80,
-      "speed": 95
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 45
-      },
-      {
-        "level": 1,
-        "moveId": 52
-      },
-      {
-        "level": 1,
-        "moveId": 43
-      },
-      {
-        "level": 1,
-        "moveId": 36
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 75,
-    "expGroup": "slow",
-    "baseExp": 194,
-    "evYield": {
-      "attack": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png"
-  },
-  {
-    "id": 60,
-    "name": "Ptitard",
-    "generation": 1,
-    "types": [
-      "eau"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 50,
-      "defense": 40,
-      "spAtk": 40,
-      "spDef": 40,
-      "speed": 90
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 145
-      },
-      {
-        "level": 16,
-        "moveId": 95
-      },
-      {
-        "level": 19,
-        "moveId": 55
-      },
-      {
-        "level": 25,
-        "moveId": 161
-      },
-      {
-        "level": 31,
-        "moveId": 34
-      },
-      {
-        "level": 38,
-        "moveId": 133
-      },
-      {
-        "level": 45,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 25,
-        "evolvesInto": 61
-      }
-    ],
-    "catchRate": 255,
-    "expGroup": "mediumSlow",
-    "baseExp": 60,
-    "evYield": {
-      "speed": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/60.png"
-  },
-  {
-    "id": 61,
-    "name": "Têtarte",
-    "generation": 1,
-    "types": [
-      "eau"
-    ],
-    "baseStats": {
-      "hp": 65,
-      "attack": 65,
-      "defense": 65,
-      "spAtk": 50,
-      "spDef": 50,
-      "speed": 90
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 145
-      },
-      {
-        "level": 1,
-        "moveId": 95
-      },
-      {
-        "level": 1,
-        "moveId": 55
-      },
-      {
-        "level": 16,
-        "moveId": 95
-      },
-      {
-        "level": 19,
-        "moveId": 55
-      },
-      {
-        "level": 26,
-        "moveId": 161
-      },
-      {
-        "level": 35,
-        "moveId": 34
-      },
-      {
-        "level": 44,
-        "moveId": 133
-      },
-      {
-        "level": 53,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "stone",
-        "stone": "pierre-eau",
-        "evolvesInto": 62
-      }
-    ],
-    "catchRate": 120,
-    "expGroup": "mediumSlow",
-    "baseExp": 135,
-    "evYield": {
-      "speed": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/61.png"
-  },
-  {
-    "id": 62,
-    "name": "Tartard",
-    "generation": 1,
-    "types": [
-      "eau",
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 90,
-      "attack": 95,
-      "defense": 95,
-      "spAtk": 70,
-      "spDef": 90,
-      "speed": 70
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 145
-      },
-      {
-        "level": 1,
-        "moveId": 95
-      },
-      {
-        "level": 1,
-        "moveId": 55
-      },
-      {
-        "level": 1,
-        "moveId": 66
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 45,
-    "expGroup": "mediumSlow",
-    "baseExp": 225,
-    "evYield": {
-      "defense": 3
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/62.png"
-  },
-  {
-    "id": 63,
-    "name": "Abra",
-    "generation": 1,
-    "types": [
-      "psy"
-    ],
-    "baseStats": {
-      "hp": 25,
-      "attack": 20,
-      "defense": 15,
-      "spAtk": 105,
-      "spDef": 55,
-      "speed": 90
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 100
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 16,
-        "evolvesInto": 64
-      }
-    ],
-    "catchRate": 200,
-    "expGroup": "mediumSlow",
-    "baseExp": 62,
-    "evYield": {
-      "spAtk": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/63.png"
-  },
-  {
-    "id": 64,
-    "name": "Kadabra",
-    "generation": 1,
-    "types": [
-      "psy"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 35,
-      "defense": 30,
-      "spAtk": 120,
-      "spDef": 70,
-      "speed": 105
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 100
-      },
-      {
-        "level": 1,
-        "moveId": 93
-      },
-      {
-        "level": 27,
-        "moveId": 94
-      },
-      {
-        "level": 31,
-        "moveId": 105
-      },
-      {
-        "level": 38,
-        "moveId": 149
-      },
-      {
-        "level": 42,
-        "moveId": 115
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "trade",
-        "evolvesInto": 65
-      }
-    ],
-    "catchRate": 100,
-    "expGroup": "mediumSlow",
-    "baseExp": 140,
-    "evYield": {
-      "spAtk": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/64.png"
-  },
-  {
-    "id": 65,
-    "name": "Alakazam",
-    "generation": 1,
-    "types": [
-      "psy"
-    ],
-    "baseStats": {
-      "hp": 55,
-      "attack": 50,
-      "defense": 45,
-      "spAtk": 135,
-      "spDef": 95,
-      "speed": 120
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 100
-      },
-      {
-        "level": 1,
-        "moveId": 93
-      },
-      {
-        "level": 1,
-        "moveId": 94
-      },
-      {
-        "level": 1,
-        "moveId": 105
-      },
-      {
-        "level": 27,
-        "moveId": 94
-      },
-      {
-        "level": 31,
-        "moveId": 105
-      },
-      {
-        "level": 38,
-        "moveId": 149
-      },
-      {
-        "level": 42,
-        "moveId": 115
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 50,
-    "expGroup": "mediumSlow",
-    "baseExp": 225,
-    "evYield": {
-      "spAtk": 3
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/65.png"
-  },
-  {
-    "id": 66,
-    "name": "Machoc",
-    "generation": 1,
-    "types": [
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 70,
-      "attack": 80,
-      "defense": 50,
-      "spAtk": 35,
-      "spDef": 35,
-      "speed": 35
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 2
-      },
-      {
-        "level": 20,
-        "moveId": 67
-      },
-      {
-        "level": 25,
-        "moveId": 43
-      },
-      {
-        "level": 32,
-        "moveId": 116
-      },
-      {
-        "level": 39,
-        "moveId": 69
-      },
-      {
-        "level": 46,
-        "moveId": 66
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 28,
-        "evolvesInto": 67
-      }
-    ],
-    "catchRate": 180,
-    "expGroup": "mediumSlow",
-    "baseExp": 61,
-    "evYield": {
-      "attack": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/66.png"
-  },
-  {
-    "id": 67,
-    "name": "Machopeur",
-    "generation": 1,
-    "types": [
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 80,
-      "attack": 100,
-      "defense": 70,
-      "spAtk": 50,
-      "spDef": 60,
-      "speed": 45
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 2
-      },
-      {
-        "level": 1,
-        "moveId": 43
-      },
-      {
-        "level": 20,
-        "moveId": 67
-      },
-      {
-        "level": 25,
-        "moveId": 43
-      },
-      {
-        "level": 36,
-        "moveId": 116
-      },
-      {
-        "level": 44,
-        "moveId": 69
-      },
-      {
-        "level": 52,
-        "moveId": 66
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "trade",
-        "evolvesInto": 68
-      }
-    ],
-    "catchRate": 90,
-    "expGroup": "mediumSlow",
-    "baseExp": 142,
-    "evYield": {
-      "attack": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/67.png"
-  },
-  {
-    "id": 68,
-    "name": "Mackogneur",
-    "generation": 1,
-    "types": [
-      "combat"
-    ],
-    "baseStats": {
-      "hp": 90,
-      "attack": 130,
-      "defense": 80,
-      "spAtk": 65,
-      "spDef": 85,
-      "speed": 55
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 2
-      },
-      {
-        "level": 1,
-        "moveId": 43
-      },
-      {
-        "level": 1,
-        "moveId": 67
-      },
-      {
-        "level": 20,
-        "moveId": 67
-      },
-      {
-        "level": 25,
-        "moveId": 43
-      },
-      {
-        "level": 36,
-        "moveId": 116
-      },
-      {
-        "level": 44,
-        "moveId": 69
-      },
-      {
-        "level": 52,
-        "moveId": 66
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 45,
-    "expGroup": "mediumSlow",
-    "baseExp": 227,
-    "evYield": {
-      "attack": 3
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png"
-  },
-  {
-    "id": 69,
-    "name": "Chétiflor",
-    "generation": 1,
-    "types": [
-      "plante",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 50,
-      "attack": 75,
-      "defense": 35,
-      "spAtk": 70,
-      "spDef": 30,
-      "speed": 40
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 22
-      },
-      {
-        "level": 13,
-        "moveId": 35
-      },
-      {
-        "level": 15,
-        "moveId": 76
-      },
-      {
-        "level": 18,
-        "moveId": 75
-      },
-      {
-        "level": 21,
-        "moveId": 77
-      },
-      {
-        "level": 26,
-        "moveId": 51
-      },
-      {
-        "level": 33,
-        "moveId": 73
-      },
-      {
-        "level": 42,
-        "moveId": 23
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 21,
-        "evolvesInto": 70
-      }
-    ],
-    "catchRate": 255,
-    "expGroup": "mediumSlow",
-    "baseExp": 60,
-    "evYield": {
-      "attack": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/69.png"
-  },
-  {
-    "id": 70,
-    "name": "Boustiflor",
-    "generation": 1,
-    "types": [
-      "plante",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 65,
-      "attack": 90,
-      "defense": 50,
-      "spAtk": 85,
-      "spDef": 45,
-      "speed": 55
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 22
-      },
-      {
-        "level": 1,
-        "moveId": 35
-      },
-      {
-        "level": 1,
-        "moveId": 76
-      },
-      {
-        "level": 13,
-        "moveId": 35
-      },
-      {
-        "level": 15,
-        "moveId": 76
-      },
-      {
-        "level": 18,
-        "moveId": 75
-      },
-      {
-        "level": 23,
-        "moveId": 77
-      },
-      {
-        "level": 29,
-        "moveId": 51
-      },
-      {
-        "level": 38,
-        "moveId": 73
-      },
-      {
-        "level": 49,
-        "moveId": 23
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "stone",
-        "stone": "pierre-plante",
-        "evolvesInto": 71
-      }
-    ],
-    "catchRate": 120,
-    "expGroup": "mediumSlow",
-    "baseExp": 137,
-    "evYield": {
-      "attack": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/70.png"
-  },
-  {
-    "id": 71,
-    "name": "Empiflor",
-    "generation": 1,
-    "types": [
-      "plante",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 80,
-      "attack": 105,
-      "defense": 65,
-      "spAtk": 100,
-      "spDef": 70,
-      "speed": 70
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 75
-      },
-      {
-        "level": 1,
-        "moveId": 77
-      },
-      {
-        "level": 1,
-        "moveId": 51
-      },
-      {
-        "level": 1,
-        "moveId": 73
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 45,
-    "expGroup": "mediumSlow",
-    "baseExp": 221,
-    "evYield": {
-      "attack": 3
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/71.png"
-  },
-  {
-    "id": 72,
-    "name": "Tentacool",
-    "generation": 1,
-    "types": [
-      "eau",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 40,
-      "defense": 35,
-      "spAtk": 50,
-      "spDef": 100,
-      "speed": 70
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 51
-      },
-      {
-        "level": 7,
-        "moveId": 48
-      },
-      {
-        "level": 13,
-        "moveId": 35
-      },
-      {
-        "level": 18,
-        "moveId": 40
-      },
-      {
-        "level": 22,
-        "moveId": 55
-      },
-      {
-        "level": 27,
-        "moveId": 132
-      },
-      {
-        "level": 33,
-        "moveId": 115
-      },
-      {
-        "level": 40,
-        "moveId": 103
-      },
-      {
-        "level": 48,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 30,
-        "evolvesInto": 73
-      }
-    ],
-    "catchRate": 190,
-    "expGroup": "slow",
-    "baseExp": 67,
-    "evYield": {
-      "spDef": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/72.png"
-  },
-  {
-    "id": 73,
-    "name": "Tentacruel",
-    "generation": 1,
-    "types": [
-      "eau",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 80,
-      "attack": 70,
-      "defense": 65,
-      "spAtk": 80,
-      "spDef": 120,
-      "speed": 100
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 51
-      },
-      {
-        "level": 1,
-        "moveId": 48
-      },
-      {
-        "level": 1,
-        "moveId": 35
-      },
-      {
-        "level": 7,
-        "moveId": 48
-      },
-      {
-        "level": 13,
-        "moveId": 35
-      },
-      {
-        "level": 18,
-        "moveId": 40
-      },
-      {
-        "level": 22,
-        "moveId": 55
-      },
-      {
-        "level": 27,
-        "moveId": 132
-      },
-      {
-        "level": 35,
-        "moveId": 115
-      },
-      {
-        "level": 43,
-        "moveId": 103
-      },
-      {
-        "level": 50,
-        "moveId": 56
-      }
-    ],
-    "evolutions": [],
-    "catchRate": 60,
-    "expGroup": "slow",
-    "baseExp": 180,
-    "evYield": {
-      "spDef": 2
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/73.png"
-  },
-  {
-    "id": 74,
-    "name": "Racaillou",
-    "generation": 1,
-    "types": [
-      "roche",
-      "sol"
-    ],
-    "baseStats": {
-      "hp": 40,
-      "attack": 80,
-      "defense": 100,
-      "spAtk": 30,
-      "spDef": 30,
-      "speed": 20
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 33
-      },
-      {
-        "level": 12,
-        "moveId": 106
-      },
-      {
-        "level": 16,
-        "moveId": 88
-      },
-      {
-        "level": 22,
-        "moveId": 120
-      },
-      {
-        "level": 26,
-        "moveId": 111
-      },
-      {
-        "level": 31,
-        "moveId": 89
-      },
-      {
-        "level": 36,
-        "moveId": 121
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "level",
-        "level": 25,
-        "evolvesInto": 75
-      }
-    ],
-    "catchRate": 255,
-    "expGroup": "mediumSlow",
-    "baseExp": 60,
-    "evYield": {
-      "defense": 1
-    },
-    "spriteUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/74.png"
-  },
-  {
-    "id": 75,
-    "name": "Gravalanch",
-    "generation": 1,
-    "types": [
-      "roche",
-      "sol"
-    ],
-    "baseStats": {
-      "hp": 55,
-      "attack": 95,
-      "defense": 115,
-      "spAtk": 45,
-      "spDef": 45,
-      "speed": 35
-    },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 33
-      },
-      {
-        "level": 1,
-        "moveId": 106
-      },
-      {
-        "level": 1,
-        "moveId": 88
-      },
-      {
-        "level": 16,
-        "moveId": 88
-      },
-      {
-        "level": 22,
-        "moveId": 120
-      },
-      {
-        "level": 29,
-        "moveId": 111
-      },
-      {
-        "level": 36,
-        "moveId": 89
-      },
-      {
-        "level": 43,
-        "moveId": 121
-      }
-    ],
-    "evolutions": [
-      {
-        "method": "trade",
         "evolvesInto": 76
       }
     ],
@@ -5801,44 +4350,7 @@
       "spDef": 65,
       "speed": 45
     },
-    "learnset": [
-      {
-        "level": 1,
-        "moveId": 33
-      },
-      {
-        "level": 1,
-        "moveId": 111
-      },
-      {
-        "level": 1,
-        "moveId": 88
-      },
-      {
-        "level": 1,
-        "moveId": 121
-      },
-      {
-        "level": 16,
-        "moveId": 88
-      },
-      {
-        "level": 22,
-        "moveId": 120
-      },
-      {
-        "level": 29,
-        "moveId": 111
-      },
-      {
-        "level": 36,
-        "moveId": 89
-      },
-      {
-        "level": 43,
-        "moveId": 121
-      }
-    ],
+    "learnset": Grolem,
     "evolutions": [],
     "catchRate": 45,
     "expGroup": "mediumSlow",
@@ -6125,10 +4637,14 @@
       },
       {
         "level": 35,
-        "moveId": 129
+        "moveId": 86
       },
       {
         "level": 41,
+        "moveId": 129
+      },
+      {
+        "level": 47,
         "moveId": 103
       }
     ],
@@ -6807,8 +5323,9 @@
     ],
     "evolutions": [
       {
-        "method": "trade",
-        "evolvesInto": 94
+            "method": "stone",
+            "stone": "link-cable",
+            "evolvesInto": 94
       }
     ],
     "catchRate": 90,
@@ -7587,7 +6104,11 @@
     "learnset": [
       {
         "level": 1,
-        "moveId": 5
+        "moveId": 4
+      },
+      {
+        "level": 1,
+        "moveId": 82
       },
       {
         "level": 33,
@@ -7604,6 +6125,10 @@
       {
         "level": 48,
         "moveId": 5
+      },
+      {
+        "level": 53,
+        "moveId": 68
       }
     ],
     "evolutions": [],
@@ -7916,32 +6441,28 @@
         "moveId": 3
       },
       {
-        "level": 12,
-        "moveId": 61
-      },
-      {
         "level": 24,
-        "moveId": 4
+        "moveId": 47
       },
       {
         "level": 30,
-        "moveId": 96
+        "moveId": 45
       },
       {
         "level": 38,
-        "moveId": 50
+        "moveId": 107
       },
       {
         "level": 44,
-        "moveId": 135
+        "moveId": 111
       },
       {
         "level": 48,
-        "moveId": 38
+        "moveId": 113
       },
       {
         "level": 54,
-        "moveId": 36
+        "moveId": 38
       }
     ],
     "evolutions": [],
@@ -8033,11 +6554,11 @@
       },
       {
         "level": 1,
-        "moveId": 44
+        "moveId": 99
       },
       {
         "level": 26,
-        "moveId": 14
+        "moveId": 44
       },
       {
         "level": 31,
@@ -8045,15 +6566,15 @@
       },
       {
         "level": 36,
-        "moveId": 99
+        "moveId": 5
       },
       {
         "level": 41,
-        "moveId": 20
+        "moveId": 43
       },
       {
         "level": 46,
-        "moveId": 43
+        "moveId": 140
       }
     ],
     "evolutions": [],
