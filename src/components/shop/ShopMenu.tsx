@@ -166,8 +166,13 @@ export function ShopMenu() {
             </div>
           ) : (
             inventory.map(invItem => {
-                const item = getItemData(invItem.itemId);
-                if (!item) return null;
+                let item;
+                try {
+                  item = getItemData(invItem.itemId);
+                } catch (error) {
+                  console.warn(`Objet fantôme ignoré : ${invItem.itemId}`);
+                  return null; // On ignore l'objet sans faire planter le jeu
+                }
                 const qty = quantities[invItem.itemId] || 1;
                 const sellPrice = Math.floor(item.price / 2);
 

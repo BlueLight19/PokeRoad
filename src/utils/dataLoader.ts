@@ -455,12 +455,29 @@ export function getShopItems(): ItemData[] {
 
 export function getCityShopItems(cityId: string): ItemData[] {
   const city = getZoneData(cityId) as CityData;
-  if (!city.hasShop || !city.shopItems) return [];
+  
+  // 1. On vérifie ce que le jeu a reçu de Supabase
+  console.log(`[Boutique] Données de la ville ${cityId}:`, city);
+
+  if (!city.hasShop) {
+    console.log(`[Boutique] ERREUR : hasShop est à false pour ${cityId}`);
+    return [];
+  }
+
+  if (!city.shopItems || city.shopItems.length === 0) {
+    console.log(`[Boutique] Attention: shopItems est vide ou indéfini pour ${cityId}. On charge tous les objets par défaut.`);
+    return getShopItems();
+  }
+
+  console.log(`[Boutique] Liste des objets à charger :`, city.shopItems);
 
   return city.shopItems.map(itemId => {
     try {
-      return getItemData(itemId);
-    } catch {
+      const item = getItemData(itemId);
+      return item;
+    } catch (error) {
+      // 2. Si l'ID dans la table zones ne correspond pas EXACTEMENT à un ID de la table items
+      console.warn(`[Boutique] L'objet "${itemId}" a été ignoré car il n'existe pas dans la base de données (table items).`);
       return null;
     }
   }).filter((i): i is ItemData => i !== null);
