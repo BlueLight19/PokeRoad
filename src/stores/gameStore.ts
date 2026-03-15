@@ -39,6 +39,15 @@ import { evolvePokemon } from '../engine/evolutionEngine';
 import { useItem } from '../engine/itemLogic';
 import { fullHealTeam } from '../engine/battleEngine';
 
+export interface GameNotification {
+  id: string;
+  type: 'item' | 'pokemon';
+  itemId?: string;
+  pokemonId?: number;
+  quantity?: number;
+  level?: number;
+}
+
 export interface GameState {
   // Core state
   currentView: GameView;
@@ -61,6 +70,11 @@ export interface GameState {
   settings: {
     gameSpeed: number;
   };
+
+  // UI state
+  notifications: GameNotification[];
+  addNotification: (notification: Omit<GameNotification, 'id'>) => void;
+  removeNotification: (id: string) => void;
 
   // Actions
   initGame: () => void;
@@ -156,6 +170,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   settings: {
     gameSpeed: 1,
   },
+  notifications: [],
 
   initGame: () => {
     set({ currentView: 'title' });
@@ -212,6 +227,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   setView: (view: GameView) => set({ currentView: view }),
 
   setGameSpeed: (speed: number) => set({ settings: { ...get().settings, gameSpeed: speed } }),
+
+  addNotification: (notification) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    set({ notifications: [...get().notifications, { ...notification, id }] });
+  },
+
+  removeNotification: (id) => {
+    set({ notifications: get().notifications.filter(n => n.id !== id) });
+  },
 
   selectZone: (zoneId: string) => {
     const zone = getZoneData(zoneId);

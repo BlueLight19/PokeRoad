@@ -17,6 +17,7 @@ import { LeagueMenu } from './components/ui/LeagueMenu';
 import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
+import { NotificationOverlay } from './components/ui/NotificationOverlay';
 
 // Initialize game data on load
 initializeData();
@@ -277,6 +278,7 @@ function App() {
             {renderView()}
             {pendingEvolution && <EvolutionModal />}
             {pendingMoveLearn && <MoveLearnModal />}
+            <NotificationOverlay />
 
             {/* Bouton de triche pour les développeurs */}
             <DevTools />

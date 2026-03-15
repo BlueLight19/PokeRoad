@@ -7,7 +7,7 @@ import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game'
 import { soundManager } from '../../utils/SoundManager';
 
 export function CityMenu() {
-  const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent } = useGameStore();
+  const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent, addNotification } = useGameStore();
   const { startGymBattle, startWildBattle } = useBattleStore();
   const [healMessage, setHealMessage] = useState('');
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
@@ -107,9 +107,11 @@ export function CityMenu() {
         triggerEvent(activeNpc.setsEvent);
         if (activeNpc.givesItem) {
           addItem(activeNpc.givesItem, 1);
+          addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: 1 });
         }
         if (activeNpc.givesPokemon) {
           givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+          addNotification({ type: 'pokemon', pokemonId: activeNpc.givesPokemon.pokemonId, level: activeNpc.givesPokemon.level });
         }
       }
       setActiveNpc(null);

@@ -57,9 +57,9 @@ export function Button({
 
   return (
     <button
-      style={{ ...baseStyle, ...variantStyles[variant] }}
-      disabled={disabled}
       {...props}
+      style={{ ...baseStyle, ...variantStyles[variant], ...(props.style || {}) }}
+      disabled={disabled}
       onClick={(e) => {
         if (!disabled) soundManager.playClick();
         props.onClick?.(e);

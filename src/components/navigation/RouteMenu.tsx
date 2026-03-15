@@ -17,7 +17,8 @@ export function RouteMenu() {
     setRepelSteps, // In case we want to show it
     addItem,
     givePlayerPokemon,
-    triggerEvent
+    triggerEvent,
+    addNotification
   } = useGameStore();
   const { startWildBattle, startTrainerBattle } = useBattleStore();
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
@@ -129,9 +130,11 @@ export function RouteMenu() {
         triggerEvent(activeNpc.setsEvent);
         if (activeNpc.givesItem) {
           addItem(activeNpc.givesItem, 1);
+          addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: 1 });
         }
         if (activeNpc.givesPokemon) {
           givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
+          addNotification({ type: 'pokemon', pokemonId: activeNpc.givesPokemon.pokemonId, level: activeNpc.givesPokemon.level });
         }
       }
       setActiveNpc(null);
