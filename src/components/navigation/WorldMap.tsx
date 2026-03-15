@@ -231,6 +231,11 @@ export function WorldMap() {
                             const defeatedCount = progress.defeatedTrainers.filter(t => zoneTrainers.includes(t)).length;
                             const allDefeated = zoneTrainers.length > 0 && defeatedCount === zoneTrainers.length;
 
+                            const dungeonTotalFloors = isDungeon ? ((zone as CityData).totalFloors ?? 1) : 1;
+                            const dungeonMaxFloor = isDungeon && dungeonTotalFloors > 1
+                              ? useGameStore.getState().getMaxUnlockedFloor(zone.id, dungeonTotalFloors)
+                              : 1;
+
                             const hasGym = isCity && (zone as any).gymId;
                             const gymBadgeEarned = hasGym && (() => {
                                 let gymDefeated = false;
@@ -391,6 +396,18 @@ export function WorldMap() {
                                                         marginLeft: '8px'
                                                     }}>
                                                         {allDefeated ? '\u2713 ' : ''}{defeatedCount}/{zoneTrainers.length} Dresseurs
+                                                    </span>
+                                                )}
+
+                                                {/* Floor indicator for multi-floor dungeons */}
+                                                {isDungeon && dungeonTotalFloors > 1 && (
+                                                    <span style={{
+                                                        color: dungeonMaxFloor >= dungeonTotalFloors ? '#4CAF50' : '#9C27B0',
+                                                        fontSize: '10px',
+                                                        fontFamily: "'Press Start 2P', monospace",
+                                                        marginLeft: '8px'
+                                                    }}>
+                                                        Etage {dungeonMaxFloor}/{dungeonTotalFloors}
                                                     </span>
                                                 )}
 

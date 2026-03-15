@@ -18,7 +18,9 @@ export function RouteMenu() {
     addItem,
     givePlayerPokemon,
     triggerEvent,
-    addNotification
+    addNotification,
+    setCurrentFloor,
+    isFloorUnlocked,
   } = useGameStore();
   const { startWildBattle, startTrainerBattle } = useBattleStore();
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
@@ -27,13 +29,36 @@ export function RouteMenu() {
   if (!selectedZone) return null;
 
   const zone = getZoneData(selectedZone) as unknown as RouteData | CityData;
-  const wildEncounters: WildEncounter[] = (zone as RouteData).wildEncounters || [];
-  const waterEncounters: WildEncounter[] = (zone as RouteData).waterEncounters || [];
-  const fishingEncounters: WildEncounter[] = (zone as RouteData).fishingEncounters || [];
+  const isDungeon = zone.type === 'dungeon';
+  const totalFloors = isDungeon ? ((zone as CityData).totalFloors ?? 1) : 1;
+  const hasMultipleFloors = totalFloors > 1;
+
+  const currentFloor = useGameStore(s => s.progress.currentFloors[selectedZone!] ?? 1);
+
+  const allWildEncounters: WildEncounter[] = (zone as RouteData).wildEncounters || [];
+  const allWaterEncounters: WildEncounter[] = (zone as RouteData).waterEncounters || [];
+  const allFishingEncounters: WildEncounter[] = (zone as RouteData).fishingEncounters || [];
+
+  // Filter encounters by floor for dungeons
+  const filterByFloor = (encounters: WildEncounter[]) => {
+    if (!hasMultipleFloors) return encounters;
+    return encounters.filter(e => !e.floor || e.floor === currentFloor);
+  };
+
+  const wildEncounters = filterByFloor(allWildEncounters);
+  const waterEncounters = filterByFloor(allWaterEncounters);
+  const fishingEncounters = filterByFloor(allFishingEncounters);
   const staticEncounters = (zone as RouteData).staticEncounters || [];
   const npcs: NPCData[] = (zone as RouteData).npcs || [];
   const player = useGameStore(s => s.player);
-  const filteredTrainers = getZoneTrainers(selectedZone, player.starter);
+
+  // Filter trainers by floor for dungeons
+  const filteredTrainers = hasMultipleFloors
+    ? getZoneTrainers(selectedZone, player.starter, currentFloor)
+    : getZoneTrainers(selectedZone, player.starter);
+
+  // Check if all trainers on current floor are defeated
+  const allFloorTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t.id));
 
   const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
   const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
@@ -192,9 +217,80 @@ export function RouteMenu() {
                 {zone.name}
             </h2>
             <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
-                Zone Sauvage
+                {isDungeon ? 'Donjon' : 'Zone Sauvage'}
             </div>
         </div>
+
+      {/* Floor Navigation for multi-floor dungeons */}
+      {hasMultipleFloors && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          padding: '12px 16px',
+          background: 'linear-gradient(135deg, #2a1a3a 0%, #1a1030 100%)',
+          border: '2px solid #9C27B0',
+          borderRadius: '12px',
+          marginBottom: '20px',
+        }}>
+          <button
+            onClick={() => {
+              soundManager.playClick();
+              if (currentFloor > 1) setCurrentFloor(selectedZone!, currentFloor - 1);
+            }}
+            disabled={currentFloor <= 1}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: currentFloor > 1 ? '#CE93D8' : '#444',
+              fontSize: '16px',
+              fontFamily: "'Press Start 2P', monospace",
+              cursor: currentFloor > 1 ? 'pointer' : 'default',
+              padding: '4px 8px',
+            }}
+          >
+            {'<'}
+          </button>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              color: '#CE93D8',
+              fontSize: '12px',
+              fontFamily: "'Press Start 2P', monospace",
+            }}>
+              Etage {currentFloor} / {totalFloors}
+            </div>
+            <div style={{
+              color: allFloorTrainersDefeated ? '#4CAF50' : '#888',
+              fontSize: '8px',
+              fontFamily: "'Press Start 2P', monospace",
+              marginTop: '4px',
+            }}>
+              {allFloorTrainersDefeated ? 'Etage termine' : `${filteredTrainers.filter(t => progress.defeatedTrainers.includes(t.id)).length}/${filteredTrainers.length} dresseurs`}
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              soundManager.playClick();
+              if (currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1)) {
+                setCurrentFloor(selectedZone!, currentFloor + 1);
+              }
+            }}
+            disabled={currentFloor >= totalFloors || !isFloorUnlocked(selectedZone!, currentFloor + 1)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? '#CE93D8' : '#444',
+              fontSize: '16px',
+              fontFamily: "'Press Start 2P', monospace",
+              cursor: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? 'pointer' : 'default',
+              padding: '4px 8px',
+            }}
+          >
+            {'>'}
+          </button>
+        </div>
+      )}
 
       {useGameStore.getState().safariState && (
         <div style={{

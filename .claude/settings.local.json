@@ -11,5 +11,9 @@
       "Bash(find:*)",
       "Bash(npm install:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }

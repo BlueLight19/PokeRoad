@@ -19,6 +19,7 @@ import {
   getItemData,
   getAllZones,
   getPokemonData,
+  getZoneTrainers,
 } from '../utils/dataLoader';
 import {
   createPokemonInstance,
@@ -120,6 +121,12 @@ export interface GameState {
   setRepelSteps: (steps: number) => void;
   triggerEvent: (eventId: string) => void;
 
+  // Dungeon floors
+  setCurrentFloor: (zoneId: string, floor: number) => void;
+  getCurrentFloor: (zoneId: string) => number;
+  isFloorUnlocked: (zoneId: string, floor: number) => boolean;
+  getMaxUnlockedFloor: (zoneId: string, totalFloors: number) => number;
+
   // Post-battle
   grantXpAndProcess: (
     pokemonIndex: number,
@@ -173,6 +180,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     repelSteps: 0,
     lastPokemonCenter: 'bourg-palette',
     events: {},
+    currentFloors: {},
   },
   safariState: null,
   selectedZone: null,
@@ -226,6 +234,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         repelSteps: 0,
         lastPokemonCenter: 'bourg-palette',
         events: {},
+        currentFloors: {},
       },
       selectedZone: null,
       pendingEvolution: null,
@@ -834,6 +843,38 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().saveGameState();
   },
 
+  // Dungeon floors
+  setCurrentFloor: (zoneId: string, floor: number) => {
+    const state = get();
+    set({
+      progress: {
+        ...state.progress,
+        currentFloors: { ...state.progress.currentFloors, [zoneId]: floor },
+      },
+    });
+    get().saveGameState();
+  },
+
+  getCurrentFloor: (zoneId: string) => {
+    return get().progress.currentFloors[zoneId] ?? 1;
+  },
+
+  isFloorUnlocked: (zoneId: string, floor: number) => {
+    if (floor <= 1) return true;
+    const state = get();
+    // All trainers on the previous floor must be defeated
+    const prevFloorTrainers = getZoneTrainers(zoneId, state.player.starter, floor - 1);
+    return prevFloorTrainers.every(t => state.progress.defeatedTrainers.includes(t.id));
+  },
+
+  getMaxUnlockedFloor: (zoneId: string, totalFloors: number) => {
+    const state = get();
+    for (let f = totalFloors; f >= 1; f--) {
+      if (state.isFloorUnlocked(zoneId, f)) return f;
+    }
+    return 1;
+  },
+
   getTrainersForZone: (zoneId: string) => {
     try {
       const zone = getZoneData(zoneId) as any;
@@ -1088,6 +1129,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       ...data.progress,
       lastPokemonCenter: data.progress.lastPokemonCenter || 'bourg-palette',
       events: data.progress.events || {},
+      currentFloors: data.progress.currentFloors || {},
     };
 
     set({

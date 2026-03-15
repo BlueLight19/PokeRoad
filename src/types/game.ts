@@ -25,6 +25,7 @@ export interface WildEncounter {
   minLevel: number;
   maxLevel: number;
   rate: number;
+  floor?: number;
 }
 
 export interface StaticEncounter {
@@ -68,6 +69,7 @@ export interface CityData {
   npcs?: NPCData[];
   connectedZones: string[];
   unlockCondition?: UnlockCondition;
+  totalFloors?: number;
 }
 
 export interface GymData {
@@ -94,6 +96,7 @@ export interface TrainerData {
   team: TrainerPokemon[];
   zone: string;
   category: string; // 'route' | 'gym' | 'rival' | 'elite4'
+  floor: number;
 }
 
 export interface TrainerPokemon {
@@ -142,6 +145,7 @@ export interface ProgressData {
   repelSteps: number;
   lastPokemonCenter: string;
   events: Record<string, boolean>; // Tracks completed story events and caught/defeated static encounters
+  currentFloors: Record<string, number>; // zoneId -> current floor (1-based)
 }
 
 export interface SafariState {

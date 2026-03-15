@@ -67,7 +67,7 @@ function convertMove(raw: DBMove): MoveData {
     accuracy: raw.accuracy,
     pp: raw.pp,
     priority: raw.priority,
-    target: (raw as any).target as MoveData['target'] ?? 'enemy',
+    target: (raw.target as MoveData['target']) ?? 'enemy',
     effect: raw.effect as MoveData['effect'],
   };
 }
@@ -94,6 +94,7 @@ function convertTrainer(raw: DBTrainer): TrainerData {
     reward: raw.reward,
     zone: raw.zone_id,
     category: raw.category || 'route',
+    floor: raw.floor ?? 1,
     team: (raw.team || []).map(t => ({
       pokemonId: t.pokemonId,
       level: t.level,
@@ -124,6 +125,7 @@ function convertWildEncounter(raw: DBWildEncounter): WildEncounter {
     minLevel: raw.min_level,
     maxLevel: raw.max_level,
     rate: raw.rate,
+    floor: raw.floor ?? undefined,
   };
 }
 
@@ -158,10 +160,10 @@ function convertZone(
 
   const connectedZones = raw.connected_zones || [];
 
-  if (raw.type === 'city' || raw.type === 'building') {
+  if (raw.type === 'city' || raw.type === 'building' || raw.type === 'dungeon') {
     const city: CityData = {
       id: raw.id,
-      type: raw.type === 'building' ? 'dungeon' : 'city',
+      type: (raw.type === 'building' || raw.type === 'dungeon') ? 'dungeon' : 'city',
       name: raw.name,
       region: raw.region,
       generation: raw.generation,
@@ -176,6 +178,7 @@ function convertZone(
       npcs: npcs.length > 0 ? npcs : undefined,
       connectedZones,
       unlockCondition: unlockCondition ?? undefined,
+      totalFloors: raw.total_floors ?? 1,
     };
     return city;
   }
@@ -329,17 +332,8 @@ export async function initializeData(): Promise<void> {
   // Type chart (static — not in Supabase)
   typeChart = typeChartData as TypeChart;
 
-  // Validation & debug
-  console.log(`[dataLoader] Registries loaded: ${pokemonRegistry.size} pokemon, ${moveRegistry.size} moves, ${itemRegistry.size} items, ${zoneRegistry.size} zones, ${gymRegistry.size} gyms, ${trainerRegistry.size} trainers`);
-  for (const [zoneId, zone] of zoneRegistry) {
-    const trainers = (zone as any).trainers;
-    if (trainers && trainers.length > 0) {
-      console.log(`[dataLoader] zone "${zoneId}" trainers:`, trainers);
-    }
-    if ((zone as any).gymId) {
-      console.log(`[dataLoader] zone "${zoneId}" has gymId:`, (zone as any).gymId);
-    }
-  }
+  // Validation
+  console.log(`[dataLoader] Loaded: ${pokemonRegistry.size} pokemon, ${moveRegistry.size} moves, ${itemRegistry.size} items, ${zoneRegistry.size} zones, ${gymRegistry.size} gyms, ${trainerRegistry.size} trainers`);
 
   if (pokemonRegistry.size === 0) {
     throw new Error(
@@ -348,10 +342,24 @@ export async function initializeData(): Promise<void> {
     );
   }
 
+  if (moveRegistry.size === 0) {
+    throw new Error(
+      'Aucune Attaque chargée depuis IndexedDB. ' +
+      'Vérifiez que la table "moves" est remplie et que le RLS autorise la lecture.'
+    );
+  }
+
   if (itemRegistry.size === 0) {
     throw new Error(
       'Aucun Objet chargé depuis IndexedDB. ' +
       'Vérifiez que la table "items" est remplie et que le RLS autorise la lecture.'
+    );
+  }
+
+  if (zoneRegistry.size === 0) {
+    throw new Error(
+      'Aucune Zone chargée depuis IndexedDB. ' +
+      'Vérifiez que la table "zones" est remplie et que le RLS autorise la lecture.'
     );
   }
 }
@@ -379,7 +387,8 @@ export function getTrainerData(id: string): TrainerData {
 }
 
 // Get zone trainers filtered by category and rival starter logic
-export function getZoneTrainers(zoneId: string, playerStarter: number | null): TrainerData[] {
+// Optional floor param filters trainers to a specific dungeon floor
+export function getZoneTrainers(zoneId: string, playerStarter: number | null, floor?: number): TrainerData[] {
   const zone = zoneRegistry.get(zoneId);
   if (!zone) return [];
 
@@ -391,8 +400,10 @@ export function getZoneTrainers(zoneId: string, playerStarter: number | null): T
       if (!t) return false;
       // For rivals: only show the variant matching the player's starter
       if (t.category === 'rival' && playerStarter !== null) {
-        return isRivalMatchingStarter(t, playerStarter);
+        if (!isRivalMatchingStarter(t, playerStarter)) return false;
       }
+      // Filter by floor if specified
+      if (floor !== undefined && t.floor !== floor) return false;
       return true;
     });
 }
@@ -455,29 +466,18 @@ export function getShopItems(): ItemData[] {
 
 export function getCityShopItems(cityId: string): ItemData[] {
   const city = getZoneData(cityId) as CityData;
-  
-  // 1. On vérifie ce que le jeu a reçu de Supabase
-  console.log(`[Boutique] Données de la ville ${cityId}:`, city);
 
-  if (!city.hasShop) {
-    console.log(`[Boutique] ERREUR : hasShop est à false pour ${cityId}`);
-    return [];
-  }
+  if (!city.hasShop) return [];
 
   if (!city.shopItems || city.shopItems.length === 0) {
-    console.log(`[Boutique] Attention: shopItems est vide ou indéfini pour ${cityId}. On charge tous les objets par défaut.`);
     return getShopItems();
   }
 
-  console.log(`[Boutique] Liste des objets à charger :`, city.shopItems);
-
   return city.shopItems.map(itemId => {
     try {
-      const item = getItemData(itemId);
-      return item;
-    } catch (error) {
-      // 2. Si l'ID dans la table zones ne correspond pas EXACTEMENT à un ID de la table items
-      console.warn(`[Boutique] L'objet "${itemId}" a été ignoré car il n'existe pas dans la base de données (table items).`);
+      return getItemData(itemId);
+    } catch {
+      console.warn(`[Boutique] Objet "${itemId}" introuvable dans la table items.`);
       return null;
     }
   }).filter((i): i is ItemData => i !== null);

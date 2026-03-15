@@ -37,6 +37,7 @@ export interface DBMove {
   accuracy: number | null;
   pp: number;
   priority: number;
+  target?: string;
   effect: Record<string, unknown> | null;
   description?: string;
 }
@@ -73,6 +74,7 @@ export interface DBZone {
   unlock_condition: Record<string, unknown> | null;
   npcs: Array<Record<string, unknown>> | null;
   shop_items?: string[];
+  total_floors?: number;
 }
 
 export interface DBWildEncounter {
@@ -83,6 +85,7 @@ export interface DBWildEncounter {
   max_level: number;
   rate: number;
   encounter_type: string;
+  floor?: number | null;
 }
 
 export interface DBGym {
@@ -105,6 +108,7 @@ export interface DBTrainer {
   zone_id: string;
   team: Array<{ pokemonId: number; level: number; moves: number[] }>;
   category?: string; // 'route' | 'gym' | 'rival' | 'elite4'
+  floor?: number;
 }
 
 // Player stores
@@ -323,9 +327,28 @@ export async function syncFromSupabase(
 
   // Validate that critical data was actually synced
   const pokemonCount = await db.count('pokemon');
+  const moveCount = await db.count('moves');
+  const itemCount = await db.count('items');
+  const zoneCount = await db.count('zones');
+
   if (pokemonCount === 0) {
     throw new Error(
       'Sync terminée mais 0 Pokémon récupérés. Vérifiez les policies RLS (anon SELECT) sur toutes les tables.'
+    );
+  }
+  if (moveCount === 0) {
+    throw new Error(
+      'Sync terminée mais 0 Attaque récupérée. Vérifiez la table "moves" et les policies RLS.'
+    );
+  }
+  if (itemCount === 0) {
+    throw new Error(
+      'Sync terminée mais 0 Objet récupéré. Vérifiez la table "items" et les policies RLS.'
+    );
+  }
+  if (zoneCount === 0) {
+    throw new Error(
+      'Sync terminée mais 0 Zone récupérée. Vérifiez la table "zones" et les policies RLS.'
     );
   }
 
@@ -478,6 +501,7 @@ export async function savePlayerProgress(
     { key: 'repel_steps', value: progress.repelSteps },
     { key: 'last_pokemon_center', value: progress.lastPokemonCenter },
     { key: 'events', value: progress.events },
+    { key: 'current_floors', value: progress.currentFloors },
     { key: 'pc', value: pc },
     { key: 'save_version', value: '0.3.0' },
     { key: 'save_timestamp', value: Date.now() },
@@ -529,6 +553,7 @@ export async function loadPlayerProgress(): Promise<{
     repelSteps: (await get('repel_steps') as number) ?? 0,
     lastPokemonCenter: (await get('last_pokemon_center') as string) ?? 'bourg-palette',
     events: (await get('events') as Record<string, boolean>) ?? {},
+    currentFloors: (await get('current_floors') as Record<string, number>) ?? {},
   };
 
   const pc = (await get('pc') as PCStorage) ?? null;
@@ -567,6 +592,10 @@ export async function hasSaveInDB(): Promise<boolean> {
 export async function deleteSaveFromDB(): Promise<void> {
   const db = await getDB();
 
+  // Preserve sync-related keys in player_progress
+  const syncTimestamp = await db.get('player_progress', SYNC_KEY);
+  const dataVersion = await db.get('player_progress', 'data_version');
+
   const tx = db.transaction(
     ['player_team', 'player_inventory', 'player_progress', 'player_pokedex'],
     'readwrite'
@@ -576,12 +605,21 @@ export async function deleteSaveFromDB(): Promise<void> {
   await tx.objectStore('player_inventory').clear();
   await tx.objectStore('player_progress').clear();
   await tx.objectStore('player_pokedex').clear();
+
+  // Restore sync keys so we don't re-sync from Supabase unnecessarily
+  if (syncTimestamp) await tx.objectStore('player_progress').put(syncTimestamp);
+  if (dataVersion) await tx.objectStore('player_progress').put(dataVersion);
 
   await tx.done;
 }
 
 export async function resetGameData(): Promise<void> {
   const db = await getDB();
+
+  // Preserve sync-related keys in player_progress
+  const syncTimestamp = await db.get('player_progress', SYNC_KEY);
+  const dataVersion = await db.get('player_progress', 'data_version');
+
   const tx = db.transaction(
     ['player_team', 'player_inventory', 'player_progress', 'player_pokedex'],
     'readwrite'
@@ -590,6 +628,11 @@ export async function resetGameData(): Promise<void> {
   await tx.objectStore('player_inventory').clear();
   await tx.objectStore('player_progress').clear();
   await tx.objectStore('player_pokedex').clear();
+
+  // Restore sync keys
+  if (syncTimestamp) await tx.objectStore('player_progress').put(syncTimestamp);
+  if (dataVersion) await tx.objectStore('player_progress').put(dataVersion);
+
   await tx.done;
 }
 
