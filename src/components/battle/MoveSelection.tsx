@@ -1,6 +1,7 @@
 import React from 'react';
 import { PokemonInstance, PokemonType } from '../../types/pokemon';
 import { getMoveData, getPokemonData, getTypeEffectiveness } from '../../utils/dataLoader';
+import { soundManager } from '../../utils/SoundManager';
 
 interface MoveSelectionProps {
   pokemon: PokemonInstance;
@@ -63,7 +64,10 @@ export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelect
         }}
       >
         <button
-          onClick={() => onSelectMove(-1)}
+          onClick={() => {
+            soundManager.playClick();
+            onSelectMove(-1);
+          }}
           style={{
             padding: '10px 8px',
             background: '#55222222',
@@ -114,7 +118,12 @@ export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelect
         return (
           <button
             key={index}
-            onClick={() => haspp && onSelectMove(index)}
+            onClick={() => {
+              if (haspp) {
+                soundManager.playClick();
+                onSelectMove(index);
+              }
+            }}
             disabled={!haspp}
             style={{
               padding: '10px 8px',

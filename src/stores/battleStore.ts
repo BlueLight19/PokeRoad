@@ -366,7 +366,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
             };
         });
         
-        const delay = step.log.message.length * 15 + 300;
+        const delay = (step.log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
         await new Promise(r => setTimeout(r, delay));
     }
 
@@ -503,7 +503,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     });
 
     // We must await log delay for the switch message
-    await new Promise(r => setTimeout(r, 1000));
+    const switchDelay = 1000 / useGameStore.getState().settings.gameSpeed;
+    await new Promise(r => setTimeout(r, switchDelay));
 
     // Enemy gets a free attack when switching (except during forced switch after fainting)
     if (state.phase !== 'switching') {
@@ -560,7 +561,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                     enemyTeam: newET
                 };
             });
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const enemyLogDelay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, enemyLogDelay));
         }
 
         const finalState = get();
@@ -663,7 +665,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                     enemyTeam: newET
                 };
             });
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const enemyAttackDelay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, enemyAttackDelay));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -731,7 +734,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const delay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, delay));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -797,7 +801,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const delay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, delay));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -866,7 +871,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const delay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, delay));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];
@@ -942,7 +948,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
           for (const log of newLogs) {
             set(s => ({ logs: [...s.logs, log] }));
-            await new Promise(r => setTimeout(r, log.message.length * 15 + 300));
+            const delay = (log.message.length * 15 + 300) / useGameStore.getState().settings.gameSpeed;
+            await new Promise(r => setTimeout(r, delay));
           }
 
           const player = state.playerTeam[state.activePlayerIndex];

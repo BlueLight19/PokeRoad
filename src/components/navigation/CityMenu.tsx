@@ -4,6 +4,7 @@ import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getGymData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
+import { soundManager } from '../../utils/SoundManager';
 
 export function CityMenu() {
   const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent } = useGameStore();
@@ -179,7 +180,10 @@ export function CityMenu() {
           return (
             <button
               key={npc.id}
-              onClick={() => handleNpcClick(npc)}
+              onClick={() => {
+                soundManager.playClick();
+                handleNpcClick(npc);
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -209,7 +213,10 @@ export function CityMenu() {
         {/* Shop */}
         {hasShop && (
           <button
-            onClick={() => setView('shop')}
+            onClick={() => {
+              soundManager.playClick();
+              setView('shop');
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -250,7 +257,10 @@ export function CityMenu() {
         {/* Gym */}
         {gym && (
           <button
-            onClick={handleGymBattle}
+            onClick={() => {
+              soundManager.playClick();
+              handleGymBattle();
+            }}
             disabled={gymDefeated || gymLocked}
             style={{
               display: 'flex',
@@ -307,6 +317,7 @@ export function CityMenu() {
             <button
               key={trainerId}
               onClick={() => {
+                soundManager.playClick();
                 if (defeated) return;
                 const { startTrainerBattle } = useBattleStore.getState();
                 startTrainerBattle(trainer, team);
@@ -362,6 +373,7 @@ export function CityMenu() {
             <button
               key={encounter.id}
               onClick={() => {
+                soundManager.playClick();
                 startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
                 setView('battle');
               }}
@@ -394,7 +406,10 @@ export function CityMenu() {
         {/* Safari Zone */}
         {zone.id === 'parmanie' && (
           <button
-            onClick={useGameStore.getState().startSafari}
+            onClick={() => {
+              soundManager.playClick();
+              useGameStore.getState().startSafari();
+            }}
             disabled={useGameStore.getState().player.money < 500}
             style={{
               display: 'flex',
@@ -432,7 +447,10 @@ export function CityMenu() {
 
         {/* Heal */}
         <button
-          onClick={handleHeal}
+          onClick={() => {
+            soundManager.playClick();
+            handleHeal();
+          }}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -485,6 +503,7 @@ function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogue
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const fullText = npc.dialogue[dialogueIndex];
+  const gameSpeed = useGameStore(s => s.settings.gameSpeed);
 
   useEffect(() => {
     setDisplayedText('');
@@ -497,9 +516,9 @@ function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogue
         clearInterval(interval);
         setIsTyping(false);
       }
-    }, 10);
+    }, 10 / gameSpeed);
     return () => clearInterval(interval);
-  }, [fullText]);
+  }, [fullText, gameSpeed]);
 
   const handleClick = () => {
     if (isTyping) {

@@ -5,6 +5,7 @@ import { xpForLevel } from '../../engine/experienceCalculator';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { Button } from '../ui/Button';
+import { soundManager } from '../../utils/SoundManager';
 
 export function TeamView() {
   const { team, setView, selectedPokemonIndex, healTeam, switchTeamOrder } = useGameStore();
@@ -193,7 +194,10 @@ export function TeamView() {
                 setDragIndex(null);
                 setDragOverIndex(null);
               }}
-              onClick={() => setSelected(index)}
+              onClick={() => {
+                soundManager.playClick();
+                setSelected(index);
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',

@@ -5,6 +5,7 @@ import { CityData, RouteData } from '../../types/game';
 import { Button } from '../ui/Button';
 import cityLogo from '../../assets/cityLogo.png';
 import wildsLogo from '../../assets/wildsLogo.png';
+import { soundManager } from '../../utils/SoundManager';
 
 // Complete Kanto progression order
 const ZONE_ORDER = [
@@ -261,7 +262,12 @@ export function WorldMap() {
                                     <button
                                         onMouseEnter={() => isUnlocked && setHoveredZoneId(zone.id)}
                                         onMouseLeave={() => setHoveredZoneId(null)}
-                                        onClick={() => isUnlocked && selectZone(zone.id)}
+                                        onClick={() => {
+                                            if (isUnlocked) {
+                                                soundManager.playClick();
+                                                selectZone(zone.id);
+                                            }
+                                        }}
                                         disabled={!isUnlocked}
                                         style={{
                                             display: 'flex',

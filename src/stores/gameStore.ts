@@ -57,6 +57,11 @@ export interface GameState {
   pendingMoveLearn: { pokemonIndex: number; moveId: number; sourceItem?: string } | null;
   pendingMoveQueue: { pokemonIndex: number; moveId: number }[];
 
+  // Settings
+  settings: {
+    gameSpeed: number;
+  };
+
   // Actions
   initGame: () => void;
   startNewGame: (playerName: string, starterId: number) => void;
@@ -64,6 +69,7 @@ export interface GameState {
   selectZone: (zoneId: string) => void;
   startSafari: () => void;
   quitSafari: () => void;
+  setGameSpeed: (speed: number) => void;
 
   // Team management
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
@@ -147,6 +153,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   pendingEvolutionQueue: [],
   pendingMoveLearn: null,
   pendingMoveQueue: [],
+  settings: {
+    gameSpeed: 1,
+  },
 
   initGame: () => {
     set({ currentView: 'title' });
@@ -193,12 +202,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       pendingEvolutionQueue: [],
       pendingMoveLearn: null,
       pendingMoveQueue: [],
+      // Keep existing settings
+      settings: get().settings,
     });
 
     get().saveGameState();
   },
 
   setView: (view: GameView) => set({ currentView: view }),
+
+  setGameSpeed: (speed: number) => set({ settings: { ...get().settings, gameSpeed: speed } }),
 
   selectZone: (zoneId: string) => {
     const zone = getZoneData(zoneId);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { getCityShopItems, getShopItems, getItemData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
+import { soundManager } from '../../utils/SoundManager';
 
 export function ShopMenu() {
   const { player, addItem, removeItem, spendMoney, addMoney, setView, inventory, selectedZone, sellItemAction } = useGameStore();
@@ -117,7 +118,10 @@ export function ShopMenu() {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <button
-                    onClick={() => setQty(item.id, qty - 1)}
+                    onClick={() => {
+                      soundManager.playClick();
+                      setQty(item.id, qty - 1);
+                    }}
                     style={{
                       width: '24px', height: '24px', background: '#333', border: '1px solid #555',
                       borderRadius: '4px', color: '#fff', cursor: 'pointer', fontSize: '14px',
@@ -130,7 +134,10 @@ export function ShopMenu() {
                     {qty}
                   </span>
                   <button
-                    onClick={() => setQty(item.id, qty + 1)}
+                    onClick={() => {
+                      soundManager.playClick();
+                      setQty(item.id, qty + 1);
+                    }}
                     style={{
                       width: '24px', height: '24px', background: '#333', border: '1px solid #555',
                       borderRadius: '4px', color: '#fff', cursor: 'pointer', fontSize: '14px',
@@ -191,7 +198,10 @@ export function ShopMenu() {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <button
-                        onClick={() => setQty(invItem.itemId, qty - 1, invItem.quantity)}
+                        onClick={() => {
+                          soundManager.playClick();
+                          setQty(invItem.itemId, qty - 1, invItem.quantity);
+                        }}
                         style={{
                         width: '24px', height: '24px', background: '#333', border: '1px solid #555',
                         borderRadius: '4px', color: '#fff', cursor: 'pointer', fontSize: '14px',
@@ -204,7 +214,10 @@ export function ShopMenu() {
                         {qty}
                     </span>
                     <button
-                        onClick={() => setQty(invItem.itemId, qty + 1, invItem.quantity)}
+                        onClick={() => {
+                          soundManager.playClick();
+                          setQty(invItem.itemId, qty + 1, invItem.quantity);
+                        }}
                         style={{
                         width: '24px', height: '24px', background: '#333', border: '1px solid #555',
                         borderRadius: '4px', color: '#fff', cursor: 'pointer', fontSize: '14px',

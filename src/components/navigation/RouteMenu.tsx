@@ -4,6 +4,7 @@ import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getTrainerData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
+import { soundManager } from '../../utils/SoundManager';
 
 export function RouteMenu() {
   const {
@@ -221,7 +222,10 @@ export function RouteMenu() {
           return (
             <button
               key={npc.id}
-              onClick={() => handleNpcClick(npc)}
+              onClick={() => {
+                soundManager.playClick();
+                handleNpcClick(npc);
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -251,7 +255,10 @@ export function RouteMenu() {
         {/* Safari Action */}
         {useGameStore.getState().safariState ? (
           <button
-            onClick={handleSafariSearch}
+            onClick={() => {
+              soundManager.playClick();
+              handleSafariSearch();
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -280,7 +287,10 @@ export function RouteMenu() {
           /* Standard Wild encounters */
           wildEncounters.length > 0 && (
             <button
-              onClick={handleWildEncounter}
+              onClick={() => {
+                soundManager.playClick();
+                handleWildEncounter();
+              }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -322,7 +332,10 @@ export function RouteMenu() {
         {/* Surf Encounters */}
         {!useGameStore.getState().safariState && waterEncounters.length > 0 && hasSurf && (
           <button
-            onClick={handleWaterEncounter}
+            onClick={() => {
+              soundManager.playClick();
+              handleWaterEncounter();
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -350,7 +363,10 @@ export function RouteMenu() {
         {/* Fishing Encounters */}
         {!useGameStore.getState().safariState && fishingEncounters.length > 0 && hasRod && (
           <button
-            onClick={handleFishingEncounter}
+            onClick={() => {
+              soundManager.playClick();
+              handleFishingEncounter();
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -387,6 +403,7 @@ export function RouteMenu() {
               <button
                 key={encounter.id}
                 onClick={() => {
+                  soundManager.playClick();
                   if (encounter.isGift) {
                     // Direct add without battle
                     const state = useGameStore.getState();
@@ -438,7 +455,10 @@ export function RouteMenu() {
             return (
               <button
                 key={trainerId}
-                onClick={() => handleTrainerBattle(trainerId)}
+                onClick={() => {
+                  soundManager.playClick();
+                  handleTrainerBattle(trainerId);
+                }}
                 disabled={defeated}
                 style={{
                   display: 'flex',
@@ -497,6 +517,7 @@ function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogue
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
   const fullText = npc.dialogue[dialogueIndex];
+  const gameSpeed = useGameStore(s => s.settings.gameSpeed);
 
   useEffect(() => {
     setDisplayedText('');
@@ -509,9 +530,9 @@ function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogue
         clearInterval(interval);
         setIsTyping(false);
       }
-    }, 10);
+    }, 10 / gameSpeed);
     return () => clearInterval(interval);
-  }, [fullText]);
+  }, [fullText, gameSpeed]);
 
   const handleClick = () => {
     if (isTyping) {

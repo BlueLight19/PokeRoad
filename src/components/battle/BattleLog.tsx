@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { BattleLogEntry } from '../../types/battle';
+import { useGameStore } from '../../stores/gameStore';
 
 interface BattleLogProps {
   logs: BattleLogEntry[];
@@ -78,6 +79,7 @@ export function BattleLog({ logs }: BattleLogProps) {
 
 function TypewriterMessage({ log, isNew }: { log: BattleLogEntry, isNew: boolean }) {
     const [currentText, setCurrentText] = useState(isNew ? "" : log.message);
+    const gameSpeed = useGameStore(s => s.settings.gameSpeed);
 
     useEffect(() => {
         if (!isNew) {
@@ -90,10 +92,10 @@ function TypewriterMessage({ log, isNew }: { log: BattleLogEntry, isNew: boolean
             current++;
             setCurrentText(log.message.slice(0, current));
             if (current >= log.message.length) clearInterval(interval);
-        }, 15);
+        }, 15 / gameSpeed);
 
         return () => clearInterval(interval);
-    }, [log.message, isNew]);
+    }, [log.message, isNew, gameSpeed]);
 
     return (
         <div

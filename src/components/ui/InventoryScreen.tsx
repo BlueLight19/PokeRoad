@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { getItemData, getPokemonData } from '../../utils/dataLoader';
 import { Button } from './Button';
+import { soundManager } from '../../utils/SoundManager';
 
 type TabKey = 'soins' | 'balls' | 'combat' | 'ctcs' | 'baies' | 'objets';
 
@@ -137,7 +138,11 @@ export function InventoryScreen() {
                             return (
                                 <button
                                     key={tab.key}
-                                    onClick={() => { setActiveTab(tab.key); setMessage(null); }}
+                                    onClick={() => { 
+                                        soundManager.playClick();
+                                        setActiveTab(tab.key); 
+                                        setMessage(null); 
+                                    }}
                                     style={{
                                         fontFamily: "'Press Start 2P', monospace",
                                         fontSize: '9px',

@@ -16,6 +16,7 @@ import { PokedexScreen } from './components/ui/PokedexScreen';
 import { LeagueMenu } from './components/ui/LeagueMenu';
 import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 import { HallOfFame } from './components/scenes/HallOfFame';
+import { soundManager } from './utils/SoundManager';
 
 // Initialize game data on load
 initializeData();
@@ -39,6 +40,8 @@ function DevTools() {
     const givePlayerPokemon = useGameStore(s => s.givePlayerPokemon);
     const addMoney = useGameStore(s => s.addMoney);
     const currentView = useGameStore(s => s.currentView);
+    const setGameSpeed = useGameStore(s => s.setGameSpeed);
+    const gameSpeed = useGameStore(s => s.settings.gameSpeed);
 
     // Cache le bouton sur l'écran titre
     if (currentView === 'title') return null;
@@ -46,7 +49,10 @@ function DevTools() {
     if (!isOpen) {
         return (
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={() => {
+                    soundManager.playClick();
+                    setIsOpen(true);
+                }}
                 style={{
                     position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
                     background: '#e94560', color: '#fff', border: '2px solid #fff',
@@ -128,7 +134,7 @@ function DevTools() {
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                     <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Accès Restreint</span>
-                    <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
+                    <button onClick={() => { soundManager.playClick(); setIsOpen(false); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
                 </div>
 
                 <input
@@ -139,7 +145,7 @@ function DevTools() {
                     onChange={(e) => setPasswordInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 />
-                <button style={btnStyle} onClick={handleLogin}>Déverrouiller</button>
+                <button style={btnStyle} onClick={() => { soundManager.playClick(); handleLogin(); }}>Déverrouiller</button>
 
                 {errorMsg && <span style={{ color: '#ff4444', fontSize: '7px', marginTop: '6px', textAlign: 'center' }}>{errorMsg}</span>}
             </div>
@@ -160,7 +166,7 @@ function DevTools() {
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>
                 <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Outils Dev</span>
-                <button onClick={() => { setIsOpen(false); setIsAuthenticated(false); setPasswordInput(''); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
+                <button onClick={() => { soundManager.playClick(); setIsOpen(false); setIsAuthenticated(false); setPasswordInput(''); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
             </div>
 
             <div style={sectionStyle}>
@@ -168,7 +174,7 @@ function DevTools() {
                 <input style={inputStyle} type="text" placeholder="ID de l'objet (ex: potion)" value={itemId} onChange={e => setItemId(e.target.value)} />
                 <div style={{ display: 'flex', gap: '4px' }}>
                     <input style={{...inputStyle, width: '60px', marginBottom: 0}} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
-                    <button style={{...btnStyle, flex: 1}} onClick={() => addItem(itemId, itemQty)}>Donner</button>
+                    <button style={{...btnStyle, flex: 1}} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
                 </div>
             </div>
 
@@ -178,12 +184,12 @@ function DevTools() {
                     <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
                     <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
                 </div>
-                <button style={btnStyle} onClick={() => givePlayerPokemon(pokeId, pokeLevel)}>Donner Pokémon</button>
+                <button style={btnStyle} onClick={() => { soundManager.playClick(); givePlayerPokemon(pokeId, pokeLevel); }}>Donner Pokémon</button>
             </div>
 
         <div style={sectionStyle}>
             <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
-            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={handleGiveAllPokemon} disabled={isGenerating}>
+            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
                 {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
             </button>
         </div>
@@ -192,7 +198,16 @@ function DevTools() {
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                     <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
-                    <button style={{...btnStyle, width: 'auto'}} onClick={() => addMoney(moneyAmount)}>+ P</button>
+                    <button style={{...btnStyle, width: 'auto'}} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
+                </div>
+            </div>
+
+            <div style={sectionStyle}>
+                <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Vitesse du Jeu (Combat & Dialogues)</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
+                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
+                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
                 </div>
             </div>
 
@@ -201,7 +216,7 @@ function DevTools() {
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
                     style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000'}}
-                    onClick={handleReset}
+                    onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
                 </button>

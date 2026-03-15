@@ -321,6 +321,7 @@ export function BattleScreen() {
                 <button
                   key={idx}
                   onClick={() => {
+                    soundManager.playClick();
                     if (!isFainted && !isActive) {
                       battle.selectSwitch(idx);
                       setShowTeam(false);
@@ -414,6 +415,7 @@ export function BattleScreen() {
         <button
           key={item.itemId}
           onClick={() => {
+            soundManager.playClick();
             if (itemData.effect?.type === 'catch') {
               gameStore.removeItem(item.itemId, 1);
               battle.attemptCapture(item.itemId);

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { Button } from './ui/Button';
+import { soundManager } from '../utils/SoundManager';
 
 export function TitleScreen() {
   const { startNewGame, loadGameState, hasSaveData } = useGameStore();
@@ -123,7 +124,10 @@ export function TitleScreen() {
               return (
                 <button
                   key={starter.id}
-                  onClick={() => setSelectedStarter(starter.id)}
+                  onClick={() => {
+                    soundManager.playClick();
+                    setSelectedStarter(starter.id);
+                  }}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',

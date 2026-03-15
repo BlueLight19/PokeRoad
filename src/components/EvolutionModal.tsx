@@ -3,6 +3,7 @@ import { useGameStore } from '../stores/gameStore';
 import { getPokemonData, getMoveData } from '../utils/dataLoader';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { soundManager } from '../utils/SoundManager';
 
 export function EvolutionModal() {
   const { pendingEvolution, team, confirmEvolution } = useGameStore();
@@ -107,7 +108,10 @@ export function MoveLearnModal() {
             return (
               <button
                 key={i}
-                onClick={() => learnMoveChoice(i)}
+                onClick={() => {
+                  soundManager.playClick();
+                  learnMoveChoice(i);
+                }}
                 style={{
                   padding: '8px 12px',
                   background: '#16213e',
