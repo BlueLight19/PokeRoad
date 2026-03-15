@@ -291,6 +291,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                     if (defender === enemyClone) {
                         if (log.state.defenderHp !== undefined) eHP = log.state.defenderHp;
                         if (log.state.defenderStatus !== undefined) eStatus = log.state.defenderStatus;
+                        if ((log.state.target as any) === 'defender') log.state.target = 'enemy';
                     }
                 } else if (attacker === enemyClone) {
                     if (log.state.attackerHp !== undefined) eHP = log.state.attackerHp;
@@ -298,6 +299,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                     if (defender === playerClone) {
                         if (log.state.defenderHp !== undefined) pHP = log.state.defenderHp;
                         if (log.state.defenderStatus !== undefined) pStatus = log.state.defenderStatus;
+                        if ((log.state.target as any) === 'defender') log.state.target = 'player';
                     }
                 }
             }
@@ -546,6 +548,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                 if (log.state.attackerStatus !== undefined) nextEnemyStatus = log.state.attackerStatus;
                 if (log.state.defenderHp !== undefined) nextPlayerHp = log.state.defenderHp;
                 if (log.state.defenderStatus !== undefined) nextPlayerStatus = log.state.defenderStatus;
+                if (log.state.target === 'defender') log.state.target = 'player';
             }
 
             set(s => {
@@ -650,6 +653,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
                 if (log.state.attackerStatus !== undefined) nextEnemyStatus = log.state.attackerStatus;
                 if (log.state.defenderHp !== undefined) nextPlayerHp = log.state.defenderHp;
                 if (log.state.defenderStatus !== undefined) nextPlayerStatus = log.state.defenderStatus;
+                if ((log.state.target as any) === 'defender') log.state.target = 'player';
             }
 
             set(s => {

@@ -345,25 +345,30 @@ export function executeMove(
       totalDamage += result.damage;
       hitCount++;
 
-      // Only log effectiveness/crit once or per hit? 
-      // Usually, Gen 1 logs "Critical hit!" per hit, but effectiveness once.
-      // Simplified: Log damage per hit.
-
-      if (result.isCritical) logs.push({ message: `Coup critique !`, type: 'critical' });
-
-      // Show effectiveness only on first hit to reduce spam
+      let combinedMessage = `${defenderName} perd ${result.damage} PV !`;
+      if (result.isCritical) combinedMessage += ' Coup critique !';
       if (i === 0) {
-        if (result.effectiveness > 1) logs.push({ message: `C'est super efficace !`, type: 'effective' });
-        if (result.effectiveness < 1 && result.effectiveness > 0) logs.push({ message: `Ce n'est pas très efficace...`, type: 'effective' });
-        if (result.effectiveness === 0) logs.push({ message: `Ça n'affecte pas ${defenderName}...`, type: 'effective' });
+        if (result.effectiveness > 1) combinedMessage += ' C\'est super efficace !';
+        if (result.effectiveness < 1 && result.effectiveness > 0) combinedMessage += ' Ce n\'est pas très efficace...';
+        if (result.effectiveness === 0) combinedMessage += ` Ça n'affecte pas ${defenderName}...`;
       }
 
-      // logs.push({ message: `${defenderName} perd ${result.damage} PV !`, type: 'damage' });
+      logs.push({
+        message: combinedMessage,
+        type: 'damage',
+        state: {
+          attackerHp: attacker.currentHp,
+          defenderHp: defender.currentHp,
+          attackerStatus: attacker.status,
+          defenderStatus: defender.status,
+          isCritical: result.isCritical,
+          effectiveness: i === 0 ? result.effectiveness : undefined,
+          target: 'defender' as any // We resolve this dynamically in store
+        }
+      });
 
       if (defender.currentHp <= 0) break;
     }
-
-    logs.push({ message: `${defenderName} perd ${totalDamage} PV !`, type: 'damage' });
 
     if (hits > 1) {
       logs.push({ message: `Touché ${hitCount} fois !`, type: 'info' });

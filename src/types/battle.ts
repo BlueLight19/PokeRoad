@@ -35,6 +35,10 @@ export interface BattleLogEntry {
     defenderHp?: number;
     attackerStatus?: any;
     defenderStatus?: any;
+    // Animation hints
+    target?: 'player' | 'enemy';
+    isCritical?: boolean;
+    effectiveness?: number;
   };
 }
 

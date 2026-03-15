@@ -22,30 +22,29 @@ export function BattleScreen() {
   const player = battle.playerTeam[battle.activePlayerIndex];
   const enemy = battle.enemyTeam[battle.activeEnemyIndex];
 
-  // Animate on new logs (damage, effectiveness)
+  // Animate on new logs (damage, effectiveness, critical)
   useEffect(() => {
     if (battle.logs.length > prevLogsLen.current) {
       const newLogs = battle.logs.slice(prevLogsLen.current);
       for (const log of newLogs) {
-        if (log.type === 'damage' && log.message.includes('perd')) {
+        if (log.type === 'damage') {
           soundManager.playDamage();
-          // Determine who got hit
-          const enemyName = enemy ? (getPokemonData(enemy.dataId).name) : '';
-          if (log.message.includes(enemyName)) {
+          
+          if (log.state?.target === 'enemy') {
             setShakeEnemy(true);
             setTimeout(() => setShakeEnemy(false), 500);
-          } else {
+          } else if (log.state?.target === 'player') {
             setShakePlayer(true);
             setTimeout(() => setShakePlayer(false), 500);
           }
-        }
-        if (log.type === 'effective' && log.message.includes('super efficace')) {
-          setFlashScreen('rgba(255, 200, 0, 0.15)');
-          setTimeout(() => setFlashScreen(null), 300);
-        }
-        if (log.type === 'critical') {
-          setFlashScreen('rgba(255, 80, 80, 0.2)');
-          setTimeout(() => setFlashScreen(null), 300);
+
+          if (log.state?.isCritical) {
+            setFlashScreen('rgba(255, 80, 80, 0.2)');
+            setTimeout(() => setFlashScreen(null), 300);
+          } else if (log.state?.effectiveness && log.state.effectiveness > 1) {
+            setFlashScreen('rgba(255, 200, 0, 0.15)');
+            setTimeout(() => setFlashScreen(null), 300);
+          }
         }
       }
     }
@@ -444,16 +443,29 @@ export function BattleScreen() {
             width: '28px',
             height: '28px',
             borderRadius: '50%',
-            background: itemData.category === 'pokeball' ? '#e94560' : '#4CAF50',
+            background: itemData.category === 'pokeball' ? 'rgba(233, 69, 96, 0.2)' : 'rgba(76, 175, 80, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '12px',
-            color: '#fff',
-            fontWeight: 'bold',
             flexShrink: 0,
+            border: itemData.category === 'pokeball' ? '1px solid rgba(233, 69, 96, 0.5)' : '1px solid rgba(76, 175, 80, 0.5)',
           }}>
-            {categoryIcons[itemData.category] || '?'}
+            <img 
+              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${itemData.id.replace('super-potion', 'super-potion').replace('hyper-potion', 'hyper-potion').replace('max-potion', 'max-potion')}.png`}
+              alt={itemData.name}
+              style={{ width: '22px', height: '22px', imageRendering: 'pixelated' }}
+              onError={(e) => { 
+                (e.target as HTMLImageElement).style.display = 'none';
+                if ((e.target as HTMLImageElement).parentElement) {
+                  const span = document.createElement('span');
+                  span.style.fontSize = '12px';
+                  span.style.color = '#fff';
+                  span.style.fontWeight = 'bold';
+                  span.innerText = categoryIcons[itemData.category] || '?';
+                  (e.target as HTMLImageElement).parentElement!.appendChild(span);
+                }
+              }}
+            />
           </div>
           <div style={{ flex: 1 }}>
             <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
