@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGameStore } from '../stores/gameStore';
 import { Button } from './ui/Button';
 import { soundManager } from '../utils/SoundManager';
+import { hasSave } from '../utils/saveManager';
 
 export function TitleScreen() {
-  const { startNewGame, loadGameState, hasSaveData } = useGameStore();
+  const { startNewGame, loadGameState } = useGameStore();
   const [showNewGame, setShowNewGame] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [selectedStarter, setSelectedStarter] = useState<number | null>(null);
+  const [saveExists, setSaveExists] = useState(false);
+  const [saveChecked, setSaveChecked] = useState(false);
+
+  useEffect(() => {
+    hasSave().then(exists => {
+      setSaveExists(exists);
+      setSaveChecked(true);
+    });
+  }, []);
 
   const starters = [
     { id: 1, name: 'Bulbizarre', type: 'plante', color: '#78C850', desc: 'PV et Spe. equilibres' },
@@ -18,6 +28,10 @@ export function TitleScreen() {
   const handleStart = () => {
     if (!playerName.trim() || selectedStarter === null) return;
     startNewGame(playerName.trim(), selectedStarter);
+  };
+
+  const handleContinue = async () => {
+    await loadGameState();
   };
 
   if (showNewGame) {
@@ -146,7 +160,6 @@ export function TitleScreen() {
                     animation: `slideUp 0.4s ease ${0.1 + idx * 0.1}s both`,
                   }}
                 >
-                  {/* Selected glow */}
                   {isSelected && (
                     <div style={{
                       position: 'absolute',
@@ -247,7 +260,7 @@ export function TitleScreen() {
             maxHeight: '600px',
             background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
             borderRadius: '50%',
-            filter: 'blur(60px)', /* C'est ce qui crée le fondu parfait sans bords */
+            filter: 'blur(60px)',
             pointerEvents: 'none',
             zIndex: 0,
         }} />
@@ -292,13 +305,13 @@ export function TitleScreen() {
           width: '280px',
           animation: 'slideUp 0.6s ease 0.5s both',
         }}>
-          {hasSaveData() && (
-            <Button variant="primary" size="lg" onClick={() => loadGameState()}>
+          {saveChecked && saveExists && (
+            <Button variant="primary" size="lg" onClick={handleContinue}>
               Continuer
             </Button>
           )}
           <Button
-            variant={hasSaveData() ? 'secondary' : 'primary'}
+            variant={saveExists ? 'secondary' : 'primary'}
             size="lg"
             onClick={() => setShowNewGame(true)}
           >
@@ -315,7 +328,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        <span id={"version"}>0.2.1 - Kanto work in progress</span>
+        <span id={"version"}>0.3.0 - Supabase + IndexedDB</span>
       </div>
     </div>
   );

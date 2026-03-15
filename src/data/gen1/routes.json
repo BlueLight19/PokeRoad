@@ -130,7 +130,7 @@
     "unlockCondition": {
       "type": "trainers",
       "zones": [
-        "jadielle"
+        "route-1"
       ]
     }
   },

@@ -1,0 +1,149 @@
+❯ i need all the trainer and gym leader in jadielle (and in every city) to show behind the gym button.
+
+● Let me simplify the approach — handle it entirely in CityMenu instead of dataLoader. If a city has a gym, all its
+  trainers go behind the gym button.
+
+● Read 1 file (ctrl+o to expand)
+
+● Now I'll rewrite the gym section to use filteredTrainers (the zone's trainers) directly instead of the separate
+  gymTrainersRegistry, and hide the regular trainer list when there's a gym.
+
+● Update(src\components\navigation\CityMenu.tsx)
+  ⎿  Added 1 line, removed 1 line
+      1  import React, { useState, useEffect } from 'react';
+      2  import { useGameStore } from '../../stores/gameStore';
+      3  import { useBattleStore } from '../../stores/battleStore';
+      4 -import { getZoneData, getGymData, getZoneTrainers, getGymTrainers } from '../../utils/dataLoader';
+      4 +import { getZoneData, getGymData, getZoneTrainers } from '../../utils/dataLoader';
+      5  import { Button } from '../ui/Button';
+      6  import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
+      7
+
+● Now replace the gym section and the separate trainer section with one unified gym section:
+
+● Update(src\components\navigation\CityMenu.tsx)
+  ⎿  Added 22 lines, removed 26 lines
+      218            </button>
+      219          )}
+      220
+      221 -        {/* Gym */}
+      221 +        {/* Gym (with all zone trainers inside) */}
+      222          {gym && (() => {
+      223 -          const gymTrainers = getGymTrainers(selectedZone);
+      224 -          const allGymTrainersDefeated = gymTrainers.every(t => progress.defeatedTrainers.includes(t.i
+          -d));
+      223 +          const allTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t
+          +.id));
+      224 +          const trainerCount = filteredTrainers.length;
+      225
+      226            return (
+      227              <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+     ...
+      230                  onClick={() => {
+      231                    if (gymLocked) return;
+      232                    if (gymDefeated) return;
+      233 -                  if (gymTrainers.length === 0) {
+      234 -                    handleGymBattle();
+      235 -                  } else {
+      236 -                    setGymExpanded(!gymExpanded);
+      237 -                  }
+      233 +                  setGymExpanded(!gymExpanded);
+      234                  }}
+      235                  disabled={gymLocked}
+      236                  style={{
+     ...
+      272                        ? 'Badge obtenu !'
+      273                        : gymLocked
+      274                          ? gymLockReason
+      279 -                        : gymTrainers.length > 0
+      280 -                          ? `${gymTrainers.length} dresseur${gymTrainers.length > 1 ? 's' : ''} + Cham
+          -pion`
+      281 -                          : `${gym.team.length} Pokemon`}
+      275 +                        : trainerCount > 0
+      276 +                          ? `${trainerCount} dresseur${trainerCount > 1 ? 's' : ''} + Champion`
+      277 +                          : `Champion - ${gym.team.length} Pokemon`}
+      278                    </div>
+      279                  </div>
+      280                </button>
+      281
+      286 -              {/* Expanded gym trainers */}
+      282 +              {/* Expanded: all zone trainers + gym leader */}
+      283                {gymExpanded && !gymDefeated && !gymLocked && (
+      284                  <div style={{
+      285                    background: '#1a1a1a',
+     ...
+      291                    flexDirection: 'column',
+      292                    gap: '6px',
+      293                  }}>
+      298 -                  {/* Gym trainers */}
+      299 -                  {gymTrainers.map(trainer => {
+      294 +                  {/* Zone trainers */}
+      295 +                  {filteredTrainers.map(trainer => {
+      296                      const defeated = progress.defeatedTrainers.includes(trainer.id);
+      297                      return (
+      298                        <button
+     ...
+      341                      );
+      342                    })}
+      343
+      348 -                  {/* Gym leader — only clickable when all gym trainers defeated */}
+      344 +                  {/* Gym leader — only clickable when all trainers defeated */}
+      345                    <button
+      346                      onClick={() => {
+      351 -                      if (!allGymTrainersDefeated) return;
+      347 +                      if (!allTrainersDefeated) return;
+      348                        handleGymBattle();
+      349                      }}
+      354 -                    disabled={!allGymTrainersDefeated}
+      350 +                    disabled={!allTrainersDefeated}
+      351                      style={{
+      352                        display: 'flex',
+      353                        alignItems: 'center',
+      354                        gap: '10px',
+      355                        padding: '12px',
+      360 -                      background: allGymTrainersDefeated ? '#3a1a1a' : '#111',
+      361 -                      border: allGymTrainersDefeated ? '2px solid #FFD600' : '2px solid #444',
+      356 +                      background: allTrainersDefeated ? '#3a1a1a' : '#111',
+      357 +                      border: allTrainersDefeated ? '2px solid #FFD600' : '2px solid #444',
+      358                        borderRadius: '6px',
+      363 -                      cursor: allGymTrainersDefeated ? 'pointer' : 'default',
+      364 -                      opacity: allGymTrainersDefeated ? 1 : 0.4,
+      359 +                      cursor: allTrainersDefeated ? 'pointer' : 'default',
+      360 +                      opacity: allTrainersDefeated ? 1 : 0.4,
+      361                        textAlign: 'left',
+      362                        width: '100%',
+      363                      }}
+      364                    >
+      369 -                    <span style={{ fontSize: '16px', color: allGymTrainersDefeated ? '#FFD600' : '#555
+          -' }}>
+      365 +                    <span style={{ fontSize: '16px', color: allTrainersDefeated ? '#FFD600' : '#555' }
+          +}>
+      366                        {'\u2605'}
+      367                      </span>
+      368                      <div>
+      369                        <div style={{
+      374 -                        color: allGymTrainersDefeated ? '#FFD600' : '#555',
+      370 +                        color: allTrainersDefeated ? '#FFD600' : '#555',
+      371                          fontSize: '10px',
+      372                          fontFamily: "'Press Start 2P', monospace",
+      373                        }}>
+     ...
+      379                          fontFamily: "'Press Start 2P', monospace",
+      380                          marginTop: '3px',
+      381                        }}>
+      386 -                        {allGymTrainersDefeated
+      382 +                        {allTrainersDefeated
+      383                            ? `${gym.team.length} Pokemon - Pret au combat !`
+      384                            : 'Battez tous les dresseurs d\'abord'}
+      385                        </div>
+     ...
+      391            );
+      392          })()}
+      393
+      398 -        {/* Zone trainers (filtered: no gym/elite4, rival matched to starter) */}
+      399 -        {filteredTrainers.map(trainer => {
+      394 +        {/* Zone trainers — only shown if NO gym in this city */}
+      395 +        {!gym && filteredTrainers.map(trainer => {
+      396            const defeated = progress.defeatedTrainers.includes(trainer.id);
+      397
+      398            return (

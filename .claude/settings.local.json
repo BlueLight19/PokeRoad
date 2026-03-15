@@ -7,7 +7,9 @@
       "Bash(jq -r '.[] | select\\(.npcs\\) | .npcs | .[] | select\\(.requiredEvent or .setsEvent\\) | \"\\\\\\(.name\\): requires=\\\\\\(.requiredEvent // \"none\"\\) sets=\\\\\\(.setsEvent // \"none\"\\)\"' /Users/Tomer/Documents/GitHub/PokeRoad/src/data/gen1/routes.json)",
       "Bash(cat > /tmp/zone_order.txt << 'EOF'\nbourg-palette\nroute-1\njadielle\nroute-22\nroute-2\nforet-jade\nargenta\nroute-3\nmt-moon\nroute-4\nazuria\nroute-24\nroute-25\nroute-5\nroute-6\ncarmin\nroute-11\ncave-diglett\nroute-9\nroute-10\nrock-tunnel\nlavanville\nroute-8\nsafrania\nroute-7\nceladopole\nroute-16\nroute-17\nroute-18\nparmanie\nroute-15\nroute-14\nroute-13\nroute-12\nroute-19\nroute-20\nseafoam-islands\ncramois-ile\npokemon-mansion\nroute-21\npower-plant\nroute-23\nvictory-road\nplateau-indigo\nleague-hall\ncerulean-cave\nEOF\njq -r 'map\\(.id\\) | .[]' /Users/Tomer/Documents/GitHub/PokeRoad/src/data/gen1/routes.json | sort > /tmp/routes_ids.txt && comm -23 /tmp/zone_order.txt /tmp/routes_ids.txt)",
       "Bash(echo \"=== CIRCULAR DEPENDENCY CHECK ===\" && echo \"\" && echo \"required-old-amber is SET by: Scientifique du Musée \\(argenta\\)\" && echo \"required-old-amber is REQUIRED by: Scientifique du Labo \\(league-hall\\)\" && echo \"\" && echo \"Check if both are accessible:\" && jq '.[] | select\\(.id == \"argenta\" or .id == \"league-hall\"\\) | {id, name, unlockCondition}' /Users/Tomer/Documents/GitHub/PokeRoad/src/data/gen1/routes.json)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

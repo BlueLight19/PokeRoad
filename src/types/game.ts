@@ -93,6 +93,7 @@ export interface TrainerData {
   reward: number;
   team: TrainerPokemon[];
   zone: string;
+  category: string; // 'route' | 'gym' | 'rival' | 'elite4'
 }
 
 export interface TrainerPokemon {

@@ -76,6 +76,9 @@ export interface GameState {
   addNotification: (notification: Omit<GameNotification, 'id'>) => void;
   removeNotification: (id: string) => void;
 
+  // Loading state
+  hasSaveLoaded: boolean; // Whether we've checked for a save
+
   // Actions
   initGame: () => void;
   startNewGame: (playerName: string, starterId: number) => void;
@@ -131,10 +134,21 @@ export interface GameState {
   // Post-game
   handleGameCleared: () => void;
 
-  // Save/load
+  // Save/load (async)
   saveGameState: () => void;
-  loadGameState: () => boolean;
-  hasSaveData: () => boolean;
+  loadGameState: () => Promise<boolean>;
+  checkForSave: () => Promise<boolean>;
+}
+
+// Helper: fire-and-forget save (non-blocking)
+function fireAndForgetSave(state: GameState) {
+  saveGame({
+    player: state.player,
+    team: state.team,
+    pc: state.pc,
+    inventory: state.inventory,
+    progress: state.progress,
+  }).catch(e => console.error('Auto-save failed:', e));
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -171,6 +185,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     gameSpeed: 1,
   },
   notifications: [],
+  hasSaveLoaded: false,
 
   initGame: () => {
     set({ currentView: 'title' });
@@ -239,7 +254,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   selectZone: (zoneId: string) => {
     const zone = getZoneData(zoneId);
-    // Determine view based on zone type field
     const zoneData = zone as any;
     let view: GameView = zoneData.type === 'city' ? 'city_menu' : 'route_menu';
 
@@ -261,11 +275,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else {
       const success = depositPokemon(state.pc, pokemon);
       if (success) {
-        set({ pc: { ...state.pc } }); // Trigger update
+        set({ pc: { ...state.pc } });
       }
     }
 
-    // Track caught
     if (!state.progress.caughtPokemon.includes(pokemon.dataId)) {
       set({
         progress: {
@@ -289,17 +302,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     const statusMoves = availableMoves.filter(m => m.power === 0);
 
     const selectedMoves = [];
-    // Prioritize damage moves
     for (let i = 0; i < 2 && i < damageMoves.length; i++) {
       selectedMoves.push(damageMoves[i]);
     }
-    // Fill with status moves
     for (let i = 0; selectedMoves.length < 4 && i < statusMoves.length; i++) {
       if (!selectedMoves.some(m => m.id === statusMoves[i].id)) {
         selectedMoves.push(statusMoves[i]);
       }
     }
-    // If still not 4, fill with any remaining moves
     for (let i = 0; selectedMoves.length < 4 && i < availableMoves.length; i++) {
       if (!selectedMoves.some(m => m.id === availableMoves[i].id)) {
         selectedMoves.push(availableMoves[i]);
@@ -336,7 +346,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   releasePokemon: (uid: string) => {
     const state = get();
-    // Check team
     const inTeam = state.team.find(p => p.uid === uid);
     if (inTeam) {
       if (state.team.length <= 1) return;
@@ -344,10 +353,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    // Check PC
     const found = findPokemonInPC(state.pc, uid);
     if (found) {
-      withdrawPokemon(state.pc, found.boxId, found.slotId); // Remove from box (returns pokemon, but we ignore it)
+      withdrawPokemon(state.pc, found.boxId, found.slotId);
       set({ pc: { ...state.pc } });
     }
   },
@@ -402,7 +410,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     set({ inventory });
 
-    // Re-check zone unlocks for item-type conditions
     const newProgress = { ...get().progress };
     const allZones = getAllZones();
     let changed = false;
@@ -461,14 +468,12 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   useItemAction: (itemId: string, pokemonUid?: string) => {
     const state = get();
-    // Check quantity
     const qty = get().getItemQuantity(itemId);
     if (qty <= 0) return { success: false, message: "Vous n'en avez pas !" };
 
     const itemData = getItemData(itemId);
     if (!itemData) return { success: false, message: "Objet inconnu." };
 
-    // Field items
     if (itemData.effect?.type === 'repel') {
       get().setRepelSteps(itemData.effect.repelSteps || 100);
       get().removeItem(itemId, 1);
@@ -476,33 +481,29 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     if (itemData.effect?.type === 'escape_rope') {
-      get().selectZone('bourg-palette'); // Teleport to home for now
+      get().selectZone('bourg-palette');
       get().removeItem(itemId, 1);
       return { success: true, message: "Vous utilisez la Corde Sortie." };
     }
 
     if (itemData.effect?.type === 'teach' && itemData.effect.moveId) {
       const idx = state.team.findIndex(p => p.uid === pokemonUid);
-      const pokemon = state.team[idx]; // Use team index via uid
+      const pokemon = state.team[idx];
       if (!pokemon) return { success: false, message: "Utiliser sur qui ?" };
 
       const moveId = itemData.effect.moveId;
       const moveData = getMoveData(moveId);
       const pokemonData = getPokemonData(pokemon.dataId);
 
-      // Check TM compatibility
       if (pokemonData.tmLearnset && !pokemonData.tmLearnset.includes(moveId)) {
         return { success: false, message: `${pokemon.nickname || pokemonData.name} ne peut pas apprendre ${moveData.name} !` };
       }
 
-      // Check if already known
       if (pokemon.moves.some(m => m.moveId === moveId)) {
         return { success: false, message: `${pokemon.nickname || getPokemonData(pokemon.dataId).name} connait déjà ${moveData.name} !` };
       }
 
-      // Check move count
       if (pokemon.moves.length < 4) {
-        // Learn immediately
         pokemon.moves.push({
           moveId,
           currentPp: moveData.pp,
@@ -511,11 +512,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
         get().removeItem(itemId, 1);
-        // Force update
         set({ team: [...state.team] });
         return { success: true, message: `${name} apprend ${moveData.name} !` };
       } else {
-        // Needs to forget a move
         set({
           pendingMoveLearn: {
             pokemonIndex: idx,
@@ -527,7 +526,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    // If item requires a target
     const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost', 'full_restore', 'rare_candy', 'ev_boost', 'pp_restore'].includes(itemData.effect?.type || '');
 
     if (requiresTarget) {
@@ -535,12 +533,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       const pokemon = state.team.find(p => p.uid === pokemonUid);
       if (!pokemon) return { success: false, message: "Pokémon introuvable." };
 
-      // Use logic
       const result = useItem(itemData, pokemon);
       if (result.success && result.consumed) {
         get().removeItem(itemId, 1);
 
-        // Check level up results (Rare Candy)
         if (result.levelUpResult) {
           const lResult = result.levelUpResult;
           const pokemonIdx = state.team.findIndex(p => p.uid === pokemonUid);
@@ -550,7 +546,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           let currentPendingEvo = get().pendingEvolution;
           const currentEvoQueue = [...get().pendingEvolutionQueue];
 
-          // Handle moves
           if (lResult.learnableMoves.length > 0) {
             for (const moveId of lResult.learnableMoves) {
               if (pokemon.moves.some(m => m.moveId === moveId)) continue;
@@ -568,7 +563,6 @@ export const useGameStore = create<GameState>((set, get) => ({
             }
           }
 
-          // Handle evolution
           if (lResult.canEvolve && lResult.evolutionId) {
             const evoEntry = { pokemonIndex: pokemonIdx, targetId: lResult.evolutionId };
             if (!currentPendingEvo) {
@@ -586,7 +580,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           });
         }
 
-        // Create fresh references for modified pokemon to trigger React re-renders
         const newTeam = [...state.team];
         newTeam[newTeam.findIndex(p => p.uid === pokemonUid)] = {
           ...pokemon,
@@ -628,21 +621,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       defeatedTrainers: [...state.progress.defeatedTrainers, trainerId],
     };
 
-    // Check if this unlocks new zones - iterate ALL zones
     const allZones = getAllZones();
-    // We might need multiple passes if unlocking one zone unlocks another immediately (cascade)
-    // For now, simple pass. If cascade is needed, we'd loop until no changes.
-    // Actually, one pass is usually enough per action in this simple logic.
-
-    // Optimization: we can't just check neighbors of current zone because 
-    // "unlocking a zone" might happen ANYWHERE if conditions are met.
-    // BUT, we only want to unlock if it connects to something we HAVE.
 
     for (const zone of allZones) {
       const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
 
-      // connectivity check
       const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
       if (!isConnected) continue;
 
@@ -655,7 +639,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           continue;
         }
 
-        // Check Event/Item Locks
         if (condition.eventId && !newProgress.events[condition.eventId]) continue;
         if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
 
@@ -715,7 +698,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ player: newPlayer });
     }
 
-    // Re-check zone unlocks for ALL zones
     const newProgress = { ...get().progress };
     const allZonesData = getAllZones();
 
@@ -723,7 +705,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       const zoneId = zone.id;
       if (newProgress.unlockedZones.includes(zoneId)) continue;
 
-      // connectivity check
       const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
       if (!isConnected) continue;
 
@@ -734,7 +715,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           continue;
         }
 
-        // Check Event/Item Locks
         if (condition.eventId && !newProgress.events[condition.eventId]) continue;
         if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
         if (condition.type === 'gym' && condition.gymId) {
@@ -788,7 +768,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   advanceLeagueProgress: () => {
     const state = get();
-    // 0 -> 1 (defeated Lorelei) -> 2 (Bruno) -> 3 (Agatha) -> 4 (Lance) -> 5 (Champion)
     const newProgress = {
       ...state.progress,
       leagueProgress: state.progress.leagueProgress + 1
@@ -812,7 +791,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newEvents = { ...state.progress.events, [eventId]: true };
     const newProgress = { ...state.progress, events: newEvents };
 
-    // Trigger zone unlocks after event completion
     const allZones = getAllZones();
     for (const zone of allZones) {
       const zoneId = zone.id;
@@ -887,10 +865,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     const xp = calculateXpGain(defeatedId, defeatedLevel, isTrainer);
     pokemon.xp += xp;
 
-    // Apply EV gains
     pokemon.evs = applyEvGains(pokemon, defeatedId);
 
-    // Check level up
     const result = processLevelUp(pokemon);
     if (result) {
       const hpDiff = result.newMaxHp - pokemon.maxHp;
@@ -900,11 +876,9 @@ export const useGameStore = create<GameState>((set, get) => ({
       pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + hpDiff);
       pokemon.xpToNextLevel = result.newXpToNextLevel;
 
-      // Handle move learning - process all learnable moves
       if (result.learnableMoves.length > 0) {
         const movesToQueue: { pokemonIndex: number; moveId: number }[] = [];
         for (const moveId of result.learnableMoves) {
-          // Skip if already known
           if (pokemon.moves.some(m => m.moveId === moveId)) continue;
           if (pokemon.moves.length < 4) {
             const moveData = getMoveData(moveId);
@@ -916,13 +890,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (movesToQueue.length > 0) {
           const existing = get().pendingMoveQueue;
           if (!get().pendingMoveLearn) {
-            // Set first as pendingMoveLearn, rest go to queue
             set({
               pendingMoveLearn: movesToQueue[0],
               pendingMoveQueue: [...existing, ...movesToQueue.slice(1)],
             });
           } else {
-            // Already a pending move learn - queue all
             set({
               pendingMoveQueue: [...existing, ...movesToQueue],
             });
@@ -930,18 +902,15 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
       }
 
-      // Handle evolution - queue instead of overwriting
       if (result.canEvolve && result.evolutionId) {
         const evoEntry = { pokemonIndex, targetId: result.evolutionId };
         if (!get().pendingEvolution) {
           set({ pendingEvolution: evoEntry });
         } else {
-          // Queue for later
           set({ pendingEvolutionQueue: [...get().pendingEvolutionQueue, evoEntry] });
         }
       }
     } else {
-      // No level up, but still recalculate stats for EV gains (important for lv100 pokemon)
       const newStats = recalculateStats(pokemon);
       const hpDiff = newStats.hp - pokemon.maxHp;
       pokemon.stats = newStats;
@@ -949,7 +918,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + Math.max(0, hpDiff));
     }
 
-    // Track seen
     const progress = get().progress;
     if (!progress.seenPokemon.includes(defeatedId)) {
       set({
@@ -957,7 +925,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       });
     }
 
-    // Create fresh references for modified pokemon to trigger React re-renders
     team[pokemonIndex] = {
       ...pokemon,
       moves: pokemon.moves.map(m => ({ ...m })),
@@ -1004,7 +971,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (pokemon) {
         const result = evolvePokemon(pokemon, pendingEvolution.targetId);
         
-        // Handle new moves from evolution
         if (result.learnableMoves.length > 0) {
           const movesToQueue = result.learnableMoves.map(moveId => ({
             pokemonIndex: pendingEvolution.pokemonIndex,
@@ -1026,7 +992,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           }
         }
       }
-      // Process next evolution from queue
       if (pendingEvolutionQueue.length > 0) {
         const [next, ...rest] = pendingEvolutionQueue;
         set({ team: newTeam, pendingEvolution: next, pendingEvolutionQueue: rest });
@@ -1034,7 +999,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ team: newTeam, pendingEvolution: null });
       }
     } else {
-      // Declined - process next from queue
       if (pendingEvolutionQueue.length > 0) {
         const [next, ...rest] = pendingEvolutionQueue;
         set({ pendingEvolution: next, pendingEvolutionQueue: rest });
@@ -1065,7 +1029,6 @@ export const useGameStore = create<GameState>((set, get) => ({
         maxPp: moveData.pp,
       };
 
-      // Consume TM if applicable
       const sourceItem = pendingMoveLearn.sourceItem;
       if (sourceItem) {
         const { inventory } = get();
@@ -1078,9 +1041,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
       }
     }
-    // If forgetIndex is null, the move is not learned (and TM is not consumed)
 
-    // Check if there are more moves in the queue
     const queue = get().pendingMoveQueue;
     if (queue.length > 0) {
       const [next, ...rest] = queue;
@@ -1101,19 +1062,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().saveGameState();
   },
 
+  // Save: fire-and-forget async write to IndexedDB
   saveGameState: () => {
-    const state = get();
-    saveGame({
-      player: state.player,
-      team: state.team,
-      pc: state.pc,
-      inventory: state.inventory,
-      progress: state.progress,
-    });
+    fireAndForgetSave(get());
   },
 
-  loadGameState: () => {
-    const data = loadGame();
+  // Load: async read from IndexedDB
+  loadGameState: async () => {
+    const data = await loadGame();
     if (!data) return false;
 
     // Migration for legacy PC (array)
@@ -1122,11 +1078,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       (data.pc as any[]).forEach(p => {
         depositPokemon(pc, p);
       });
-    } else {
+    } else if (data.pc) {
       pc = data.pc;
     }
 
-    // Migration: add lastPokemonCenter and events if missing
     const progress = {
       ...data.progress,
       lastPokemonCenter: data.progress.lastPokemonCenter || 'bourg-palette',
@@ -1149,5 +1104,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     return true;
   },
 
-  hasSaveData: () => hasSave(),
+  // Check if a save exists in IndexedDB
+  checkForSave: async () => {
+    const exists = await hasSave();
+    set({ hasSaveLoaded: true });
+    return exists;
+  },
 }));

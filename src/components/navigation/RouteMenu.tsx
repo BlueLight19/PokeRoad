@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
-import { getZoneData, getTrainerData } from '../../utils/dataLoader';
+import { getZoneData, getTrainerData, getZoneTrainers } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
 import { soundManager } from '../../utils/SoundManager';
@@ -32,7 +32,8 @@ export function RouteMenu() {
   const fishingEncounters: WildEncounter[] = (zone as RouteData).fishingEncounters || [];
   const staticEncounters = (zone as RouteData).staticEncounters || [];
   const npcs: NPCData[] = (zone as RouteData).npcs || [];
-  const trainerIds: string[] = zone.trainers || [];
+  const player = useGameStore(s => s.player);
+  const filteredTrainers = getZoneTrainers(selectedZone, player.starter);
 
   const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
   const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
@@ -449,18 +450,17 @@ export function RouteMenu() {
           })
         }
 
-        {/* Trainers */}
+        {/* Trainers (filtered: no gym/elite4, rival matched to starter) */}
         {
-          trainerIds.map(trainerId => {
-            const trainer = getTrainerData(trainerId);
-            const defeated = isTrainerDefeated(trainerId);
+          filteredTrainers.map(trainer => {
+            const defeated = isTrainerDefeated(trainer.id);
 
             return (
               <button
-                key={trainerId}
+                key={trainer.id}
                 onClick={() => {
                   soundManager.playClick();
-                  handleTrainerBattle(trainerId);
+                  handleTrainerBattle(trainer.id);
                 }}
                 disabled={defeated}
                 style={{
