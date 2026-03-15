@@ -11,6 +11,10 @@ export function ShopMenu() {
   const [view, setShopView] = useState<'buy' | 'sell'>('buy');
 
   const items = selectedZone ? getCityShopItems(selectedZone) : getShopItems();
+  const sellableInventory = inventory.filter(invItem => {
+    const itemData = getItemData(invItem.itemId);
+    return itemData && itemData.price > 0;
+  });
 
   const handleBuy = (itemId: string, price: number) => {
     const qty = quantities[itemId] || 1;
@@ -31,6 +35,11 @@ export function ShopMenu() {
   };
 
   const handleSell = (itemId: string, price: number) => {
+    if (price <= 0) {
+      setMessage('Cet objet ne peut pas être vendu !');
+      setTimeout(() => setMessage(null), 2000);
+      return;
+    }
     const qty = quantities[itemId] || 1;
     const sellPrice = Math.floor(price / 2);
     
@@ -160,12 +169,12 @@ export function ShopMenu() {
             );
           })
         ) : (
-          inventory.length === 0 ? (
+          sellableInventory.length === 0 ? (
             <div style={{ color: '#666', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", textAlign: 'center', padding: '30px' }}>
-                Votre sac est vide.
+                Rien à vendre.
             </div>
           ) : (
-            inventory.map(invItem => {
+            sellableInventory.map(invItem => {
                 const item = getItemData(invItem.itemId);
                 if (!item) return null;
                 const qty = quantities[invItem.itemId] || 1;
