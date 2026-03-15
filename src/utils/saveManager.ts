@@ -1,37 +1,67 @@
-import { SaveData } from '../types/game';
+import { PokemonInstance } from '../types/pokemon';
+import { PlayerData, ProgressData } from '../types/game';
+import { InventoryItem } from '../types/inventory';
+import { PCStorage } from '../engine/pcStorage';
+import {
+  savePlayerTeam,
+  savePlayerInventory,
+  savePlayerProgress,
+  savePokedex,
+  loadPlayerTeam,
+  loadPlayerInventory,
+  loadPlayerProgress,
+  hasSaveInDB,
+  deleteSaveFromDB,
+} from './db';
 
-const SAVE_KEY = 'pokeroad-save';
-const SAVE_VERSION = '0.1.0';
+export interface SavePayload {
+  player: PlayerData;
+  team: PokemonInstance[];
+  pc: PCStorage;
+  inventory: InventoryItem[];
+  progress: ProgressData;
+}
 
-export function saveGame(data: Omit<SaveData, 'version' | 'timestamp'>): void {
-  const save: SaveData = {
-    ...data,
-    version: SAVE_VERSION,
-    timestamp: Date.now(),
-  };
+export async function saveGame(data: SavePayload): Promise<void> {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    await Promise.all([
+      savePlayerTeam(data.team),
+      savePlayerInventory(data.inventory),
+      savePlayerProgress(data.player, data.progress, data.pc),
+      savePokedex(data.progress.seenPokemon, data.progress.caughtPokemon),
+    ]);
   } catch (e) {
     console.error('Failed to save game:', e);
   }
 }
 
-export function loadGame(): SaveData | null {
+export async function loadGame(): Promise<SavePayload | null> {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw) as SaveData;
-    return data;
+    const [progressData, team, inventory] = await Promise.all([
+      loadPlayerProgress(),
+      loadPlayerTeam(),
+      loadPlayerInventory(),
+    ]);
+
+    if (!progressData) return null;
+
+    return {
+      player: progressData.player,
+      team,
+      pc: progressData.pc,
+      inventory,
+      progress: progressData.progress,
+    };
   } catch (e) {
     console.error('Failed to load save:', e);
     return null;
   }
 }
 
-export function deleteSave(): void {
-  localStorage.removeItem(SAVE_KEY);
+export async function deleteSave(): Promise<void> {
+  await deleteSaveFromDB();
 }
 
-export function hasSave(): boolean {
-  return localStorage.getItem(SAVE_KEY) !== null;
+export async function hasSave(): Promise<boolean> {
+  return hasSaveInDB();
 }
