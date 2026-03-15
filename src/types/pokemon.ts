@@ -1,9 +1,9 @@
 // ===== Pokémon Types =====
 
 export type PokemonType =
-  | 'normal' | 'feu' | 'eau' | 'plante' | 'electrique'
-  | 'glace' | 'combat' | 'poison' | 'sol' | 'vol'
-  | 'psy' | 'insecte' | 'roche' | 'spectre' | 'dragon';
+  | 'normal' | 'fire' | 'water' | 'grass' | 'electric'
+  | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying'
+  | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon';
 
 export type MoveCategory = 'physical' | 'special' | 'status';
 

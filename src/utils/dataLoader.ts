@@ -347,6 +347,13 @@ export async function initializeData(): Promise<void> {
       'Vérifiez que les tables Supabase sont remplies et que le RLS autorise la lecture (anon SELECT).'
     );
   }
+
+  if (itemRegistry.size === 0) {
+    throw new Error(
+      'Aucun Objet chargé depuis IndexedDB. ' +
+      'Vérifiez que la table "items" est remplie et que le RLS autorise la lecture.'
+    );
+  }
 }
 
 // ——————————————————————————————————————————————

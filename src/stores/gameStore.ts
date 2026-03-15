@@ -409,6 +409,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       inventory.push({ itemId, quantity: qty });
     }
     set({ inventory });
+    get().saveGameState();
 
     const newProgress = { ...get().progress };
     const allZones = getAllZones();
@@ -449,6 +450,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else {
       set({ inventory });
     }
+    get().saveGameState();
   },
 
   sellItemAction: (itemId: string, qty: number) => {

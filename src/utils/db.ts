@@ -263,6 +263,33 @@ const GAME_TABLES = [
   'trainers',
 ] as const;
 
+async function fetchAllRows(table: string): Promise<any[]> {
+  let allData: any[] = [];
+  let from = 0;
+  const step = 1000;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from(table)
+      .select('*')
+      .range(from, from + step - 1);
+
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      hasMore = false;
+    } else {
+      allData = [...allData, ...data];
+      if (data.length < step) {
+        hasMore = false;
+      } else {
+        from += step;
+      }
+    }
+  }
+  return allData;
+}
+
 export async function syncFromSupabase(
   onProgress?: (table: string, pct: number) => void
 ): Promise<void> {
@@ -273,12 +300,8 @@ export async function syncFromSupabase(
     const table = GAME_TABLES[i];
     onProgress?.(table, ((i) / total) * 100);
 
-    // Fetch all rows from Supabase
-    const { data, error } = await supabase
-      .from(table)
-      .select('*');
-
-    if (error) throw new Error(`Sync failed for ${table}: ${error.message}`);
+    // Fetch all rows from Supabase (with pagination)
+    const data = await fetchAllRows(table);
 
     if (!data || data.length === 0) {
       console.warn(`[sync] Table "${table}" returned 0 rows. Check RLS policies or table data.`);
@@ -544,10 +567,6 @@ export async function hasSaveInDB(): Promise<boolean> {
 export async function deleteSaveFromDB(): Promise<void> {
   const db = await getDB();
 
-  // Clear player stores but preserve game data sync keys
-  const syncTimestamp = await db.get('player_progress', SYNC_KEY);
-  const dataVersion = await db.get('player_progress', 'data_version');
-
   const tx = db.transaction(
     ['player_team', 'player_inventory', 'player_progress', 'player_pokedex'],
     'readwrite'
@@ -557,10 +576,6 @@ export async function deleteSaveFromDB(): Promise<void> {
   await tx.objectStore('player_inventory').clear();
   await tx.objectStore('player_progress').clear();
   await tx.objectStore('player_pokedex').clear();
-
-  // Restore sync keys
-  if (syncTimestamp) await tx.objectStore('player_progress').put(syncTimestamp);
-  if (dataVersion) await tx.objectStore('player_progress').put(dataVersion);
 
   await tx.done;
 }
@@ -575,5 +590,20 @@ export async function resetGameData(): Promise<void> {
   await tx.objectStore('player_inventory').clear();
   await tx.objectStore('player_progress').clear();
   await tx.objectStore('player_pokedex').clear();
+  await tx.done;
+}
+
+export async function forceFullSync(): Promise<void> {
+  const db = await getDB();
+  const allStores = [
+    'pokemon', 'moves', 'pokemon_learnset', 'items',
+    'zones', 'wild_encounters', 'gyms', 'trainers',
+    'player_team', 'player_inventory', 'player_progress', 'player_pokedex'
+  ] as const;
+
+  const tx = db.transaction(allStores as any, 'readwrite');
+  for (const storeName of allStores) {
+    await tx.objectStore(storeName as any).clear();
+  }
   await tx.done;
 }

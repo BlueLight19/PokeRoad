@@ -3,7 +3,7 @@ import { useGameStore } from '../../stores/gameStore';
 // Removed PlayArea import
 import { Button } from '../ui/Button';
 import { PokemonInstance } from '../../types/pokemon';
-import pokemonData from '../../data/gen1/pokemon.json';
+import { getPokemonData } from '../../utils/dataLoader';
 
 interface HallOfFameProps {
     onComplete: () => void;
@@ -32,7 +32,7 @@ export const HallOfFame: React.FC<HallOfFameProps> = ({ onComplete }) => {
     }, [team.length]);
 
     const displayedPokemon = currentIndex >= 0 ? team[currentIndex] : null;
-    const displayedData = displayedPokemon ? pokemonData.find(p => p.id === displayedPokemon.dataId) : null;
+    const displayedData = displayedPokemon ? getPokemonData(displayedPokemon.dataId) : null;
 
     return (
         <div style={{

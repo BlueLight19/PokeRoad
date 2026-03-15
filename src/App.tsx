@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { createPCStorage } from './engine/pcStorage';
-import { initGameData } from './utils/db';
-import { initializeData } from './utils/dataLoader';
+import { initGameData, forceFullSync } from './utils/db';
+import { initializeData, getItemData, getAllItems } from './utils/dataLoader';
 import { deleteSave } from './utils/saveManager';
 import { TitleScreen } from './components/TitleScreen';
 import { WorldMap } from './components/navigation/WorldMap';
@@ -264,10 +264,52 @@ function DevTools() {
             <div>
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
-                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000'}}
+                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px'}}
                     onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
+                </button>
+                <button
+                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
+                    onClick={() => { 
+                        try {
+                            const items = getAllItems();
+                            if (items.length === 0) {
+                                alert("Registre VIDE");
+                            } else {
+                                alert(`Total: ${items.length}\nIDs: ${items.slice(0, 10).map(i => i.id).join(', ')}`);
+                            }
+                        } catch (e) {
+                            alert(`ERROR: ${e instanceof Error ? e.message : 'Unknown'}`);
+                        }
+                    }}
+                >
+                    Lister Ids Recus
+                </button>
+                <button
+                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
+                    onClick={() => { 
+                        try {
+                            const ball = getItemData('poke-ball');
+                            const pot = getItemData('potion');
+                            alert(`OK: Registry has ${ball.name} and ${pot.name}`);
+                        } catch (e) {
+                            alert(`ERROR: ${e instanceof Error ? e.message : 'Unknown'}`);
+                        }
+                    }}
+                >
+                    Tester Registre Items
+                </button>
+                <button
+                    style={{...btnStyle, background: '#4a148c', borderColor: '#7c43bd'}}
+                    onClick={async () => { 
+                        if (window.confirm("Cela va vider TOUTE la base de données locale (incluant les données de jeu) et forcer un rechargement depuis Supabase. Continuer ?")) {
+                            await forceFullSync();
+                            window.location.reload();
+                        }
+                    }}
+                >
+                    Forcer Sync Supabase
                 </button>
             </div>
         </div>
