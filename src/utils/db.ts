@@ -189,7 +189,7 @@ export async function getDB(): Promise<IDBPDatabase<GameDB>> {
   if (dbInstance) return dbInstance;
 
   dbInstance = await openDB<GameDB>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db: IDBPDatabase<GameDB>) {
       // Game Data stores (synced from Supabase)
       db.createObjectStore('pokemon', { keyPath: 'id' });
       db.createObjectStore('moves', { keyPath: 'id' });
@@ -287,7 +287,7 @@ export async function syncFromSupabase(
     }
 
     // Parse JSON columns
-    const parsed = (data || []).map(row => parseJsonCols(row, table));
+    const parsed = (data || []).map((row: any) => parseJsonCols(row, table));
 
     // Write to IndexedDB in a single transaction
     const tx = db.transaction(table, 'readwrite');
@@ -358,7 +358,7 @@ export async function getAllFromStore<T extends keyof GameDB>(
   storeName: T
 ): Promise<GameDB[T]['value'][]> {
   const db = await getDB();
-  return db.getAll(storeName);
+  return db.getAll(storeName as any);
 }
 
 export async function getFromStore<T extends keyof GameDB>(
@@ -366,7 +366,7 @@ export async function getFromStore<T extends keyof GameDB>(
   key: GameDB[T]['key']
 ): Promise<GameDB[T]['value'] | undefined> {
   const db = await getDB();
-  return db.get(storeName, key);
+  return db.get(storeName as any, key as any);
 }
 
 export async function getAllFromIndex<T extends keyof GameDB>(
@@ -375,9 +375,9 @@ export async function getAllFromIndex<T extends keyof GameDB>(
   value: string | number
 ): Promise<GameDB[T]['value'][]> {
   const db = await getDB();
-  const tx = db.transaction(storeName, 'readonly');
-  const index = tx.store.index(indexName);
-  return index.getAll(value as never);
+  const tx = db.transaction(storeName as any, 'readonly');
+  const index = (tx.store as any).index(indexName);
+  return index.getAll(value);
 }
 
 // ——————————————————————————————————————————————
@@ -403,8 +403,8 @@ export async function loadPlayerTeam(): Promise<PokemonInstance[]> {
   const db = await getDB();
   const entries = await db.getAll('player_team');
   return entries
-    .sort((a, b) => a.slot - b.slot)
-    .map(e => e.data as unknown as PokemonInstance);
+    .sort((a: any, b: any) => a.slot - b.slot)
+    .map((e: any) => e.data as unknown as PokemonInstance);
 }
 
 export async function savePlayerInventory(inventory: InventoryItem[]): Promise<void> {
@@ -424,7 +424,7 @@ export async function savePlayerInventory(inventory: InventoryItem[]): Promise<v
 export async function loadPlayerInventory(): Promise<InventoryItem[]> {
   const db = await getDB();
   const entries = await db.getAll('player_inventory');
-  return entries.map(e => ({ itemId: e.item_id, quantity: e.quantity }));
+  return entries.map((e: any) => ({ itemId: e.item_id, quantity: e.quantity }));
 }
 
 export async function savePlayerProgress(

@@ -157,7 +157,7 @@ function DevTools() {
 
                 for (let i = 1; i <= 151; i++) {
                     try {
-                        const result = givePlayerPokemon(i, 100);
+                        const result = givePlayerPokemon(i, 100) as any;
                         if (result instanceof Promise) await result;
                     } catch (e) {
                         console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);

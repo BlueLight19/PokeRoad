@@ -26,7 +26,7 @@ export function calculateDamage(
   const baseSpeed = attackerData.baseStats.speed;
   let critThreshold = baseSpeed / 512;
   // High crit moves have 8x multiplier in Gen 1
-  if (move.effect?.type === 'high_crit') critThreshold *= 8;
+  if ((move.effect?.type as any) === 'high_crit') critThreshold *= 8;
   const isCritical = Math.random() < Math.min(0.99, critThreshold);
 
   // Physical vs Special split

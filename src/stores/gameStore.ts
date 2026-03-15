@@ -298,8 +298,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       .map(e => getMoveData(e.moveId))
       .reverse();
 
-    const damageMoves = availableMoves.filter(m => m.power > 0);
-    const statusMoves = availableMoves.filter(m => m.power === 0);
+    const damageMoves = availableMoves.filter(m => m.power && m.power > 0);
+    const statusMoves = availableMoves.filter(m => !m.power || m.power === 0);
 
     const selectedMoves = [];
     for (let i = 0; i < 2 && i < damageMoves.length; i++) {
