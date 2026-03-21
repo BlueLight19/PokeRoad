@@ -251,6 +251,7 @@ const typeColors: Record<string, string> = {
   electrique: '#F8D030', glace: '#98D8D8', combat: '#C03028', poison: '#A040A0',
   sol: '#E0C068', vol: '#A890F0', psy: '#F85888', insecte: '#A8B820',
   roche: '#B8A038', spectre: '#705898', dragon: '#7038F8',
+  ténèbres: '#705848', dark: '#705848', acier: '#B8B8D0', steel: '#B8B8D0', fée: '#EE99AC', fairy: '#EE99AC',
 };
 
 const statNames: Record<string, string> = {

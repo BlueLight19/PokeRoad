@@ -9,11 +9,16 @@
       "Bash(echo \"=== CIRCULAR DEPENDENCY CHECK ===\" && echo \"\" && echo \"required-old-amber is SET by: Scientifique du Musée \\(argenta\\)\" && echo \"required-old-amber is REQUIRED by: Scientifique du Labo \\(league-hall\\)\" && echo \"\" && echo \"Check if both are accessible:\" && jq '.[] | select\\(.id == \"argenta\" or .id == \"league-hall\"\\) | {id, name, unlockCondition}' /Users/Tomer/Documents/GitHub/PokeRoad/src/data/gen1/routes.json)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "WebFetch(domain:pokeapi.co)",
+      "Bash(node:*)",
+      "Bash(npm run:*)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

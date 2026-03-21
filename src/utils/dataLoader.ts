@@ -54,6 +54,7 @@ function convertPokemon(raw: DBPokemon, learnset: DBLearnsetEntry[]): PokemonDat
     evYield: raw.ev_yield as Partial<PokemonData['baseStats']>,
     spriteUrl: raw.sprite_url,
     tmLearnset: raw.tm_learnset ?? undefined,
+    abilities: raw.abilities ?? [],
   };
 }
 
@@ -68,8 +69,185 @@ function convertMove(raw: DBMove): MoveData {
     pp: raw.pp,
     priority: raw.priority,
     target: (raw.target as MoveData['target']) ?? 'enemy',
-    effect: raw.effect as MoveData['effect'],
+    effect: translateEffect(raw.effect, raw.category),
   };
+}
+
+/**
+ * Translate Supabase DB effect types to code handler types.
+ * The DB uses PokeAPI-style types (damage+ailment, net-good-stats, etc.)
+ * while the battle engine expects specific handler types (status, stat, drain, etc.)
+ */
+function translateEffect(
+  raw: Record<string, unknown> | null,
+  category: string
+): MoveData['effect'] {
+  if (!raw || !raw.type) return null;
+
+  const dbType = raw.type as string;
+  const chance = (raw.chance as number) ?? 0;
+  const status = raw.status as string | null;
+
+  // Already uses code handler types (enriched moves)
+  const codeTypes = [
+    'status', 'stat', 'drain', 'recoil', 'flinch', 'charge', 'recharge', 'multi',
+    'disable', 'mist', 'ohko', 'trap', 'force_switch', 'fixed_damage',
+    'rampage', 'recoil_crash', 'money', 'critical', 'leech_seed',
+    'self_destruct', 'weather', 'protect', 'heal_self', 'transform', 'override',
+  ];
+  if (codeTypes.includes(dbType)) {
+    return raw as unknown as MoveData['effect'];
+  }
+
+  switch (dbType) {
+    // --- Pure status moves (ailment) ---
+    case 'ailment': {
+      if (status === 'leech-seed') {
+        return { type: 'leech_seed', chance: chance || 100 };
+      }
+      // Map standard statuses
+      const mapped = mapStatusName(status);
+      if (mapped) {
+        return { type: 'status', status: mapped as any, chance: chance || 100 };
+      }
+      // Unhandled ailments (nightmare, infatuation, etc.) — pass through as override
+      return { type: 'override', chance };
+    }
+
+    // --- Damaging moves with secondary status ---
+    case 'damage+ailment': {
+      if (status === 'trap') {
+        return { type: 'trap', chance: chance || 100 };
+      }
+      if (status === 'leech-seed') {
+        return { type: 'leech_seed', chance: chance || 100 };
+      }
+      const mapped = mapStatusName(status);
+      if (mapped) {
+        return { type: 'status', status: mapped as any, chance: chance || 30 };
+      }
+      // Flinch, silence, unknown — leave as generic for now
+      return raw as unknown as MoveData['effect'];
+    }
+
+    // --- Drain moves ---
+    case 'damage+heal': {
+      return { type: 'drain', amount: (raw.amount as number) ?? 50, drainPercent: (raw.drainPercent as number) ?? 50 };
+    }
+
+    // --- Self-healing moves ---
+    case 'heal': {
+      return { type: 'heal_self' };
+    }
+
+    // --- Stat change status moves (Swords Dance, Growl, etc.) ---
+    case 'net-good-stats': {
+      // If enriched, will have stat/stages. Otherwise fallback.
+      if (raw.stat && raw.stages) {
+        return { type: 'stat', stat: raw.stat as any, stages: raw.stages as number, chance: chance || 100 };
+      }
+      // Not yet enriched — pass through so the fallback stat logic in battleEngine handles it
+      return { type: 'stat', chance: chance || 100, ...(raw.stat ? { stat: raw.stat as any } : {}), ...(raw.stages ? { stages: raw.stages as number } : {}) } as any;
+    }
+
+    // --- Damaging moves that lower enemy stat ---
+    case 'damage+lower': {
+      if (raw.stat && raw.stages) {
+        return { type: 'stat', stat: raw.stat as any, stages: raw.stages as number, chance: chance || 100 };
+      }
+      return { type: 'stat', chance: chance || 100 } as any;
+    }
+
+    // --- Damaging moves that raise own stat ---
+    case 'damage+raise': {
+      if (raw.stat && raw.stages) {
+        return { type: 'stat', selfEffect: { stat: raw.stat as any, stages: raw.stages as number }, chance: chance || 100 } as any;
+      }
+      return { type: 'stat', chance: chance || 100 } as any;
+    }
+
+    // --- Force switch ---
+    case 'force-switch': {
+      return { type: 'force_switch' };
+    }
+
+    // --- OHKO (already matches but just in case) ---
+    case 'ohko': {
+      return { type: 'ohko' };
+    }
+
+    // --- Field effects (Mist, Light Screen, Reflect, Safeguard) ---
+    case 'field-effect': {
+      // Will be enriched per-move. For now, generic protect-like.
+      return { type: 'mist' };
+    }
+
+    // --- Whole field effects (weather, terrain, Trick Room) ---
+    case 'whole-field-effect': {
+      if (raw.weather) {
+        return { type: 'weather', weather: raw.weather as any };
+      }
+      return { type: 'weather' };
+    }
+
+    // --- Swagger (confuse + stat change) ---
+    case 'swagger': {
+      const mapped = mapStatusName(status);
+      if (mapped) {
+        return { type: 'status', status: mapped as any, chance: 100 };
+      }
+      return { type: 'override' };
+    }
+
+    // --- Unique moves ---
+    case 'unique': {
+      // Some unique moves have specific sub-types we can detect
+      if (status === 'disable') return { type: 'disable' };
+      return { type: 'override' };
+    }
+
+    // --- Hazards (not fully implemented yet) ---
+    case 'hazard': {
+      return { type: 'override' };
+    }
+
+    // --- Substitute ---
+    case 'substitute': {
+      return { type: 'override' };
+    }
+
+    // --- Plain damage (may be enriched later to multi, recoil, etc.) ---
+    case 'damage': {
+      // If enriched sub-fields exist, use them
+      if (raw.recoil) return { type: 'recoil', amount: raw.recoil as number };
+      if (raw.multi_min) return { type: 'multi', min: raw.multi_min as number, max: raw.multi_max as number };
+      if (raw.fixed_damage) return { type: 'fixed_damage', amount: raw.fixed_damage as number };
+      if (raw.high_crit) return { type: 'critical' };
+      if (raw.self_destruct) return { type: 'self_destruct' };
+      if (raw.flinch_chance) return { type: 'flinch', chance: raw.flinch_chance as number };
+      // Plain damage — no special effect needed
+      return null;
+    }
+
+    default:
+      return raw as unknown as MoveData['effect'];
+  }
+}
+
+/** Map DB status strings to game StatusCondition values */
+function mapStatusName(status: string | null): string | null {
+  if (!status) return null;
+  const map: Record<string, string> = {
+    'burn': 'burn',
+    'freeze': 'freeze',
+    'paralysis': 'paralysis',
+    'poison': 'poison',
+    'sleep': 'sleep',
+    'confusion': 'confusion',
+    'badly_poisoned': 'toxic',
+    'badly-poisoned': 'toxic',
+  };
+  return map[status] ?? null;
 }
 
 function convertItem(raw: DBItem): ItemData {
@@ -378,6 +556,10 @@ export function getMoveData(id: number): MoveData {
   const data = moveRegistry.get(id);
   if (!data) throw new Error(`Move ${id} not found`);
   return data;
+}
+
+export function getAllMoveIds(): number[] {
+  return Array.from(moveRegistry.keys());
 }
 
 export function getTrainerData(id: string): TrainerData {

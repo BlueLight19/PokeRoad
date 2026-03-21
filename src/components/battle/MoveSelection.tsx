@@ -25,6 +25,9 @@ const typeColors: Record<string, string> = {
   rock: '#B8A038',
   ghost: '#705898',
   dragon: '#7038F8',
+  dark: '#705848',
+  steel: '#B8B8D0',
+  fairy: '#EE99AC',
 };
 
 function getEffectivenessBadge(
@@ -52,6 +55,18 @@ function getEffectivenessBadge(
 }
 
 export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelectionProps) {
+  // Rampage lock-in: force the rampage move
+  const rampageLocked = pokemon.volatile.rampageTurns > 0 && pokemon.volatile.rampageMoveId !== undefined;
+  const rampageIndex = rampageLocked
+    ? pokemon.moves.findIndex(m => m.moveId === pokemon.volatile.rampageMoveId)
+    : -1;
+
+  // Encore lock-in: force the encored move
+  const encoreLocked = pokemon.volatile.encoreTurns > 0 && pokemon.volatile.encoreMoveId !== undefined;
+  const encoreIndex = encoreLocked
+    ? pokemon.moves.findIndex(m => m.moveId === pokemon.volatile.encoreMoveId)
+    : -1;
+
   const allMovesEmpty = pokemon.moves.every((m) => m.currentPp <= 0);
 
   if (allMovesEmpty) {
@@ -113,25 +128,32 @@ export function MoveSelection({ pokemon, onSelectMove, enemyDataId }: MoveSelect
       {pokemon.moves.map((moveInst, index) => {
         const move = getMoveData(moveInst.moveId);
         const haspp = moveInst.currentPp > 0;
+        const isDisabled = pokemon.volatile.disabled?.moveId === moveInst.moveId;
+        const isRampageForced = rampageLocked && index === rampageIndex;
+        const isRampageBlocked = rampageLocked && index !== rampageIndex;
+        const isEncoreForced = encoreLocked && index === encoreIndex;
+        const isEncoreBlocked = encoreLocked && index !== encoreIndex;
+        const isLocked = isRampageBlocked || isEncoreBlocked;
+        const canUse = haspp && !isDisabled && !isLocked;
         const badge = getEffectivenessBadge(move.type, move.power, enemyDataId);
 
         return (
           <button
             key={index}
             onClick={() => {
-              if (haspp) {
+              if (canUse) {
                 soundManager.playClick();
                 onSelectMove(index);
               }
             }}
-            disabled={!haspp}
+            disabled={!canUse}
             style={{
               padding: '10px 8px',
-              background: haspp ? `${typeColors[move.type] || '#555'}22` : '#1a1a1a',
-              border: `2px solid ${haspp ? typeColors[move.type] || '#555' : '#333'}`,
+              background: (isRampageForced || isEncoreForced) ? `${typeColors[move.type] || '#555'}44` : canUse ? `${typeColors[move.type] || '#555'}22` : '#1a1a1a',
+              border: `2px solid ${(isRampageForced || isEncoreForced) ? '#ff6060' : canUse ? typeColors[move.type] || '#555' : '#333'}`,
               borderRadius: '8px',
-              cursor: haspp ? 'pointer' : 'not-allowed',
-              opacity: haspp ? 1 : 0.4,
+              cursor: canUse ? 'pointer' : 'not-allowed',
+              opacity: canUse ? 1 : 0.4,
               textAlign: 'left',
               position: 'relative',
             }}

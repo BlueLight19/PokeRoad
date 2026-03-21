@@ -26,6 +26,7 @@ export interface DBPokemon {
   sprite_url: string;
   shiny_sprite_url?: string;
   evolutions: Array<{ to: number; level?: number; method: string; condition?: string }>;
+  abilities: string[];
 }
 
 export interface DBMove {
