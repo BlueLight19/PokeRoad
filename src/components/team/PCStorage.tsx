@@ -364,11 +364,6 @@ export function PCStorage() {
         })}
       </div>
 
-      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-        <Button variant="ghost" onClick={() => setView('world_map')}>
-          Quitter
-        </Button>
-      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { theme } from '../../theme';
 
 interface ModalProps {
   open: boolean;
@@ -15,7 +16,7 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.7)',
+        background: theme.colors.overlay,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -25,10 +26,10 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
     >
       <div
         style={{
-          background: '#1a1a2e',
-          border: '3px solid #e94560',
-          borderRadius: '12px',
-          padding: '20px',
+          background: theme.colors.panelBg,
+          border: theme.borders.thick(theme.colors.primary),
+          borderRadius: `${theme.radius.lg}px`,
+          padding: `${theme.spacing.xl}px`,
           maxWidth: '500px',
           width: '90%',
           maxHeight: '80vh',
@@ -38,10 +39,10 @@ export function Modal({ open, title, children, onClose }: ModalProps) {
       >
         <h2
           style={{
-            color: '#e94560',
-            fontSize: '14px',
-            fontFamily: "'Press Start 2P', monospace",
-            marginBottom: '16px',
+            color: theme.colors.primary,
+            fontSize: theme.font.xxl,
+            fontFamily: theme.font.family,
+            marginBottom: `${theme.spacing.lg}px`,
             textAlign: 'center',
           }}
         >

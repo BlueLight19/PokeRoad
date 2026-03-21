@@ -19,6 +19,7 @@ import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
 import { NotificationOverlay } from './components/ui/NotificationOverlay';
+import { NavBar } from './components/ui/NavBar';
 
 // --- LOADING SCREEN ---
 function LoadingScreen({ progress, table }: { progress: number; table: string }) {
@@ -99,6 +100,9 @@ function DevTools() {
 
     if (currentView === 'title') return null;
 
+    const hasNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+    const devBottom = hasNavBar ? '70px' : '10px';
+
     if (!isOpen) {
         return (
             <button
@@ -107,7 +111,7 @@ function DevTools() {
                     setIsOpen(true);
                 }}
                 style={{
-                    position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+                    position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
                     background: '#e94560', color: '#fff', border: '2px solid #fff',
                     padding: '6px 10px', fontFamily: "'Press Start 2P', monospace", fontSize: '8px',
                     cursor: 'pointer', borderRadius: '4px', boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
@@ -178,7 +182,7 @@ function DevTools() {
     if (!isAuthenticated) {
         return (
             <div style={{
-                position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+                position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
                 background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
                 padding: '10px', display: 'flex', flexDirection: 'column', width: '200px',
                 boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
@@ -209,7 +213,7 @@ function DevTools() {
 
     return (
         <div style={{
-            position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+            position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
             background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
             padding: '10px', display: 'flex', flexDirection: 'column',
             boxShadow: '0 4px 10px rgba(0,0,0,0.5)', width: '240px', maxHeight: '80vh', overflowY: 'auto'
@@ -434,6 +438,8 @@ function App() {
         }
     };
 
+    const showNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+
     return (
         <div
             style={{
@@ -444,13 +450,16 @@ function App() {
                 maxWidth: '900px',
                 margin: '0 auto',
                 padding: '0 8px',
+                paddingBottom: showNavBar ? '66px' : '0',
             }}
         >
-            {renderView()}
+            <div key={currentView} className="view-enter">
+                {renderView()}
+            </div>
             {pendingEvolution && <EvolutionModal />}
             {pendingMoveLearn && <MoveLearnModal />}
             <NotificationOverlay />
-
+            <NavBar />
             <DevTools />
         </div>
     );

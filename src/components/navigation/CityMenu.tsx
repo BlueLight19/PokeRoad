@@ -142,6 +142,22 @@ export function CityMenu() {
           padding: '24px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       }}>
+        {/* Back to Map */}
+        <button
+          onClick={() => { soundManager.playClick(); setView('world_map'); }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace",
+            padding: '4px 0', marginBottom: '12px',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#aaa')}
+        >
+          <span style={{ fontSize: '12px' }}>{'\u2190'}</span> Carte
+        </button>
+
         {/* Header Card */}
         <div style={{
             background: 'linear-gradient(135deg, #1a1a2e 0%, #0f1923 100%)',
@@ -609,12 +625,6 @@ export function CityMenu() {
           </div>
         </button>
 
-        {/* Back button */}
-        <div style={{ marginTop: '12px' }}>
-          <Button variant="ghost" onClick={() => setView('world_map')}>
-            Retour
-          </Button>
-        </div>
       </div>
       </div>
     </div>

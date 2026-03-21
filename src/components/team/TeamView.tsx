@@ -358,11 +358,7 @@ export function TeamView() {
         })}
       </div>
 
-      <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
-        <Button variant="ghost" onClick={() => setView('world_map')}>
-          Retour
-        </Button>
-      </div>
+      {/* Navigation handled by NavBar */}
     </div>
   );
 }

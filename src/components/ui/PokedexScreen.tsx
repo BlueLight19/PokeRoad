@@ -86,11 +86,6 @@ export function PokedexScreen() {
                 })}
             </div>
 
-            <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-                <Button variant="ghost" onClick={() => setView('world_map')}>
-                    Retour
-                </Button>
-            </div>
         </div>
     );
 }
