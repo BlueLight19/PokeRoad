@@ -1,4 +1,4 @@
-import { PokemonInstance, MoveData, StatName, MoveInstance } from '../types/pokemon';
+import { PokemonInstance, MoveData, StatName, MoveInstance, freshStatStages } from '../types/pokemon';
 import { BattleLogEntry, SideConditions } from '../types/battle';
 import { getPokemonData, getMoveData, getAllMoveIds } from '../utils/dataLoader';
 import { getEffectiveStat } from './statCalculator';
@@ -44,7 +44,7 @@ const effectHandlers: Record<string, EffectHandler> = {
         logs.push({ message: `Les stats de ${name} ne peuvent pas aller plus loin !`, type: 'info' });
         return;
       }
-      (target.statStages as Record<string, number>)[stat] = newStage;
+      (target.statStages as any)[stat] = newStage;
       const direction = stages > 0 ? 'monte' : 'baisse';
       const intensity = Math.abs(stages) > 1 ? ' beaucoup' : '';
       logs.push({ message: `${statNames[stat] || stat} de ${name} ${direction}${intensity} !`, type: 'info' });
@@ -485,9 +485,8 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
 
   // Haze (Buée Noire) — ID 114
   if (moveId === 114 || moveName.includes('buée noire') || moveName.includes('haze')) {
-    const reset = { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 };
-    ctx.attacker.statStages = { ...reset };
-    ctx.defender.statStages = { ...reset };
+    ctx.attacker.statStages = freshStatStages();
+    ctx.defender.statStages = freshStatStages();
     return [{ message: `Toutes les modifications de stats sont annulées !`, type: 'info' }];
   }
 

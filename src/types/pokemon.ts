@@ -156,6 +156,28 @@ export function freshVolatile(): VolatileStatus {
   };
 }
 
+export interface StatStages {
+  attack: number;
+  defense: number;
+  spAtk: number;
+  spDef: number;
+  speed: number;
+  accuracy: number;
+  evasion: number;
+}
+
+export function freshStatStages(): StatStages {
+  return {
+    attack: 0,
+    defense: 0,
+    spAtk: 0,
+    spDef: 0,
+    speed: 0,
+    accuracy: 0,
+    evasion: 0,
+  };
+}
+
 export interface PokemonInstance {
   uid: string;
   dataId: number;
@@ -170,7 +192,7 @@ export interface PokemonInstance {
   status: StatusCondition;
   statusTurns: number;
   volatile: VolatileStatus;
-  statStages: BaseStats; // Representing stages -6 to +6
+  statStages: StatStages; // Representing stages -6 to +6
   xp: number;
   xpToNextLevel: number;
   friendship: number;

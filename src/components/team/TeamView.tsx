@@ -1,17 +1,24 @@
 import React from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getPokemonData, getMoveData } from '../../utils/dataLoader';
+import { getPokemonData, getMoveData, getItemData, getAllItems } from '../../utils/dataLoader';
 import { xpForLevel } from '../../engine/experienceCalculator';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { Button } from '../ui/Button';
 import { soundManager } from '../../utils/SoundManager';
+import { ItemCategory } from '../../types/inventory';
+import { typeColors } from '../../utils/typeColors';
 
 export function TeamView() {
-  const { team, setView, selectedPokemonIndex, healTeam, switchTeamOrder } = useGameStore();
+  const { team, setView, selectedPokemonIndex, healTeam, switchTeamOrder, setHeldItem, inventory } = useGameStore();
   const [selected, setSelected] = React.useState<number | null>(null);
   const [dragIndex, setDragIndex] = React.useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null);
+  const [showItemPicker, setShowItemPicker] = React.useState(false);
+
+  const HELD_CATEGORIES: ItemCategory[] = [
+    'held-items', 'type-enhancement', 'in-a-pinch', 'choice', 'bad-held-items', 'scarves',
+  ];
 
   // Detailed view of a Pokémon
   if (selected !== null) {
@@ -142,6 +149,120 @@ export function TeamView() {
           })}
         </div>
 
+        {/* Held Item */}
+        <div style={{ marginTop: '16px' }}>
+          <h4 style={{ color: '#e94560', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+            Objet tenu
+          </h4>
+          {pokemon.heldItem ? (() => {
+            let itemName = pokemon.heldItem;
+            try { itemName = getItemData(pokemon.heldItem).name; } catch {}
+            return (
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '6px 8px', background: 'rgba(22, 33, 62, 0.8)', borderRadius: '4px',
+              }}>
+                <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
+                  {itemName}
+                </span>
+                <Button variant="ghost" onClick={() => {
+                  soundManager.playClick();
+                  setHeldItem(selected, null);
+                }}>
+                  Retirer
+                </Button>
+              </div>
+            );
+          })() : (
+            <div style={{ color: '#666', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", padding: '6px 8px' }}>
+              Pas d'objet tenu
+            </div>
+          )}
+          <div style={{ marginTop: '8px' }}>
+            <Button variant="primary" onClick={() => {
+              soundManager.playClick();
+              setShowItemPicker(true);
+            }}>
+              Donner objet
+            </Button>
+          </div>
+        </div>
+
+        {/* Item Picker Modal */}
+        {showItemPicker && (() => {
+          const holdableItems = inventory
+            .map(inv => {
+              try {
+                const data = getItemData(inv.itemId);
+                return { inv, data };
+              } catch {
+                return null;
+              }
+            })
+            .filter((entry): entry is NonNullable<typeof entry> => {
+              if (!entry || entry.inv.quantity <= 0) return false;
+              return HELD_CATEGORIES.includes(entry.data.category);
+            });
+
+          return (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0,0,0,0.85)', zIndex: 1000,
+              display: 'flex', justifyContent: 'center', alignItems: 'center',
+            }}>
+              <div style={{
+                background: '#1a1a2e', border: '2px solid #333', borderRadius: '8px',
+                padding: '16px', maxWidth: '420px', width: '90%', maxHeight: '70vh', overflow: 'auto',
+              }}>
+                <h3 style={{ color: '#2196F3', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", marginBottom: '12px', textAlign: 'center' }}>
+                  Choisir un objet
+                </h3>
+                {holdableItems.length === 0 ? (
+                  <div style={{ color: '#666', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", textAlign: 'center', padding: '16px' }}>
+                    Aucun objet disponible
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {holdableItems.map(({ inv, data }) => (
+                      <button
+                        key={inv.itemId}
+                        onClick={() => {
+                          soundManager.playClick();
+                          setHeldItem(selected, inv.itemId);
+                          setShowItemPicker(false);
+                        }}
+                        style={{
+                          display: 'flex', flexDirection: 'column', gap: '2px',
+                          padding: '8px', background: 'rgba(22, 33, 62, 0.8)',
+                          border: '1px solid #333', borderRadius: '4px',
+                          cursor: 'pointer', textAlign: 'left',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
+                            {data.name}
+                          </span>
+                          <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+                            x{inv.quantity}
+                          </span>
+                        </div>
+                        <span style={{ color: '#888', fontSize: '7px', fontFamily: "'Press Start 2P', monospace", lineHeight: '1.4' }}>
+                          {data.description}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                  <Button variant="ghost" onClick={() => setShowItemPicker(false)}>
+                    Annuler
+                  </Button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         <div style={{ marginTop: '16px' }}>
           <Button variant="ghost" onClick={() => setSelected(null)}>
             Retour
@@ -245,14 +366,6 @@ export function TeamView() {
     </div>
   );
 }
-
-const typeColors: Record<string, string> = {
-  normal: '#A8A878', feu: '#F08030', eau: '#6890F0', plante: '#78C850',
-  electrique: '#F8D030', glace: '#98D8D8', combat: '#C03028', poison: '#A040A0',
-  sol: '#E0C068', vol: '#A890F0', psy: '#F85888', insecte: '#A8B820',
-  roche: '#B8A038', spectre: '#705898', dragon: '#7038F8',
-  ténèbres: '#705848', dark: '#705848', acier: '#B8B8D0', steel: '#B8B8D0', fée: '#EE99AC', fairy: '#EE99AC',
-};
 
 const statNames: Record<string, string> = {
   hp: 'PV', attack: 'Attaque', defense: 'Defense',

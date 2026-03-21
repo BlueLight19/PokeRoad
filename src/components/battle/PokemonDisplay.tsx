@@ -1,20 +1,13 @@
 import { PokemonInstance } from '../../types/pokemon';
-import { getPokemonData } from '../../utils/dataLoader';
+import { getPokemonData, getItemData } from '../../utils/dataLoader';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
+import { typeColors } from '../../utils/typeColors';
 
 interface PokemonDisplayProps {
   pokemon: PokemonInstance;
   isPlayer: boolean;
 }
-
-const typeColors: Record<string, string> = {
-  normal: '#A8A878', feu: '#F08030', eau: '#6890F0', plante: '#78C850',
-  electrique: '#F8D030', glace: '#98D8D8', combat: '#C03028', poison: '#A040A0',
-  sol: '#E0C068', vol: '#A890F0', psy: '#F85888', insecte: '#A8B820',
-  roche: '#B8A038', spectre: '#705898', dragon: '#7038F8',
-  ténèbres: '#705848', dark: '#705848', acier: '#B8B8D0', steel: '#B8B8D0', fée: '#EE99AC', fairy: '#EE99AC',
-};
 
 export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
   const data = getPokemonData(pokemon.dataId);
@@ -147,6 +140,107 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
             </span>
           ))}
         </div>
+
+        {/* Held item */}
+        {pokemon.heldItem && (() => {
+          const item = getItemData(pokemon.heldItem);
+          return (
+            <div style={{
+              fontSize: '7px',
+              fontFamily: "'Press Start 2P', monospace",
+              color: '#aaa',
+              marginTop: '4px',
+            }}>
+              🔹 {item.name}
+            </div>
+          );
+        })()}
+
+        {/* Stat changes */}
+        {(() => {
+          const s = pokemon.statStages;
+          const boosts: { label: string; stage: number; color: string }[] = [];
+          if (s.attack !== 0) boosts.push({ label: 'Atk', stage: s.attack, color: s.attack > 0 ? '#FF9800' : '#2196F3' });
+          if (s.defense !== 0) boosts.push({ label: 'Def', stage: s.defense, color: s.defense > 0 ? '#FFEB3B' : '#9C27B0' });
+          if (s.spAtk !== 0) boosts.push({ label: 'SpA', stage: s.spAtk, color: s.spAtk > 0 ? '#FF5722' : '#3F51B5' });
+          if (s.spDef !== 0) boosts.push({ label: 'SpD', stage: s.spDef, color: s.spDef > 0 ? '#CDDC39' : '#673AB7' });
+          if (s.speed !== 0) boosts.push({ label: 'Spe', stage: s.speed, color: s.speed > 0 ? '#4CAF50' : '#795548' });
+          if (s.accuracy !== 0) boosts.push({ label: 'Acc', stage: s.accuracy, color: s.accuracy > 0 ? '#00BCD4' : '#607D8B' });
+          if (s.evasion !== 0) boosts.push({ label: 'Esa', stage: s.evasion, color: s.evasion > 0 ? '#009688' : '#9E9E9E' });
+
+          if (boosts.length === 0) return null;
+          return (
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '4px',
+              marginTop: '6px',
+            }}>
+              {boosts.map((b, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: 'inline-block',
+                    padding: '2px 4px',
+                    borderRadius: '4px',
+                    fontSize: '6px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    color: b.stage > 0 ? '#fff' : '#fff',
+                    background: `${b.color}99`,
+                    border: `1px solid ${b.color}`,
+                    boxShadow: b.stage > 0 ? `0 0 5px ${b.color}aa` : 'none',
+                  }}
+                >
+                  {b.label} {b.stage > 0 ? `+${b.stage}` : b.stage}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* Volatile status indicators */}
+        {(() => {
+          const v = pokemon.volatile;
+          const volatiles: { label: string; color: string }[] = [];
+          if (v.confusion > 0) volatiles.push({ label: 'Confus', color: '#FF9800' });
+          if (v.leechSeed) volatiles.push({ label: 'Vampigraine', color: '#4CAF50' });
+          if (v.cursed) volatiles.push({ label: 'Malédiction', color: '#705898' });
+          if (v.bound > 0) volatiles.push({ label: 'Piégé', color: '#C03028' });
+          if (v.tauntTurns > 0) volatiles.push({ label: 'Provoqué', color: '#e94560' });
+          if (v.encoreTurns > 0) volatiles.push({ label: 'Encore', color: '#FF9800' });
+          if (v.substituteHp > 0) volatiles.push({ label: 'Clone', color: '#2196F3' });
+          if (v.ingrain) volatiles.push({ label: 'Enraciné', color: '#78C850' });
+          if (v.aquaRing) volatiles.push({ label: 'Anneau Hydro', color: '#6890F0' });
+          if (v.trapped) volatiles.push({ label: 'Piégé', color: '#A040A0' });
+          if (v.perishTurns >= 0) volatiles.push({ label: `Requiem ${v.perishTurns}`, color: '#705898' });
+          if (volatiles.length === 0) return null;
+          return (
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '3px',
+              marginTop: '4px',
+            }}>
+              {volatiles.map((vs, i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: 'inline-block',
+                    padding: '1px 4px',
+                    borderRadius: '6px',
+                    fontSize: '6px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    color: '#fff',
+                    background: `${vs.color}88`,
+                    border: `1px solid ${vs.color}`,
+                  }}
+                >
+                  {vs.label}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

@@ -93,6 +93,7 @@ export interface GameState {
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
   givePlayerPokemon: (pokemonId: number, level: number) => void;
   switchTeamOrder: (idx1: number, idx2: number) => void;
+  setHeldItem: (pokemonIndex: number, itemId: string | null) => void;
   releasePokemon: (uid: string) => void;
   moveToPc: (uid: string) => void;
   moveFromPc: (uid: string) => void;
@@ -353,6 +354,38 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ team });
   },
 
+  setHeldItem: (pokemonIndex: number, itemId: string | null) => {
+    const state = get();
+    const team = [...state.team];
+    const pokemon = team[pokemonIndex];
+    if (!pokemon) return;
+    const inventory = [...state.inventory];
+
+    // Return old held item to inventory
+    if (pokemon.heldItem) {
+      const oldItemIdx = inventory.findIndex(i => i.itemId === pokemon.heldItem);
+      if (oldItemIdx >= 0) {
+        inventory[oldItemIdx] = { ...inventory[oldItemIdx], quantity: inventory[oldItemIdx].quantity + 1 };
+      } else {
+        inventory.push({ itemId: pokemon.heldItem, quantity: 1 });
+      }
+    }
+
+    // Remove new item from inventory
+    if (itemId) {
+      const newItemIdx = inventory.findIndex(i => i.itemId === itemId);
+      if (newItemIdx < 0 || inventory[newItemIdx].quantity <= 0) return;
+      inventory[newItemIdx] = { ...inventory[newItemIdx], quantity: inventory[newItemIdx].quantity - 1 };
+      if (inventory[newItemIdx].quantity <= 0) {
+        inventory.splice(newItemIdx, 1);
+      }
+    }
+
+    team[pokemonIndex] = { ...pokemon, heldItem: itemId };
+    set({ team, inventory });
+    fireAndForgetSave(get());
+  },
+
   releasePokemon: (uid: string) => {
     const state = get();
     const inTeam = state.team.find(p => p.uid === uid);
@@ -522,7 +555,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
 
         const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
-        get().removeItem(itemId, 1);
+        // TMs are reusable — don't consume them
         set({ team: [...state.team] });
         return { success: true, message: `${name} apprend ${moveData.name} !` };
       } else {
@@ -1072,17 +1105,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         maxPp: moveData.pp,
       };
 
-      const sourceItem = pendingMoveLearn.sourceItem;
-      if (sourceItem) {
-        const { inventory } = get();
-        const currentQty = inventory.find(i => i.itemId === sourceItem)?.quantity || 0;
-        if (currentQty > 0) {
-          const newInventory = inventory
-            .map(i => i.itemId === sourceItem ? { ...i, quantity: i.quantity - 1 } : i)
-            .filter(i => i.quantity > 0);
-          set({ inventory: newInventory });
-        }
-      }
+      // TMs are reusable — don't consume sourceItem for TM teaches
     }
 
     const queue = get().pendingMoveQueue;

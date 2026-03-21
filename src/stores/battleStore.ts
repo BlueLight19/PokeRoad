@@ -3,6 +3,7 @@ import {
   PokemonInstance,
   MoveInstance,
   freshVolatile,
+  freshStatStages,
 } from '../types/pokemon';
 import { BattlePhase, BattleType, BattleLogEntry, SideConditions, freshSideConditions } from '../types/battle';
 import {
@@ -897,7 +898,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       newTeam[teamIndex] = {
         ...newTeam[teamIndex],
         volatile: freshVolatile(),
-        statStages: { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 }
+        statStages: freshStatStages()
       };
       return { playerTeam: newTeam };
     });

@@ -1,4 +1,4 @@
-import { PokemonInstance, BaseStats, ExpGroup, PokemonData, freshVolatile } from '../types/pokemon';
+import { PokemonInstance, BaseStats, ExpGroup, PokemonData, freshVolatile, freshStatStages } from '../types/pokemon';
 import { getPokemonData } from '../utils/dataLoader';
 
 /**
@@ -240,7 +240,7 @@ export function createPokemonInstance(
     status: null,
     statusTurns: 0,
     volatile: freshVolatile(),
-    statStages: { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 },
+    statStages: freshStatStages(),
     xp: xpCurrent,
     xpToNextLevel: xpNext,
     friendship: 70,

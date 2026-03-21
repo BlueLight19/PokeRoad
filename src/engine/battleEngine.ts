@@ -1,4 +1,4 @@
-import { PokemonInstance, MoveData, StatusCondition, MoveInstance, freshVolatile } from '../types/pokemon';
+import { PokemonInstance, MoveData, StatusCondition, MoveInstance, freshVolatile, freshStatStages } from '../types/pokemon';
 import { BattleLogEntry, BattleAction, SideConditions } from '../types/battle';
 import { calculateDamage, } from './damageCalculator';
 import { getEffectiveStat } from './statCalculator';
@@ -384,7 +384,7 @@ export function tryApplyStatChange(
   }
 
   // Apply stage (supports accuracy/evasion as extended battle stats)
-  const currentStage = (target.statStages as Record<string, number>)[stat] ?? 0;
+  const currentStage = (target.statStages as any)[stat] ?? 0;
   const newStage = Math.max(-6, Math.min(6, currentStage + stages));
 
   if (currentStage === newStage) {
@@ -392,7 +392,7 @@ export function tryApplyStatChange(
     return logs;
   }
 
-  (target.statStages as Record<string, number>)[stat] = newStage;
+  (target.statStages as any)[stat] = newStage;
 
   const direction = stages > 0 ? 'monte' : 'baisse';
   const intensity = Math.abs(stages) > 1 ? 'beaucoup' : '';
@@ -582,8 +582,8 @@ export function executeMove(
       if (stage >= 0) return (3 + stage) / 3;
       return 3 / (3 - stage);
     };
-    const accStage = (attacker.statStages as Record<string, number>)['accuracy'] ?? 0;
-    const evaStage = (defender.statStages as Record<string, number>)['evasion'] ?? 0;
+    const accStage = attacker.statStages.accuracy;
+    const evaStage = defender.statStages.evasion;
     let baseAccuracy = move.accuracy;
     if (abilityIsCompoundEyes(attacker.ability)) baseAccuracy = Math.floor(baseAccuracy * 1.3);
     // Held item accuracy boost (Wide Lens, Zoom Lens)
@@ -607,8 +607,14 @@ export function executeMove(
   let defenderFainted = false;
 
   if (move.category === 'status') {
+    // Determine if this is a self-targeting move:
+    // - Explicit target === 'self'
+    // - Stat boost moves with positive stages (DB has target='all' for self-buffs like Swords Dance, Harden)
+    const isSelfTarget = move.target === 'self'
+      || (move.effect?.type === 'stat' && (move.effect.stages ?? 0) > 0);
+
     // Status move: apply effect via registry or inline
-    if (move.target === 'self') {
+    if (isSelfTarget) {
       // Handle Rest specially: heal fully, cure status, apply 2-turn sleep
       if (move.effect?.type === 'status' && move.effect.status === 'sleep') {
         if (attacker.currentHp >= attacker.maxHp) {
@@ -1123,7 +1129,7 @@ export function fullHealTeam(team: PokemonInstance[]): void {
     pokemon.status = null;
     pokemon.statusTurns = 0;
     pokemon.volatile = freshVolatile();
-    pokemon.statStages = { hp: 0, attack: 0, defense: 0, spAtk: 0, spDef: 0, speed: 0 };
+    pokemon.statStages = freshStatStages();
     for (const move of pokemon.moves) {
       move.currentPp = move.maxPp;
     }
