@@ -649,10 +649,14 @@ export function getShopItems(): ItemData[] {
 export function getCityShopItems(cityId: string): ItemData[] {
   const city = getZoneData(cityId) as CityData;
 
+  console.log(`[Boutique] Zone "${cityId}": hasShop=${city.hasShop}, shopItems=`, city.shopItems);
+
   if (!city.hasShop) return [];
 
   if (!city.shopItems || city.shopItems.length === 0) {
-    return getShopItems();
+    const fallback = getShopItems();
+    console.log(`[Boutique] No shopItems for "${cityId}", fallback: ${fallback.length} items with price > 0`);
+    return fallback;
   }
 
   return city.shopItems.map(itemId => {

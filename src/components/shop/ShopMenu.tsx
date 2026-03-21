@@ -12,9 +12,16 @@ export function ShopMenu() {
 
   const items = selectedZone ? getCityShopItems(selectedZone) : getShopItems();
   const sellableInventory = inventory.filter(invItem => {
-    const itemData = getItemData(invItem.itemId);
-    return itemData && itemData.price > 0;
+    try {
+      const itemData = getItemData(invItem.itemId);
+      return itemData && itemData.price > 0;
+    } catch {
+      return false;
+    }
   });
+
+  // Debug: log shop state
+  console.log('[ShopMenu]', { selectedZone, itemCount: items.length, inventorySize: inventory.length });
 
   const handleBuy = (itemId: string, price: number) => {
     const qty = quantities[itemId] || 1;
