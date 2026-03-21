@@ -7,6 +7,8 @@ import { supabase } from './supabaseClient';
 const DB_NAME = 'pokemon_game_db';
 const DB_VERSION = 1;
 const SYNC_KEY = 'last_sync_timestamp';
+// Bump this to force a re-sync on next app load (bypasses IndexedDB cache)
+const LOCAL_DATA_VERSION = '0.4.0';
 
 // ——————————————————————————————————————————————
 // 1. Raw DB types (snake_case, matching Supabase columns)
@@ -26,6 +28,7 @@ export interface DBPokemon {
   sprite_url: string;
   shiny_sprite_url?: string;
   evolutions: Array<{ to: number; level?: number; method: string; condition?: string }>;
+  abilities: string[];
 }
 
 export interface DBMove {
@@ -375,10 +378,20 @@ export async function initGameData(
   if (!syncEntry) {
     // First launch: full sync
     await syncFromSupabase(onProgress);
+    await db.put('player_progress', { key: 'data_version', value: LOCAL_DATA_VERSION });
     return;
   }
 
-  // Optional: check remote version for re-sync
+  // Check local code version — forces re-sync when LOCAL_DATA_VERSION is bumped
+  const localVersion = await db.get('player_progress', 'data_version');
+  if ((localVersion as DBProgressEntry | undefined)?.value !== LOCAL_DATA_VERSION) {
+    console.log(`[sync] Local version mismatch (${(localVersion as DBProgressEntry | undefined)?.value} → ${LOCAL_DATA_VERSION}), re-syncing...`);
+    await syncFromSupabase(onProgress);
+    await db.put('player_progress', { key: 'data_version', value: LOCAL_DATA_VERSION });
+    return;
+  }
+
+  // Also check remote version for hot Supabase updates
   try {
     const { data } = await supabase
       .from('game_meta')
@@ -386,13 +399,14 @@ export async function initGameData(
       .eq('key', 'data_version')
       .single();
 
-    const local = await db.get('player_progress', 'data_version');
-    if (data?.value !== (local as DBProgressEntry | undefined)?.value) {
+    if (data?.value && data.value !== LOCAL_DATA_VERSION) {
+      console.log(`[sync] Remote version ${data.value} differs, re-syncing...`);
       await syncFromSupabase(onProgress);
-      await db.put('player_progress', { key: 'data_version', value: data?.value });
+      await db.put('player_progress', { key: 'data_version', value: data.value });
     }
   } catch {
-    // game_meta table might not exist, skip version check
+    // game_meta table might not exist — not critical since local version check covers it
+    console.warn('[sync] game_meta check failed');
   }
 }
 

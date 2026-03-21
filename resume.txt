@@ -1,1 +1,1 @@
-claude --resume 2e15de44-bf73-4252-9596-8b99ce5c82b9
+claude --resume "refactor-battle-effect-registry"

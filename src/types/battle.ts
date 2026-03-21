@@ -56,6 +56,30 @@ export interface BattleAction {
   itemId?: string;
 }
 
+export interface SideConditions {
+  reflect: number;       // Turns remaining (0 = inactive)
+  lightScreen: number;   // Turns remaining
+  auroraVeil: number;    // Turns remaining
+  spikes: number;        // Layers (0-3)
+  toxicSpikes: number;   // Layers (0-2)
+  stealthRock: boolean;
+  stickyWeb: boolean;
+  tailwind: number;      // Turns remaining
+}
+
+export function freshSideConditions(): SideConditions {
+  return {
+    reflect: 0,
+    lightScreen: 0,
+    auroraVeil: 0,
+    spikes: 0,
+    toxicSpikes: 0,
+    stealthRock: false,
+    stickyWeb: false,
+    tailwind: 0,
+  };
+}
+
 export interface DamageResult {
   damage: number;
   effectiveness: number;

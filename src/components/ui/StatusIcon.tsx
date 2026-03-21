@@ -9,6 +9,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
   paralysis: { label: 'PAR', color: '#fff', bg: '#FFD600' },
   sleep: { label: 'SOM', color: '#fff', bg: '#9E9E9E' },
   poison: { label: 'PSN', color: '#fff', bg: '#9C27B0' },
+  toxic: { label: 'TOX', color: '#fff', bg: '#7B1FA2' },
   burn: { label: 'BRL', color: '#fff', bg: '#FF5722' },
   freeze: { label: 'GEL', color: '#333', bg: '#00BCD4' },
 };

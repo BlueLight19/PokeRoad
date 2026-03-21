@@ -12,10 +12,9 @@ export function getEffectiveStat(pokemon: PokemonInstance, stat: keyof BaseStats
         multiplier = 2 / (2 + Math.abs(stage));
     }
 
-    // Paralysis drops speed
+    // Paralysis drops speed (Gen 9: 0.5x)
     if (stat === 'speed' && pokemon.status === 'paralysis') {
-        multiplier *= 0.25; // Gen 1/2 was 0.25, later 0.5. Let's stick to 0.25 for severe penalty or 0.5 for modern.
-        // The previous code had 0.25. Let's keep 0.25.
+        multiplier *= 0.5;
     }
 
     // Burn drops Attack

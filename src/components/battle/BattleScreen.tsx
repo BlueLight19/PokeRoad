@@ -573,6 +573,36 @@ export function BattleScreen() {
           </div>
         )}
 
+        {/* Weather indicator */}
+        {battle.weather && (() => {
+          const weatherInfo: Record<string, { label: string; color: string }> = {
+            sun: { label: 'Ensoleillé ☀️', color: '#FF9800' },
+            rain: { label: 'Pluie 🌧️', color: '#2196F3' },
+            sandstorm: { label: 'Tempête de sable 🏜️', color: '#C8A951' },
+            hail: { label: 'Grêle ❄️', color: '#81D4FA' },
+          };
+          const w = weatherInfo[battle.weather];
+          return w ? (
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '6px',
+            }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '3px 12px',
+                borderRadius: '12px',
+                fontSize: '8px',
+                fontFamily: "'Press Start 2P', monospace",
+                color: '#fff',
+                background: `${w.color}55`,
+                border: `1px solid ${w.color}`,
+              }}>
+                {w.label}
+              </span>
+            </div>
+          ) : null;
+        })()}
+
         {/* Enemy display */}
         <div style={{
           transform: shakeEnemy ? 'translateX(-5px)' : 'none',

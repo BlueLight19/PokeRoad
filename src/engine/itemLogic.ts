@@ -1,4 +1,4 @@
-import { PokemonInstance, BaseStats } from '../types/pokemon';
+import { PokemonInstance, BaseStats, freshVolatile } from '../types/pokemon';
 import { ItemData } from '../types/inventory';
 import { checkStoneEvolution, evolvePokemon } from './evolutionEngine';
 import { recalculateStats, processLevelUp, xpForLevel, LevelUpResult } from './experienceCalculator';
@@ -68,7 +68,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         target.currentHp = Math.floor(target.maxHp * (percent / 100));
         target.status = null;
         target.statusTurns = 0;
-        target.volatile = { confusion: 0, flinch: false, leechSeed: false, bound: 0 };
+        target.volatile = freshVolatile();
 
         return { success: true, message: "Le Pokémon est ravivé !", consumed: true };
     }
@@ -226,4 +226,62 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
 
     // Default
     return { success: false, message: "Impossible d'utiliser cet objet ici.", consumed: false };
+}
+
+/**
+ * Use a battle item (X Attack, X Defense, Guard Spec, Dire Hit, etc.)
+ * Returns result with stat stage changes applied to the target.
+ */
+export function useBattleItem(item: ItemData, target: PokemonInstance): ItemUseResult {
+    if (!item.effect) {
+        return { success: false, message: "Cet objet n'a aucun effet.", consumed: false };
+    }
+
+    if (target.currentHp === 0) {
+        return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
+    }
+
+    const name = target.nickname || getPokemonData(target.dataId).name;
+
+    // Battle stat boost (X Attack, X Defense, X Speed, X Special, etc.)
+    if (item.effect.type === 'battle_stat') {
+        const stat = item.effect.stat as keyof BaseStats;
+        const stages = item.effect.stages ?? 1;
+
+        if (!stat || !(stat in target.statStages)) {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
+        }
+
+        const current = target.statStages[stat];
+        const newStage = Math.max(-6, Math.min(6, current + stages));
+
+        if (current === newStage) {
+            return { success: false, message: "Les stats ne peuvent pas aller plus loin !", consumed: false };
+        }
+
+        target.statStages[stat] = newStage;
+
+        const statNames: Record<string, string> = {
+            attack: 'Attaque', defense: 'Défense', spAtk: 'Attaque Spé.',
+            spDef: 'Défense Spé.', speed: 'Vitesse',
+        };
+
+        return {
+            success: true,
+            message: `${statNames[stat] || stat} de ${name} monte !`,
+            consumed: true,
+        };
+    }
+
+    // Guard Spec (Brume équivalent) — sets mist volatile to prevent stat drops
+    if (item.id === 'guard-spec' || item.id === 'garde-specs') {
+        if (target.volatile.mistTurns > 0) {
+            return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
+        }
+        target.volatile.mistTurns = 5;
+        return { success: true, message: `${name} est protégé contre les baisses de stats !`, consumed: true };
+    }
+
+    // Fall through to regular useItem for heal/revive/status_cure in battle
+    return useItem(item, target);
 }

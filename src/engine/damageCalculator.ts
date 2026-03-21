@@ -1,7 +1,9 @@
 import { PokemonInstance, MoveData, PokemonType } from '../types/pokemon';
-import { DamageResult } from '../types/battle';
+import { DamageResult, SideConditions } from '../types/battle';
 import { getPokemonData, getTypeEffectiveness } from '../utils/dataLoader';
 import { getEffectiveStat } from './statCalculator';
+import { abilityBlocksCrit, triggerAbility, abilityIsMoldBreaker } from './abilityEffects';
+import { triggerHeldItem } from './heldItemEffects';
 
 /**
  * Pokémon damage formula:
@@ -11,7 +13,9 @@ export function calculateDamage(
   attacker: PokemonInstance,
   defender: PokemonInstance,
   move: MoveData,
-  attackerBadges: string[] = []
+  attackerBadges: string[] = [],
+  weather: 'sun' | 'rain' | 'sandstorm' | 'hail' | null = null,
+  defenderSide?: SideConditions
 ): DamageResult {
   // Status moves do no damage
   if (move.category === 'status' || move.power === null) {
@@ -21,13 +25,19 @@ export function calculateDamage(
   const attackerData = getPokemonData(attacker.dataId);
   const defenderData = getPokemonData(defender.dataId);
 
-  // Critical hit check (Gen 1 style: based on base speed)
-  // Base chance: BaseSpeed / 512. For simplicity, we'll use a slightly boosted version or 1/16 if data missing.
-  const baseSpeed = attackerData.baseStats.speed;
-  let critThreshold = baseSpeed / 512;
-  // High crit moves have 8x multiplier in Gen 1
-  if ((move.effect?.type as any) === 'high_crit') critThreshold *= 8;
-  const isCritical = Math.random() < Math.min(0.99, critThreshold);
+  // Critical hit check (Gen 9 standard: stage-based)
+  // Shell Armor / Battle Armor block crits (unless attacker has Mold Breaker)
+  const defenderBlocksCrit = abilityBlocksCrit(defender.ability) && !abilityIsMoldBreaker(attacker.ability);
+  let critStage = 0;
+  if (move.effect?.type === 'critical' || (move.effect as any)?.high_crit) critStage += 1;
+  // Focus Energy: +2 crit stage
+  if (attacker.volatile.focusEnergy) critStage += 2;
+  // Held item crit boost (Scope Lens, Razor Claw)
+  const critItemResult = triggerHeldItem(attacker, 'modify-crit', { opponent: defender, move });
+  if (critItemResult.critStageBonus) critStage += critItemResult.critStageBonus;
+  const critRates = [1 / 24, 1 / 8, 1 / 2, 1, 1];
+  const critChance = critRates[Math.min(critStage, 4)];
+  const isCritical = !defenderBlocksCrit && Math.random() < critChance;
 
   // Physical vs Special split
   const atkStat = move.category === 'physical' ? 'attack' : 'spAtk';
@@ -37,7 +47,7 @@ export function calculateDamage(
   let def: number;
 
   if (isCritical) {
-    // Critical hits ignore stat stages in Gen 1 if they are detrimental
+    // Gen 9: crits ignore attacker's negative atk stages and defender's positive def stages
     atk = attacker.statStages[atkStat] < 0 ? attacker.stats[atkStat] : getEffectiveStat(attacker, atkStat);
     def = defender.statStages[defStat] > 0 ? defender.stats[defStat] : getEffectiveStat(defender, defStat);
   } else {
@@ -66,14 +76,61 @@ export function calculateDamage(
     baseDamage = Math.floor(baseDamage * 1.5);
   }
 
+  // Weather modifier (sun: fire x1.5 water x0.5, rain: water x1.5 fire x0.5)
+  if (weather === 'sun') {
+    if (move.type === 'fire') baseDamage = Math.floor(baseDamage * 1.5);
+    else if (move.type === 'water') baseDamage = Math.floor(baseDamage * 0.5);
+  } else if (weather === 'rain') {
+    if (move.type === 'water') baseDamage = Math.floor(baseDamage * 1.5);
+    else if (move.type === 'fire') baseDamage = Math.floor(baseDamage * 0.5);
+  }
+
   // Type effectiveness
   const effectiveness = getTypeEffectiveness(move.type, defenderData.types as PokemonType[]);
   baseDamage = Math.floor(baseDamage * effectiveness);
 
-  // Critical hit multiplier
+  // Critical hit multiplier (Gen 9: 1.5x)
   if (isCritical) {
-    // Gen 1 Crits are 2x (or near 2x)
-    baseDamage = Math.floor(baseDamage * 2);
+    baseDamage = Math.floor(baseDamage * 1.5);
+  }
+
+  // Screen damage reduction (Gen 9: 0.5x, ignored by crits)
+  if (!isCritical && defenderSide) {
+    if (move.category === 'physical' && (defenderSide.reflect > 0 || defenderSide.auroraVeil > 0)) {
+      baseDamage = Math.floor(baseDamage * 0.5);
+    } else if (move.category === 'special' && (defenderSide.lightScreen > 0 || defenderSide.auroraVeil > 0)) {
+      baseDamage = Math.floor(baseDamage * 0.5);
+    }
+  }
+
+  // Attacker ability damage modifier (Overgrow, Blaze, Torrent, Guts, Technician, etc.)
+  if (attacker.ability) {
+    const atkAbilityResult = triggerAbility(attacker.ability, 'modify-damage', {
+      pokemon: attacker, opponent: defender, trigger: 'modify-damage',
+      move, pokemonName: '', weather,
+    });
+    if (atkAbilityResult.damageMultiplier) {
+      baseDamage = Math.floor(baseDamage * atkAbilityResult.damageMultiplier);
+    }
+  }
+
+  // Defender ability damage modifier (Thick Fat, Filter, Solid Rock, Dry Skin)
+  if (defender.ability && !abilityIsMoldBreaker(attacker.ability)) {
+    const defAbilityResult = triggerAbility(defender.ability, 'modify-damage', {
+      pokemon: defender, opponent: attacker, trigger: 'modify-damage',
+      move, pokemonName: '', weather,
+    });
+    if (defAbilityResult.damageMultiplier) {
+      baseDamage = Math.floor(baseDamage * defAbilityResult.damageMultiplier);
+    }
+  }
+
+  // Attacker held item damage modifier (type boost, Life Orb, Choice Band, etc.)
+  const atkItemResult = triggerHeldItem(attacker, 'modify-damage', {
+    opponent: defender, move, effectiveness, weather,
+  });
+  if (atkItemResult.damageMultiplier) {
+    baseDamage = Math.floor(baseDamage * atkItemResult.damageMultiplier);
   }
 
   // Random factor (85-100%)

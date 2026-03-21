@@ -387,8 +387,8 @@ export function WorldMap() {
                                                     </span>
                                                 )}
 
-                                                {/* Trainer progress */}
-                                                {zoneTrainers.length > 0 && (
+                                                {/* Trainer progress (hide for cities — only show on routes/dungeons) */}
+                                                {!isCity && zoneTrainers.length > 0 && (
                                                     <span style={{
                                                         color: allDefeated ? '#4CAF50' : '#666',
                                                         fontSize: '10px',
