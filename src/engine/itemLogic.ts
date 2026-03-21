@@ -45,19 +45,16 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
         }
 
-        // Support both healAmount (standard) and healFull
-        if (item.effect.healFull) {
-            const oldHp = target.currentHp;
-            target.currentHp = target.maxHp;
-            const healed = target.currentHp - oldHp;
-            return { success: true, message: `${healed} PV restaurés.`, consumed: true };
-        }
-
-        const amount = item.effect.healAmount || 0;
+        const value = item.effect.value || 0;
         const oldHp = target.currentHp;
-        target.currentHp = Math.min(target.maxHp, target.currentHp + amount);
+        
+        if (value >= 900) { // Max Potion / Full Restore equivalent in some schemas
+            target.currentHp = target.maxHp;
+        } else {
+            target.currentHp = Math.min(target.maxHp, target.currentHp + value);
+        }
+        
         const healed = target.currentHp - oldHp;
-
         return { success: true, message: `${healed} PV restaurés.`, consumed: true };
     }
 
@@ -67,7 +64,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             return { success: false, message: "Ce Pokémon n'est pas K.O.", consumed: false };
         }
 
-        const percent = item.effect.reviveHpPercent || 50;
+        const percent = item.effect.hpPercent || 50;
         target.currentHp = Math.floor(target.maxHp * (percent / 100));
         target.status = null;
         target.statusTurns = 0;
@@ -76,29 +73,28 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         return { success: true, message: "Le Pokémon est ravivé !", consumed: true };
     }
 
-    // Status Heal
-    if (item.effect.type === 'status_cure') {
+    // Status Heal (Antidote, etc.) - Schema uses 'cure' or 'status_cure'
+    if (item.effect.type === 'status_cure' || item.effect.type === 'cure') {
         if (target.currentHp === 0) {
             return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
         }
 
-        const curesStatus = item.effect.curesStatus || [];
+        const targetStatus = item.effect.target || item.effect.curesStatus?.[0];
         let cured = false;
 
-        // Check if it cures all statuses
-        if (curesStatus.length >= 5 || curesStatus.includes('all')) {
+        if (targetStatus === 'all' || (Array.isArray(item.effect.curesStatus) && item.effect.curesStatus.includes('all'))) {
             if (target.status !== null || target.volatile.confusion > 0) {
                 target.status = null;
                 target.statusTurns = 0;
                 target.volatile.confusion = 0;
                 cured = true;
             }
-        } else if (curesStatus.includes('confusion')) {
+        } else if (targetStatus === 'confusion') {
             if (target.volatile.confusion > 0) {
                 target.volatile.confusion = 0;
                 cured = true;
             }
-        } else if (target.status && curesStatus.includes(target.status)) {
+        } else if (target.status && (targetStatus === target.status || (Array.isArray(item.effect.curesStatus) && item.effect.curesStatus.includes(target.status)))) {
             target.status = null;
             target.statusTurns = 0;
             cured = true;

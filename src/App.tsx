@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useGameStore } from './stores/gameStore';
 import { createPCStorage } from './engine/pcStorage';
-import { initializeData } from './utils/dataLoader';
+import { initGameData, forceFullSync } from './utils/db';
+import { initializeData, getItemData, getAllItems } from './utils/dataLoader';
 import { deleteSave } from './utils/saveManager';
 import { TitleScreen } from './components/TitleScreen';
 import { WorldMap } from './components/navigation/WorldMap';
@@ -19,8 +20,61 @@ import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
 import { NotificationOverlay } from './components/ui/NotificationOverlay';
 
-// Initialize game data on load
-initializeData();
+// --- LOADING SCREEN ---
+function LoadingScreen({ progress, table }: { progress: number; table: string }) {
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '100vh',
+            background: 'transparent',
+            fontFamily: "'Press Start 2P', monospace",
+        }}>
+            <h1 style={{
+                color: '#e94560',
+                fontSize: '24px',
+                marginBottom: '40px',
+                textShadow: '3px 3px 0 #0a0a15, 0 0 30px #e9456033',
+                letterSpacing: '3px',
+            }}>
+                PokeRoad
+            </h1>
+
+            <div style={{
+                width: '300px',
+                maxWidth: '80vw',
+                marginBottom: '16px',
+            }}>
+                <div style={{
+                    width: '100%',
+                    height: '12px',
+                    background: '#1a1a2e',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    border: '1px solid #333',
+                }}>
+                    <div style={{
+                        width: `${progress}%`,
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #e94560, #ff6b8a)',
+                        borderRadius: '6px',
+                        transition: 'width 0.3s ease',
+                    }} />
+                </div>
+            </div>
+
+            <p style={{
+                color: '#666',
+                fontSize: '8px',
+                fontFamily: "'Press Start 2P', monospace",
+            }}>
+                {progress >= 100 ? 'Chargement...' : `Synchronisation : ${table}`}
+            </p>
+        </div>
+    );
+}
 
 // --- COMPOSANT DEV TOOLS ---
 function DevTools() {
@@ -30,7 +84,6 @@ function DevTools() {
     const [errorMsg, setErrorMsg] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
-    // Variables d'état pour les champs de texte
     const [itemId, setItemId] = useState('super-bonbon');
     const [itemQty, setItemQty] = useState(1);
     const [pokeId, setPokeId] = useState(150);
@@ -44,7 +97,6 @@ function DevTools() {
     const setGameSpeed = useGameStore(s => s.setGameSpeed);
     const gameSpeed = useGameStore(s => s.settings.gameSpeed);
 
-    // Cache le bouton sur l'écran titre
     if (currentView === 'title') return null;
 
     if (!isOpen) {
@@ -79,7 +131,6 @@ function DevTools() {
     };
 
     const handleLogin = () => {
-        // Vérification simple et directe : on enlève les espaces et on met en minuscules
         if (passwordInput.trim() === 'tomer') {
             setIsAuthenticated(true);
             setErrorMsg('');
@@ -89,10 +140,10 @@ function DevTools() {
         }
     };
 
-    const handleReset = () => {
+    const handleReset = async () => {
         if (window.confirm("Voulez-vous vraiment effacer complètement votre partie ? Cette action est irréversible !")) {
-            deleteSave();
-            window.location.reload(); // Recharge la page pour revenir à l'écran titre à zéro
+            await deleteSave();
+            window.location.reload();
         }
     };
 
@@ -106,7 +157,7 @@ function DevTools() {
 
                 for (let i = 1; i <= 151; i++) {
                     try {
-                        const result = givePlayerPokemon(i, 100);
+                        const result = givePlayerPokemon(i, 100) as any;
                         if (result instanceof Promise) await result;
                     } catch (e) {
                         console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);
@@ -124,7 +175,6 @@ function DevTools() {
         }
     };
 
-    // --- ECRAN DE CONNEXION ---
     if (!isAuthenticated) {
         return (
             <div style={{
@@ -153,7 +203,6 @@ function DevTools() {
         );
     }
 
-    // --- MENU DEVTOOLS (Une fois connecté) ---
     const sectionStyle = {
         marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #333'
     };
@@ -212,14 +261,55 @@ function DevTools() {
                 </div>
             </div>
 
-            {/* --- Section Danger --- */}
             <div>
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
-                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000'}}
+                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px'}}
                     onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
+                </button>
+                <button
+                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
+                    onClick={() => { 
+                        try {
+                            const items = getAllItems();
+                            if (items.length === 0) {
+                                alert("Registre VIDE");
+                            } else {
+                                alert(`Total: ${items.length}\nIDs: ${items.slice(0, 10).map(i => i.id).join(', ')}`);
+                            }
+                        } catch (e) {
+                            alert(`ERROR: ${e instanceof Error ? e.message : 'Unknown'}`);
+                        }
+                    }}
+                >
+                    Lister Ids Recus
+                </button>
+                <button
+                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
+                    onClick={() => { 
+                        try {
+                            const ball = getItemData('poke-ball');
+                            const pot = getItemData('potion');
+                            alert(`OK: Registry has ${ball.name} and ${pot.name}`);
+                        } catch (e) {
+                            alert(`ERROR: ${e instanceof Error ? e.message : 'Unknown'}`);
+                        }
+                    }}
+                >
+                    Tester Registre Items
+                </button>
+                <button
+                    style={{...btnStyle, background: '#4a148c', borderColor: '#7c43bd'}}
+                    onClick={async () => { 
+                        if (window.confirm("Cela va vider TOUTE la base de données locale (incluant les données de jeu) et forcer un rechargement depuis Supabase. Continuer ?")) {
+                            await forceFullSync();
+                            window.location.reload();
+                        }
+                    }}
+                >
+                    Forcer Sync Supabase
                 </button>
             </div>
         </div>
@@ -231,6 +321,87 @@ function App() {
     const currentView = useGameStore(s => s.currentView);
     const pendingEvolution = useGameStore(s => s.pendingEvolution);
     const pendingMoveLearn = useGameStore(s => s.pendingMoveLearn);
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadProgress, setLoadProgress] = useState(0);
+    const [loadTable, setLoadTable] = useState('');
+    const [loadError, setLoadError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function init() {
+            try {
+                // 1. Sync game data from Supabase → IndexedDB (or use cache)
+                await initGameData((table, pct) => {
+                    if (mounted) {
+                        setLoadProgress(pct);
+                        setLoadTable(table);
+                    }
+                });
+
+                // 2. Load data from IndexedDB → in-memory registries
+                await initializeData();
+
+                if (mounted) {
+                    setLoadProgress(100);
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.error('Failed to initialize game data:', error);
+                if (mounted) {
+                    setLoadError(
+                        error instanceof Error ? error.message : 'Erreur de chargement'
+                    );
+                }
+            }
+        }
+
+        init();
+
+        return () => { mounted = false; };
+    }, []);
+
+    if (loadError) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                fontFamily: "'Press Start 2P', monospace",
+                padding: '20px',
+                textAlign: 'center',
+            }}>
+                <h2 style={{ color: '#e94560', fontSize: '14px', marginBottom: '20px' }}>
+                    Erreur de chargement
+                </h2>
+                <p style={{ color: '#888', fontSize: '8px', marginBottom: '20px', maxWidth: '400px', lineHeight: '1.8' }}>
+                    {loadError}
+                </p>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                        background: '#e94560',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '12px 24px',
+                        fontFamily: "'Press Start 2P', monospace",
+                        fontSize: '10px',
+                        cursor: 'pointer',
+                        borderRadius: '8px',
+                    }}
+                >
+                    Réessayer
+                </button>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return <LoadingScreen progress={loadProgress} table={loadTable} />;
+    }
 
     const renderView = () => {
         switch (currentView) {
@@ -280,7 +451,6 @@ function App() {
             {pendingMoveLearn && <MoveLearnModal />}
             <NotificationOverlay />
 
-            {/* Bouton de triche pour les développeurs */}
             <DevTools />
         </div>
     );

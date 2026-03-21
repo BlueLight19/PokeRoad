@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useGameStore } from '../../stores/gameStore';
-import { getZoneData, getAllZones, getGymData } from '../../utils/dataLoader';
+import { getZoneData, getAllZones, getGymData, getZoneTrainers } from '../../utils/dataLoader';
 import { CityData, RouteData } from '../../types/game';
 import { Button } from '../ui/Button';
 import cityLogo from '../../assets/cityLogo.png';
@@ -223,9 +223,18 @@ export function WorldMap() {
                                 if (!prevUnlocked) return null;
                             }
 
-                            const zoneTrainers: string[] = (zone as any).trainers || [];
+                            // On utilise getZoneTrainers qui filtre automatiquement les mauvaises variantes du rival
+                            // en fonction du starter choisi par le joueur !
+                            const activeTrainersData = getZoneTrainers(zone.id, player.starter);
+                            const zoneTrainers = activeTrainersData.map(t => t.id);
+
                             const defeatedCount = progress.defeatedTrainers.filter(t => zoneTrainers.includes(t)).length;
                             const allDefeated = zoneTrainers.length > 0 && defeatedCount === zoneTrainers.length;
+
+                            const dungeonTotalFloors = isDungeon ? ((zone as CityData).totalFloors ?? 1) : 1;
+                            const dungeonMaxFloor = isDungeon && dungeonTotalFloors > 1
+                              ? useGameStore.getState().getMaxUnlockedFloor(zone.id, dungeonTotalFloors)
+                              : 1;
 
                             const hasGym = isCity && (zone as any).gymId;
                             const gymBadgeEarned = hasGym && (() => {
@@ -387,6 +396,18 @@ export function WorldMap() {
                                                         marginLeft: '8px'
                                                     }}>
                                                         {allDefeated ? '\u2713 ' : ''}{defeatedCount}/{zoneTrainers.length} Dresseurs
+                                                    </span>
+                                                )}
+
+                                                {/* Floor indicator for multi-floor dungeons */}
+                                                {isDungeon && dungeonTotalFloors > 1 && (
+                                                    <span style={{
+                                                        color: dungeonMaxFloor >= dungeonTotalFloors ? '#4CAF50' : '#9C27B0',
+                                                        fontSize: '10px',
+                                                        fontFamily: "'Press Start 2P', monospace",
+                                                        marginLeft: '8px'
+                                                    }}>
+                                                        Etage {dungeonMaxFloor}/{dungeonTotalFloors}
                                                     </span>
                                                 )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
-import { getZoneData, getGymData, getTrainerData } from '../../utils/dataLoader';
+import { getZoneData, getGymData, getZoneTrainers } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
 import { soundManager } from '../../utils/SoundManager';
@@ -12,6 +12,7 @@ export function CityMenu() {
   const [healMessage, setHealMessage] = useState('');
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
   const [dialogueIndex, setDialogueIndex] = useState(0);
+  const [gymExpanded, setGymExpanded] = useState(false);
 
   if (!selectedZone) return null;
 
@@ -19,7 +20,7 @@ export function CityMenu() {
   const isCity = zone.type === 'city';
   const hasShop = (zone as CityData).hasShop;
   const gymId = (zone as CityData).gymId;
-  const trainers: string[] = zone.trainers || [];
+  const filteredTrainers = getZoneTrainers(selectedZone, player.starter);
   const npcs: NPCData[] = zone.npcs || [];
   const staticEncounters: StaticEncounter[] = (zone as any).staticEncounters || [];
 
@@ -256,14 +257,22 @@ export function CityMenu() {
           </button>
         )}
 
-        {/* Gym */}
-        {gym && (
+        {/* Gym (with all zone trainers inside) */}
+        {gym && (() => {
+          const allTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t.id));
+          const trainerCount = filteredTrainers.length;
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
+              {/* Gym header button */}
           <button
             onClick={() => {
               soundManager.playClick();
-              handleGymBattle();
+              if (gymLocked) return;
+              if (gymDefeated) return;
+              setGymExpanded(!gymExpanded);
             }}
-            disabled={gymDefeated || gymLocked}
+            disabled={gymLocked}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -271,16 +280,17 @@ export function CityMenu() {
               padding: '14px 16px',
               background: gymDefeated ? '#1a1a1a' : gymLocked ? '#1a1a1a' : '#2e1a1a',
               border: gymDefeated ? '2px solid #333' : gymLocked ? '2px solid #555' : '2px solid #e94560',
-              borderRadius: '8px',
+                  borderRadius: gymExpanded && !gymDefeated && !gymLocked ? '8px 8px 0 0' : '8px',
               cursor: gymDefeated || gymLocked ? 'default' : 'pointer',
               opacity: gymDefeated ? 0.6 : gymLocked ? 0.5 : 1,
               textAlign: 'left',
+                  width: '100%',
             }}
           >
             <span style={{ fontSize: '20px' }}>
-              {gymDefeated ? '\u2605' : gymLocked ? '\u{1F512}' : '!'}
+                  {gymDefeated ? '\u2605' : gymLocked ? '\u{1F512}' : gymExpanded ? '\u25BC' : '\u25B6'}
             </span>
-            <div>
+                <div style={{ flex: 1 }}>
               <div
                 style={{
                   color: gymDefeated ? '#FFD600' : gymLocked ? '#888' : '#e94560',
@@ -298,26 +308,136 @@ export function CityMenu() {
                   marginTop: '4px',
                 }}
               >
-                {gymDefeated ? 'Badge obtenu !' : gymLocked ? gymLockReason : `${gym.team.length} Pokemon`}
+                    {gymDefeated
+                      ? 'Badge obtenu !'
+                      : gymLocked
+                        ? gymLockReason
+                        : trainerCount > 0
+                          ? `${trainerCount} dresseur${trainerCount > 1 ? 's' : ''} + Champion`
+                          : `Champion - ${gym.team.length} Pokemon`}
               </div>
             </div>
           </button>
-        )}
 
-        {/* Zone trainers (for cities with trainers like Rival battles) */}
-        {trainers.length > 0 && trainers.map(trainerId => {
-          const defeated = progress.defeatedTrainers.includes(trainerId);
-          let trainer;
-          try {
-            trainer = getTrainerData(trainerId);
-          } catch {
-            return null;
-          }
-          if (!trainer) return null;
+              {/* Expanded: all zone trainers + gym leader */}
+              {gymExpanded && !gymDefeated && !gymLocked && (
+                <div style={{
+                  background: '#1a1a1a',
+                  border: '2px solid #e94560',
+                  borderTop: 'none',
+                  borderRadius: '0 0 8px 8px',
+                  padding: '8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                }}>
+                  {/* Zone trainers */}
+                  {filteredTrainers.map(trainer => {
+                    const defeated = progress.defeatedTrainers.includes(trainer.id);
+                    return (
+                      <button
+                        key={trainer.id}
+                        onClick={() => {
+                          if (defeated) return;
+                          const { startTrainerBattle } = useBattleStore.getState();
+                          startTrainerBattle(trainer, team);
+                          setView('battle');
+                        }}
+                        disabled={defeated}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          background: defeated ? '#111' : '#2a1a1a',
+                          border: defeated ? '1px solid #333' : '1px solid #c0392b',
+                          borderRadius: '6px',
+                          cursor: defeated ? 'default' : 'pointer',
+                          opacity: defeated ? 0.5 : 1,
+                          textAlign: 'left',
+                          width: '100%',
+                        }}
+                      >
+                        <span style={{ fontSize: '14px' }}>{defeated ? 'x' : '!'}</span>
+                        <div>
+                          <div style={{
+                            color: defeated ? '#666' : '#c0392b',
+                            fontSize: '9px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            textDecoration: defeated ? 'line-through' : 'none',
+                          }}>
+                            {trainer.trainerClass} {trainer.name}
+                          </div>
+                          <div style={{
+                            color: '#888',
+                            fontSize: '7px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            marginTop: '3px',
+                          }}>
+                            {defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {/* Gym leader — only clickable when all trainers defeated */}
+                  <button
+                    onClick={() => {
+                      if (!allTrainersDefeated) return;
+                      handleGymBattle();
+                    }}
+                    disabled={!allTrainersDefeated}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '12px',
+                      background: allTrainersDefeated ? '#3a1a1a' : '#111',
+                      border: allTrainersDefeated ? '2px solid #FFD600' : '2px solid #444',
+                      borderRadius: '6px',
+                      cursor: allTrainersDefeated ? 'pointer' : 'default',
+                      opacity: allTrainersDefeated ? 1 : 0.4,
+                      textAlign: 'left',
+                      width: '100%',
+                    }}
+                  >
+                    <span style={{ fontSize: '16px', color: allTrainersDefeated ? '#FFD600' : '#555' }}>
+                      {'\u2605'}
+                    </span>
+                    <div>
+                      <div style={{
+                        color: allTrainersDefeated ? '#FFD600' : '#555',
+                        fontSize: '10px',
+                        fontFamily: "'Press Start 2P', monospace",
+                      }}>
+                        Champion: {gym.leader}
+                      </div>
+                      <div style={{
+                        color: '#888',
+                        fontSize: '7px',
+                        fontFamily: "'Press Start 2P', monospace",
+                        marginTop: '3px',
+                      }}>
+                        {allTrainersDefeated
+                          ? `${gym.team.length} Pokemon - Pret au combat !`
+                          : 'Battez tous les dresseurs d\'abord'}
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Zone trainers — only shown if NO gym in this city */}
+        {!gym && filteredTrainers.map(trainer => {
+          const defeated = progress.defeatedTrainers.includes(trainer.id);
 
           return (
             <button
-              key={trainerId}
+              key={trainer.id}
               onClick={() => {
                 soundManager.playClick();
                 if (defeated) return;

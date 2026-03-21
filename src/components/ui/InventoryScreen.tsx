@@ -26,11 +26,11 @@ const TARGET_EFFECT_TYPES = [
 ];
 
 function getTabForItem(item: { category: string; effect?: { type?: string } }): TabKey {
-    if (item.effect?.type === 'teach') return 'ctcs';
-    if (['potion', 'drink', 'revive', 'status_heal'].includes(item.category)) return 'soins';
-    if (item.category === 'pokeball') return 'balls';
-    if (item.category === 'battle') return 'combat';
-    if (['candy', 'vitamin'].includes(item.category)) return 'baies';
+    if (item.effect?.type === 'teach' || item.category === 'all-machines') return 'ctcs';
+    if (['healing', 'revival', 'status-cures', 'pp-recovery', 'potion', 'revive', 'status_heal', 'drink'].includes(item.category)) return 'soins';
+    if (['standard-balls', 'special-balls', 'apricorn-balls', 'pokeball'].includes(item.category)) return 'balls';
+    if (['stat-boosts', 'nature-mints', 'miracle-shooter', 'battle'].includes(item.category)) return 'combat';
+    if (['vitamins', 'species-candies', 'candy', 'vitamin'].includes(item.category)) return 'baies';
     return 'objets';
 }
 
@@ -85,8 +85,10 @@ export function InventoryScreen() {
         }
     };
 
-    const spriteUrl = (item: { data: { sprite?: string }; itemId: string }) =>
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.data.sprite || item.itemId}.png`;
+    const spriteUrl = (item: { data: { sprite?: string }; itemId: string }) => {
+        if (item.data.sprite?.startsWith('http')) return item.data.sprite;
+        return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${item.data.sprite || item.itemId}.png`;
+    };
 
     return (
         <div style={{
@@ -106,6 +108,11 @@ export function InventoryScreen() {
             }}>
                 Sac
             </h2>
+            
+            {/* DEBUG INFO */}
+            <div style={{ fontSize: '7px', color: '#666', textAlign: 'center', marginBottom: '8px' }}>
+                DEBUG: State Inv: {inventory.length} | Mapped Inv: {inventoryItems.length}
+            </div>
 
             {message && (
                 <div style={{

@@ -305,7 +305,8 @@ export function PCStorage() {
                 if (dragSource?.type === 'pc') {
                   movePokemonInPC(dragSource.boxId, dragSource.slotId, currentBoxIndex, slotId);
                 } else if (dragSource?.type === 'team') {
-                  handleWithdraw(dragSource.uid);
+                  const teamPokemon = team[dragSource.index];
+                  if (teamPokemon) handleDeposit(teamPokemon.uid);
                 }
                 setDragSource(null);
                 setDragOverPcSlot(null);

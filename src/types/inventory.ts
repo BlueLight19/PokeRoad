@@ -1,10 +1,25 @@
-export type ItemCategory = 'potion' | 'revive' | 'status_heal' | 'pokeball' | 'evolution' | 'key' | 'misc' | 'battle' | 'vitamin' | 'drink' | 'sellable' | 'pp_restore' | 'candy';
+export type ItemCategory = 
+    | 'standard-balls' | 'special-balls' | 'apricorn-balls' 
+    | 'healing' | 'status-cures' | 'revival' 
+    | 'vitamins' | 'evolution' | 'held-items' 
+    | 'jewels' | 'plates' | 'memories' 
+    | 'species-candies' | 'species-specific' 
+    | 'training' | 'effort-training' | 'stat-boosts' 
+    | 'nature-mints' | 'pp-recovery' 
+    | 'miracle-shooter' | 'mulch' | 'all-machines' | 'all-mail' 
+    | 'apricorn-box' | 'gameplay' | 'plot-advancement' | 'event-items' 
+    | 'dex-completion' | 'loot' | 'collectibles' | 'tm-materials' 
+    | 'sandwich-ingredients' | 'curry-ingredients' | 'picnic' | 'tera-shard' 
+    | 'unused' | 'potion' | 'revive' | 'status_heal' | 'pokeball' | 'key' | 'misc' | 'battle' | 'vitamin' | 'drink' | 'sellable' | 'pp_restore' | 'candy';
 
 export interface ItemEffect {
-    type: 'heal' | 'revive' | 'status_cure' | 'catch' | 'evolution' | 'boost' | 'repel' | 'escape_rope' | 'teach' | 'pp_restore' | 'rare_candy' | 'ev_boost' | 'battle_stat' | 'full_restore';
-    healAmount?: number;
-    healFull?: boolean;
-    reviveHpPercent?: number;
+    type: 'heal' | 'revive' | 'status_cure' | 'cure' | 'catch' | 'evolution' | 'boost' | 'repel' | 'escape_rope' | 'teach' | 'pp_restore' | 'rare_candy' | 'ev_boost' | 'battle_stat' | 'full_restore';
+    value?: number; // Healing amount or general value
+    hpPercent?: number; // For revives
+    target?: string; // For status cures or specific targets
+    healAmount?: number; // Legacy
+    healFull?: boolean; // Legacy
+    reviveHpPercent?: number; // Legacy
     curesStatus?: string[];
     catchMultiplier?: number;
     stone?: string; // For evolution stone ID
