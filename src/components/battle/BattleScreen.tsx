@@ -396,8 +396,13 @@ export function BattleScreen() {
     });
 
     // Group items by category
-    const balls = inventory.filter(i => { try { return getItemData(i.itemId).category === 'pokeball'; } catch { return false; } });
-    const healing = inventory.filter(i => { try { const d = getItemData(i.itemId); return d.category === 'potion' || d.category === 'revive' || d.category === 'status_heal'; } catch { return false; } });
+    const balls = inventory.filter(i => {
+      try {
+        const d = getItemData(i.itemId);
+        return ['standard-balls', 'special-balls', 'apricorn-balls', 'pokeball'].includes(d.category) || d.effect?.type === 'catch';
+      } catch { return false; }
+    });
+    const healing = inventory.filter(i => !balls.includes(i));
 
     const renderItemButton = (item: typeof inventory[0]) => {
       let itemData;

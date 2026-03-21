@@ -125,7 +125,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
     }
 
     // Rare Candy (Super Bonbon)
-    if (item.effect.type === 'rare_candy') {
+    if (item.effect.type === 'rare_candy' || item.effect.type === 'level_up') {
         if (target.currentHp === 0) {
             return { success: false, message: "Ce Pokémon est K.O.", consumed: false };
         }
@@ -136,8 +136,7 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         const data = getPokemonData(target.dataId);
         
         // Create a temporary clone with boosted XP to check results
-        const nextLevel = target.level + 1;
-        const targetXp = xpForLevel(nextLevel, data.expGroup);
+        const targetXp = target.xpToNextLevel;
         const tempClone = { ...target, xp: targetXp };
         
         const result = processLevelUp(tempClone);

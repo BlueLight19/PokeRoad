@@ -155,13 +155,13 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
     }
 
-    // Check for Chroma Charms
+    // Check for shiny Charms
     const gameStore = useGameStore.getState();
     const inventory = gameStore.inventory;
-    const chromaCharms = inventory.find(i => i.itemId === 'chroma-charm')?.quantity || 0;
+    const shinyCharms = inventory.find(i => i.itemId === 'shiny-charm')?.quantity || 0;
 
     // Base rate 1/4096. 1 charm = +75% (x1.75).
-    const shinyRate = (1 / 4096) * Math.pow(1.75, chromaCharms);
+    const shinyRate = (1 / 4096) * Math.pow(1.75, shinyCharms);
     const isShiny = Math.random() < shinyRate;
 
     const level = chosen.minLevel + Math.floor(Math.random() * (chosen.maxLevel - chosen.minLevel + 1));
@@ -362,7 +362,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (!player || !enemy) return;
 
     const playerUseStruggle = moveIndex === -1;
-    const playerMove = playerUseStruggle ? null : player.moves[moveIndex];
+    let playerMove = playerUseStruggle ? null : player.moves[moveIndex];
     if (!playerUseStruggle && (!playerMove || playerMove.currentPp <= 0)) return;
 
     // Block disabled moves
@@ -383,6 +383,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     // Use clones for calculation
     const playerClone = deepCopyPokemon(state.playerTeam[state.activePlayerIndex]);
     const enemyClone = deepCopyPokemon(enemy);
+    if (!playerUseStruggle) playerMove = playerClone.moves[moveIndex];
     const playerBadges = useGameStore.getState().player.badges;
     const currentWeather = state.weather;
 

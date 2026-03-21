@@ -84,7 +84,7 @@ function DevTools() {
     const [errorMsg, setErrorMsg] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const [itemId, setItemId] = useState('super-bonbon');
+    const [itemId, setItemId] = useState('rare-candy');
     const [itemQty, setItemQty] = useState(1);
     const [pokeId, setPokeId] = useState(150);
     const [pokeLevel, setPokeLevel] = useState(100);
@@ -163,7 +163,7 @@ function DevTools() {
                         console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);
                     }
 
-                    await new Promise(r => setTimeout(r, 50));
+                    await new Promise(r => setTimeout(r, 10));
                 }
 
                 console.log("Génération terminée !");

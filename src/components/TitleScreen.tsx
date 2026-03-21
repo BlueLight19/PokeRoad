@@ -328,7 +328,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        <span id={"version"}>0.3.0 - Supabase + IndexedDB</span>
+        <span id={"version"}>0.5.1</span>
       </div>
     </div>
   );

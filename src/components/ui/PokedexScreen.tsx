@@ -22,10 +22,10 @@ export function PokedexScreen() {
                 Vus: {seenCount} | Pris: {caughtCount}
             </div>
 
-            {caughtCount >= 151 && !inventory.some(i => i.itemId === 'chroma-charm') && (
+            {caughtCount >= 151 && !inventory.some(i => i.itemId === 'shiny-charm') && (
                 <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                    <Button variant="primary" onClick={() => addItem('chroma-charm', 1)}>
-                        ⭐ Réclamer le Charme Chroma ! ⭐
+                    <Button variant="primary" onClick={() => addItem('shiny-charm', 1)}>
+                        ⭐ Réclamer le Charme shiny ! ⭐
                     </Button>
                 </div>
             )}

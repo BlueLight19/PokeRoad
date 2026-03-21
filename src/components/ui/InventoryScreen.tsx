@@ -22,7 +22,7 @@ const TABS: Tab[] = [
 
 const TARGET_EFFECT_TYPES = [
     'heal', 'status_cure', 'revive', 'evolution', 'teach',
-    'boost', 'rare_candy', 'ev_boost', 'pp_restore', 'full_restore',
+    'boost', 'rare_candy', 'ev_boost', 'pp_restore', 'full_restore', 'level_up',
 ];
 
 function getTabForItem(item: { category: string; effect?: { type?: string } }): TabKey {
@@ -82,6 +82,11 @@ export function InventoryScreen() {
         if (result.success) {
             setTargetMode(false);
             setSelectedItemId(null);
+            
+            const state = useGameStore.getState();
+            if (state.pendingEvolution || state.pendingMoveLearn) {
+                setView('world_map');
+            }
         }
     };
 
