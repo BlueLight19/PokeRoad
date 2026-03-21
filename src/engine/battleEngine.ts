@@ -120,6 +120,17 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     pokemon.volatile.perishTurns--;
   }
 
+  // Future Sight / Doom Desire: delayed damage lands
+  if (pokemon.volatile.futureAttack && pokemon.currentHp > 0) {
+    pokemon.volatile.futureAttack.turnsLeft--;
+    if (pokemon.volatile.futureAttack.turnsLeft <= 0) {
+      const fa = pokemon.volatile.futureAttack;
+      pokemon.currentHp = Math.max(0, pokemon.currentHp - fa.damage);
+      logs.push({ message: `${fa.moveName} frappe ${name} ! (-${fa.damage} PV)`, type: 'damage' });
+      pokemon.volatile.futureAttack = undefined;
+    }
+  }
+
   // Ingrain: heal 1/16 max HP per turn
   if (pokemon.volatile.ingrain && pokemon.currentHp > 0 && pokemon.currentHp < pokemon.maxHp) {
     const heal = Math.max(1, Math.floor(pokemon.maxHp / 16));
@@ -566,6 +577,24 @@ export function executeMove(
       logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
     }
     return { logs, defenderFainted };
+  }
+
+  // Future Sight (248) / Doom Desire (353): delayed attack — store damage, hit in 2 turns
+  const FUTURE_MOVES = [248, 353];
+  if (FUTURE_MOVES.includes(move.id)) {
+    if (defender.volatile.futureAttack) {
+      logs.push({ message: `Mais cela échoue !`, type: 'info' });
+      return { logs, defenderFainted: false };
+    }
+    const result = calculateDamage(attacker, defender, move, attackerBadges, weather, defenderSide);
+    defender.volatile.futureAttack = {
+      moveId: move.id,
+      damage: Math.max(1, result.damage),
+      turnsLeft: 2,
+      moveName: move.name,
+    };
+    logs.push({ message: `${attackerName} prévoit une attaque future !`, type: 'info' });
+    return { logs, defenderFainted: false };
   }
 
   // No Guard: all moves hit (both attacker and defender)

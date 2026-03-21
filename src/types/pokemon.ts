@@ -124,6 +124,7 @@ export interface VolatileStatus {
   ingrain: boolean; // Heal 1/16 per turn, cannot switch
   aquaRing: boolean; // Heal 1/16 per turn
   magnetRise: number; // Ground immunity turns remaining
+  futureAttack?: { moveId: number; damage: number; turnsLeft: number; moveName: string }; // Prescience / Voeu Destructeur
 }
 
 export function freshVolatile(): VolatileStatus {

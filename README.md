@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# 🌟 PokeRoad
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)
+![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white)
 
-Currently, two official plugins are available:
+**PokeRoad** est un jeu de rôle (RPG) Pokémon jouable entièrement sur navigateur. Développé en React et TypeScript, il propose une aventure solo dans la région de Kanto avec un moteur de combat fidèle aux mécaniques de la 9ème génération.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🎮 Aperçu du jeu
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Région actuelle :** Kanto (Gen 1) avec 58 zones explorables (villes, routes, donjons).
+- **Pokémon disponibles :** Les 151 Pokémon originaux.
+- **Capacités :** 919 attaques en base de données, prêtes pour les futures générations.
+- **Langue :** Entièrement en français.
 
-## Expanding the ESLint configuration
+Le jeu fonctionne avec un système de cache local (IndexedDB) : une fois les données chargées depuis Supabase, **le jeu peut fonctionner hors-ligne**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ✨ Fonctionnalités Principales
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- 🗺️ **Exploration :** Débloquez les 58 zones progressivement grâce aux badges et événements.
+- ⚔️ **Combats & Arènes :** Affrontez les dresseurs, les 8 champions d'arène de Kanto, et le Conseil des 4 (Ligue Pokémon).
+- 🐾 **Capture & Équipe :** Rencontres sauvages variées (hautes herbes, eau, grottes), gestion de l'équipe de 6 et stockage PC (30 boîtes).
+- 🎒 **Inventaire & Boutiques :** Objets tenus (Restes, Orbe Vie, etc.), boutiques évolutives, et Parc Safari.
+- ✨ **Bonus :** Quête secrète pour Mew, Pokémon Chromatiques (Shiny - 1/4096), et vitesse de jeu réglable (1x, 2x, 4x).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚙️ Moteur de Combat (Gen 9)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Le système de combat est conçu pour être compétitif et précis :
+- **Formule de dégâts :** Basée sur la 9ème génération, incluant le STAB, l'efficacité des types, la météo, les coups critiques, etc.
+- **Statuts & Effets :** Gestion complète des altérations d'état (Paralysie, Sommeil, Toxik...) et de plus de 20 effets volatils (Confusion, Clonage, Provoc...).
+- **Terrain & Météo :** Pluie, Zénith, Grêle, Tempête de Sable, ainsi que les Entry Hazards (Piège de Roc, Picots, Toile Gluante...).
+- **IA Intelligente :** Sélection des attaques basée sur les affinités de types et la prise en compte des effets comme Provoc ou Encore.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 🛠️ Stack Technique & Architecture
+
+| Couche | Technologie |
+|--------|-------------|
+| **Frontend** | React 19, TypeScript, Vite |
+| **State Management** | Zustand (`gameStore` + `battleStore`) |
+| **Backend / DB** | Supabase (PostgreSQL) |
+| **Cache Local** | IndexedDB (via `idb`) |
+| **Audio** | Web Audio API (Sons synthétisés) |
+
+**Flux des données :** `Supabase` ➡️ `IndexedDB` ➡️ `Mémoire RAM (Map)` ➡️ `React (Zustand)`.
+
+---
+
+## 🚀 Installation & Développement
+
+1. **Cloner et installer les dépendances :**
+   ```bash
+   npm install
