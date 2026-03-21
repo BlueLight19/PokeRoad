@@ -3,6 +3,8 @@ import { useGameStore } from '../../stores/gameStore';
 import { getItemData, getPokemonData } from '../../utils/dataLoader';
 import { Button } from './Button';
 import { soundManager } from '../../utils/SoundManager';
+import { theme } from '../../theme';
+import { getHpColor } from './HealthBar';
 
 type TabKey = 'soins' | 'balls' | 'combat' | 'ctcs' | 'baies' | 'objets';
 
@@ -92,39 +94,34 @@ export function InventoryScreen() {
 
     return (
         <div style={{
-            padding: '16px',
+            padding: `${theme.spacing.lg}px`,
             margin: '0 auto',
-            color: '#fff',
-            fontFamily: "'Press Start 2P', monospace",
+            color: theme.colors.textPrimary,
+            fontFamily: theme.font.family,
             background: 'transparent',
             minHeight: '100vh',
             boxSizing: 'border-box',
         }}>
             <h2 style={{
-                color: '#FFD600',
-                fontSize: '14px',
-                marginBottom: '12px',
+                color: theme.colors.gold,
+                fontSize: theme.font.xxl,
+                marginBottom: `${theme.spacing.md}px`,
                 textAlign: 'center',
             }}>
                 Sac
             </h2>
-            
-            {/* DEBUG INFO */}
-            <div style={{ fontSize: '7px', color: '#666', textAlign: 'center', marginBottom: '8px' }}>
-                DEBUG: State Inv: {inventory.length} | Mapped Inv: {inventoryItems.length}
-            </div>
 
             {message && (
                 <div style={{
                     background: 'rgba(51, 51, 51, 0.8)',
-                    padding: '8px',
-                    borderRadius: '4px',
-                    marginBottom: '12px',
-                    fontSize: '10px',
+                    padding: `${theme.spacing.sm}px`,
+                    borderRadius: `${theme.radius.sm}px`,
+                    marginBottom: `${theme.spacing.md}px`,
+                    fontSize: theme.font.md,
                     textAlign: 'center',
-                    border: '1px solid #FFD600',
+                    border: `1px solid ${theme.colors.gold}`,
                     maxWidth: '600px',
-                    margin: '0 auto 12px',
+                    margin: `0 auto ${theme.spacing.md}px`,
                 }}>
                     {message}
                 </div>
@@ -135,9 +132,9 @@ export function InventoryScreen() {
                     {/* Tab bar */}
                     <div style={{
                         display: 'flex',
-                        gap: '4px',
-                        paddingBottom: '8px',
-                        marginBottom: '8px',
+                        gap: `${theme.spacing.xs}px`,
+                        paddingBottom: `${theme.spacing.sm}px`,
+                        marginBottom: `${theme.spacing.sm}px`,
                     }}>
                         {TABS.map(tab => {
                             const count = itemsByTab[tab.key].length;
@@ -145,22 +142,22 @@ export function InventoryScreen() {
                             return (
                                 <button
                                     key={tab.key}
-                                    onClick={() => { 
+                                    onClick={() => {
                                         soundManager.playClick();
-                                        setActiveTab(tab.key); 
-                                        setMessage(null); 
+                                        setActiveTab(tab.key);
+                                        setMessage(null);
                                     }}
                                     style={{
-                                        fontFamily: "'Press Start 2P', monospace",
-                                        fontSize: '9px',
+                                        fontFamily: theme.font.family,
+                                        fontSize: theme.font.sm,
                                         padding: '8px 10px',
-                                        border: isActive ? '2px solid #FFD600' : '2px solid #333',
-                                        borderRadius: '6px 6px 0 0',
-                                        background: isActive ? 'rgba(22, 33, 62, 0.8)' : 'rgba(10, 10, 26, 0.7)',
-                                        color: isActive ? '#FFD600' : '#888',
+                                        border: isActive ? `2px solid ${theme.colors.gold}` : `2px solid ${theme.colors.borderDark}`,
+                                        borderRadius: `${theme.radius.sm}px ${theme.radius.sm}px 0 0`,
+                                        background: isActive ? `${theme.colors.navyBg}cc` : 'rgba(10, 10, 26, 0.7)',
+                                        color: isActive ? theme.colors.gold : theme.colors.textDim,
                                         cursor: 'pointer',
                                         whiteSpace: 'nowrap',
-                                        borderBottom: isActive ? '2px solid rgba(22, 33, 62, 0.8)' : '2px solid #333',
+                                        borderBottom: isActive ? `2px solid ${theme.colors.navyBg}cc` : `2px solid ${theme.colors.borderDark}`,
                                         transition: 'color 0.15s, border-color 0.15s',
                                     }}
                                 >
@@ -174,19 +171,19 @@ export function InventoryScreen() {
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '8px',
-                        background: 'rgba(22, 33, 62, 0.8)',
+                        gap: `${theme.spacing.sm}px`,
+                        background: `${theme.colors.navyBg}cc`,
                         padding: '10px',
-                        borderRadius: '0 8px 8px 8px',
+                        borderRadius: `0 ${theme.radius.md}px ${theme.radius.md}px ${theme.radius.md}px`,
                         minHeight: '300px',
-                        border: '1px solid #333',
+                        border: `1px solid ${theme.colors.borderDark}`,
                     }}>
                         {currentItems.length === 0 ? (
                             <div style={{
                                 textAlign: 'center',
                                 padding: '40px 20px',
-                                color: '#555',
-                                fontSize: '10px',
+                                color: theme.colors.borderMid,
+                                fontSize: theme.font.md,
                             }}>
                                 Aucun objet
                             </div>
@@ -198,9 +195,9 @@ export function InventoryScreen() {
                                     justifyContent: 'space-between',
                                     background: 'rgba(15, 15, 35, 0.7)',
                                     padding: '8px 10px',
-                                    borderRadius: '6px',
-                                    border: '1px solid #333',
-                                    gap: '8px',
+                                    borderRadius: `${theme.radius.sm}px`,
+                                    border: `1px solid ${theme.colors.borderDark}`,
+                                    gap: `${theme.spacing.sm}px`,
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
                                         <img
@@ -213,13 +210,13 @@ export function InventoryScreen() {
                                             }}
                                         />
                                         <div style={{ minWidth: 0 }}>
-                                            <div style={{ fontSize: '10px', marginBottom: '2px' }}>
+                                            <div style={{ fontSize: theme.font.md, marginBottom: '2px' }}>
                                                 {item.data.name}
-                                                <span style={{ color: '#FFD600', marginLeft: '8px' }}>x{item.quantity}</span>
+                                                <span style={{ color: theme.colors.gold, marginLeft: `${theme.spacing.sm}px` }}>x{item.quantity}</span>
                                             </div>
                                             <div style={{
-                                                fontSize: '7px',
-                                                color: '#888',
+                                                fontSize: theme.font.micro,
+                                                color: theme.colors.textDim,
                                                 lineHeight: '1.4',
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
@@ -242,16 +239,16 @@ export function InventoryScreen() {
             ) : (
                 <div style={{maxWidth: '600px', margin: '0 auto'}}>
                     <div style={{
-                        marginBottom: '12px',
+                        marginBottom: `${theme.spacing.md}px`,
                         textAlign: 'center',
-                        fontSize: '10px',
+                        fontSize: theme.font.md,
                     }}>
                         Sélectionnez un Pokémon
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: `${theme.spacing.sm}px` }}>
                         {team.map(pokemon => {
                             const hpPercent = pokemon.maxHp > 0 ? (pokemon.currentHp / pokemon.maxHp) * 100 : 0;
-                            const hpColor = hpPercent < 20 ? '#f44' : hpPercent < 50 ? '#fa0' : '#4f4';
+                            const hpColor = getHpColor(pokemon.currentHp / pokemon.maxHp);
                             let pokeName: string;
                             try {
                                 pokeName = pokemon.nickname || getPokemonData(pokemon.dataId).name;
@@ -264,35 +261,35 @@ export function InventoryScreen() {
                                     onClick={() => handleTargetSelect(pokemon.uid)}
                                     style={{
                                         padding: '10px',
-                                        background: 'rgba(22, 33, 62, 0.8)',
-                                        border: '1px solid #333',
-                                        borderRadius: '8px',
+                                        background: `${theme.colors.navyBg}cc`,
+                                        border: `1px solid ${theme.colors.borderDark}`,
+                                        borderRadius: `${theme.radius.md}px`,
                                         cursor: 'pointer',
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: '10px',
                                     }}
                                 >
-                                    <div style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>
+                                    <div style={{ fontSize: theme.font.md, whiteSpace: 'nowrap' }}>
                                         {pokeName} Nv.{pokemon.level}
                                     </div>
-                                    <div style={{ flex: 1, height: '6px', background: '#333', borderRadius: '3px' }}>
+                                    <div style={{ flex: 1, height: '6px', background: theme.colors.borderDark, borderRadius: `${theme.radius.sm}px` }}>
                                         <div style={{
                                             width: `${hpPercent}%`,
                                             height: '100%',
                                             background: hpColor,
-                                            borderRadius: '3px',
+                                            borderRadius: `${theme.radius.sm}px`,
                                             transition: 'width 0.2s',
                                         }} />
                                     </div>
-                                    <div style={{ fontSize: '8px', whiteSpace: 'nowrap' }}>
+                                    <div style={{ fontSize: theme.font.xs, whiteSpace: 'nowrap' }}>
                                         {pokemon.currentHp}/{pokemon.maxHp}
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-                    <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ marginTop: `${theme.spacing.lg}px`, display: 'flex', justifyContent: 'center' }}>
                         <Button variant="ghost" onClick={() => { setTargetMode(false); setSelectedItemId(null); setMessage(null); }}>
                             Annuler
                         </Button>

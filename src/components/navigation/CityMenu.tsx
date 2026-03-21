@@ -3,8 +3,10 @@ import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getGymData, getZoneTrainers } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
+import { NpcDialogue } from '../ui/NpcDialogue';
 import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
 import { soundManager } from '../../utils/SoundManager';
+import { theme } from '../../theme';
 
 export function CityMenu() {
   const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent, addNotification } = useGameStore();
@@ -134,35 +136,20 @@ export function CityMenu() {
       <div style={{
           width: '100%',
           maxWidth: '600px',
-          background: 'rgba(13, 17, 23, 0.85)',
+          background: `${theme.colors.deepBg}d9`,
           backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
           backgroundSize: '20px 20px',
           borderRadius: '24px',
-          border: '3px solid #1a2a3a',
+          border: `3px solid ${theme.colors.borderSubtle}`,
           padding: '24px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       }}>
-        {/* Back to Map */}
-        <button
-          onClick={() => { soundManager.playClick(); setView('world_map'); }}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace",
-            padding: '4px 0', marginBottom: '12px',
-            transition: 'color 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#aaa')}
-        >
-          <span style={{ fontSize: '12px' }}>{'\u2190'}</span> Carte
-        </button>
 
         {/* Header Card */}
         <div style={{
-            background: 'linear-gradient(135deg, #1a1a2e 0%, #0f1923 100%)',
-            borderRadius: '16px',
-            border: '2px solid #FFD600',
+            background: `linear-gradient(135deg, ${theme.colors.panelBg} 0%, ${theme.colors.deepBg} 100%)`,
+            borderRadius: `${theme.radius.xl}px`,
+            border: `2px solid ${theme.colors.gold}`,
             padding: '20px',
             marginBottom: '24px',
             boxShadow: '0 4px 15px rgba(255, 214, 0, 0.15)',
@@ -173,18 +160,18 @@ export function CityMenu() {
             <div style={{
                 position: 'absolute',
                 top: 0, left: 0, width: '100%', height: '4px',
-                background: 'linear-gradient(90deg, transparent, #FFD600, transparent)'
+                background: `linear-gradient(90deg, transparent, ${theme.colors.gold}, transparent)`
             }} />
             <h2 style={{
-                color: '#FFD600',
+                color: theme.colors.gold,
                 fontSize: '18px',
-                fontFamily: "'Press Start 2P', monospace",
+                fontFamily: theme.font.family,
                 margin: 0,
                 textShadow: '0 2px 4px rgba(0,0,0,0.5)'
             }}>
                 {zone.name}
             </h2>
-            <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
+            <div style={{ color: theme.colors.textDim, fontSize: theme.font.md, fontFamily: theme.font.family, marginTop: '8px' }}>
                 Ville de Kanto
             </div>
         </div>
@@ -208,9 +195,9 @@ export function CityMenu() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '14px 16px',
-                background: isCompleted ? '#1a1a1a' : '#1a2e1a',
-                border: isCompleted ? '2px solid #333' : '2px solid #4CAF50',
-                borderRadius: '8px',
+                background: isCompleted ? '#1a1a1a' : `${theme.colors.success}14`,
+                border: isCompleted ? `2px solid ${theme.colors.borderDark}` : `2px solid ${theme.colors.success}`,
+                borderRadius: `${theme.radius.md}px`,
                 cursor: 'pointer',
                 textAlign: 'left',
                 opacity: isCompleted ? 0.7 : 1,
@@ -218,10 +205,10 @@ export function CityMenu() {
             >
               <span style={{ fontSize: '20px' }}>💬</span>
               <div>
-                <div style={{ color: isCompleted ? '#888' : '#4CAF50', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                <div style={{ color: isCompleted ? theme.colors.textDim : theme.colors.success, fontSize: theme.font.lg, fontFamily: theme.font.family }}>
                   {npc.name}
                 </div>
-                <div style={{ color: '#888', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                <div style={{ color: theme.colors.textDim, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px' }}>
                   {isCompleted ? 'Deja parle' : 'Interagir'}
                 </div>
               </div>
@@ -241,29 +228,29 @@ export function CityMenu() {
               alignItems: 'center',
               gap: '12px',
               padding: '14px 16px',
-              background: '#1a1a2e',
-              border: '2px solid #2196F3',
-              borderRadius: '8px',
+              background: theme.colors.panelBg,
+              border: `2px solid ${theme.colors.info}`,
+              borderRadius: `${theme.radius.md}px`,
               cursor: 'pointer',
               textAlign: 'left',
             }}
           >
-            <span style={{ fontSize: '20px', color: '#2196F3' }}>$</span>
+            <span style={{ fontSize: '20px', color: theme.colors.info }}>$</span>
             <div>
               <div
                 style={{
-                  color: '#2196F3',
-                  fontSize: '11px',
-                  fontFamily: "'Press Start 2P', monospace",
+                  color: theme.colors.info,
+                  fontSize: theme.font.lg,
+                  fontFamily: theme.font.family,
                 }}
               >
                 Boutique
               </div>
               <div
                 style={{
-                  color: '#888',
-                  fontSize: '8px',
-                  fontFamily: "'Press Start 2P', monospace",
+                  color: theme.colors.textDim,
+                  fontSize: theme.font.xs,
+                  fontFamily: theme.font.family,
                   marginTop: '4px',
                 }}
               >
@@ -294,9 +281,9 @@ export function CityMenu() {
               alignItems: 'center',
               gap: '12px',
               padding: '14px 16px',
-              background: gymDefeated ? '#1a1a1a' : gymLocked ? '#1a1a1a' : '#2e1a1a',
-              border: gymDefeated ? '2px solid #333' : gymLocked ? '2px solid #555' : '2px solid #e94560',
-                  borderRadius: gymExpanded && !gymDefeated && !gymLocked ? '8px 8px 0 0' : '8px',
+              background: gymDefeated ? '#1a1a1a' : gymLocked ? '#1a1a1a' : `${theme.colors.primary}14`,
+              border: gymDefeated ? `2px solid ${theme.colors.borderDark}` : gymLocked ? `2px solid ${theme.colors.borderMid}` : `2px solid ${theme.colors.primary}`,
+                  borderRadius: gymExpanded && !gymDefeated && !gymLocked ? `${theme.radius.md}px ${theme.radius.md}px 0 0` : `${theme.radius.md}px`,
               cursor: gymDefeated || gymLocked ? 'default' : 'pointer',
               opacity: gymDefeated ? 0.6 : gymLocked ? 0.5 : 1,
               textAlign: 'left',
@@ -309,18 +296,18 @@ export function CityMenu() {
                 <div style={{ flex: 1 }}>
               <div
                 style={{
-                  color: gymDefeated ? '#FFD600' : gymLocked ? '#888' : '#e94560',
-                  fontSize: '11px',
-                  fontFamily: "'Press Start 2P', monospace",
+                  color: gymDefeated ? theme.colors.gold : gymLocked ? theme.colors.textDim : theme.colors.primary,
+                  fontSize: theme.font.lg,
+                  fontFamily: theme.font.family,
                 }}
               >
                 Arene - {gym.leader}
               </div>
               <div
                 style={{
-                  color: '#888',
-                  fontSize: '8px',
-                  fontFamily: "'Press Start 2P', monospace",
+                  color: theme.colors.textDim,
+                  fontSize: theme.font.xs,
+                  fontFamily: theme.font.family,
                   marginTop: '4px',
                 }}
               >
@@ -339,9 +326,9 @@ export function CityMenu() {
               {gymExpanded && !gymDefeated && !gymLocked && (
                 <div style={{
                   background: '#1a1a1a',
-                  border: '2px solid #e94560',
+                  border: `2px solid ${theme.colors.primary}`,
                   borderTop: 'none',
-                  borderRadius: '0 0 8px 8px',
+                  borderRadius: `0 0 ${theme.radius.md}px ${theme.radius.md}px`,
                   padding: '8px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -366,7 +353,7 @@ export function CityMenu() {
                           gap: '10px',
                           padding: '10px 12px',
                           background: defeated ? '#111' : '#2a1a1a',
-                          border: defeated ? '1px solid #333' : '1px solid #c0392b',
+                          border: defeated ? `1px solid ${theme.colors.borderDark}` : `1px solid ${theme.colors.dangerDark}`,
                           borderRadius: '6px',
                           cursor: defeated ? 'default' : 'pointer',
                           opacity: defeated ? 0.5 : 1,
@@ -374,20 +361,20 @@ export function CityMenu() {
                           width: '100%',
                         }}
                       >
-                        <span style={{ fontSize: '14px' }}>{defeated ? 'x' : '!'}</span>
+                        <span style={{ fontSize: theme.font.xxl }}>{defeated ? 'x' : '!'}</span>
                         <div>
                           <div style={{
-                            color: defeated ? '#666' : '#c0392b',
-                            fontSize: '9px',
-                            fontFamily: "'Press Start 2P', monospace",
+                            color: defeated ? theme.colors.textDimmer : theme.colors.dangerDark,
+                            fontSize: theme.font.sm,
+                            fontFamily: theme.font.family,
                             textDecoration: defeated ? 'line-through' : 'none',
                           }}>
                             {trainer.trainerClass} {trainer.name}
                           </div>
                           <div style={{
-                            color: '#888',
-                            fontSize: '7px',
-                            fontFamily: "'Press Start 2P', monospace",
+                            color: theme.colors.textDim,
+                            fontSize: theme.font.micro,
+                            fontFamily: theme.font.family,
                             marginTop: '3px',
                           }}>
                             {defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
@@ -410,7 +397,7 @@ export function CityMenu() {
                       gap: '10px',
                       padding: '12px',
                       background: allTrainersDefeated ? '#3a1a1a' : '#111',
-                      border: allTrainersDefeated ? '2px solid #FFD600' : '2px solid #444',
+                      border: allTrainersDefeated ? `2px solid ${theme.colors.gold}` : '2px solid #444',
                       borderRadius: '6px',
                       cursor: allTrainersDefeated ? 'pointer' : 'default',
                       opacity: allTrainersDefeated ? 1 : 0.4,
@@ -418,21 +405,21 @@ export function CityMenu() {
                       width: '100%',
                     }}
                   >
-                    <span style={{ fontSize: '16px', color: allTrainersDefeated ? '#FFD600' : '#555' }}>
+                    <span style={{ fontSize: '16px', color: allTrainersDefeated ? theme.colors.gold : theme.colors.borderMid }}>
                       {'\u2605'}
                     </span>
                     <div>
                       <div style={{
-                        color: allTrainersDefeated ? '#FFD600' : '#555',
-                        fontSize: '10px',
-                        fontFamily: "'Press Start 2P', monospace",
+                        color: allTrainersDefeated ? theme.colors.gold : theme.colors.borderMid,
+                        fontSize: theme.font.md,
+                        fontFamily: theme.font.family,
                       }}>
                         Champion: {gym.leader}
                       </div>
                       <div style={{
-                        color: '#888',
-                        fontSize: '7px',
-                        fontFamily: "'Press Start 2P', monospace",
+                        color: theme.colors.textDim,
+                        fontSize: theme.font.micro,
+                        fontFamily: theme.font.family,
                         marginTop: '3px',
                       }}>
                         {allTrainersDefeated
@@ -467,9 +454,9 @@ export function CityMenu() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '14px 16px',
-                background: defeated ? '#1a1a1a' : '#1a1a2e',
-                border: defeated ? '2px solid #333' : '2px solid #e94560',
-                borderRadius: '8px',
+                background: defeated ? '#1a1a1a' : theme.colors.panelBg,
+                border: defeated ? `2px solid ${theme.colors.borderDark}` : `2px solid ${theme.colors.primary}`,
+                borderRadius: `${theme.radius.md}px`,
                 cursor: defeated ? 'default' : 'pointer',
                 opacity: defeated ? 0.5 : 1,
                 textAlign: 'left',
@@ -479,9 +466,9 @@ export function CityMenu() {
               <div>
                 <div
                   style={{
-                    color: defeated ? '#666' : '#e94560',
-                    fontSize: '11px',
-                    fontFamily: "'Press Start 2P', monospace",
+                    color: defeated ? theme.colors.textDimmer : theme.colors.primary,
+                    fontSize: theme.font.lg,
+                    fontFamily: theme.font.family,
                     textDecoration: defeated ? 'line-through' : 'none',
                   }}
                 >
@@ -489,9 +476,9 @@ export function CityMenu() {
                 </div>
                 <div
                   style={{
-                    color: '#888',
-                    fontSize: '8px',
-                    fontFamily: "'Press Start 2P', monospace",
+                    color: theme.colors.textDim,
+                    fontSize: theme.font.xs,
+                    fontFamily: theme.font.family,
                     marginTop: '4px',
                   }}
                 >
@@ -522,7 +509,7 @@ export function CityMenu() {
                 padding: '14px 16px',
                 background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
                 border: '2px solid #FFD700',
-                borderRadius: '8px',
+                borderRadius: `${theme.radius.md}px`,
                 cursor: 'pointer',
                 textAlign: 'left',
                 boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
@@ -530,10 +517,10 @@ export function CityMenu() {
             >
               <span style={{ fontSize: '20px' }}>★</span>
               <div>
-                <div style={{ color: '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+                <div style={{ color: '#000', fontSize: theme.font.lg, fontFamily: theme.font.family, fontWeight: 'bold' }}>
                   {encounter.name}
                 </div>
-                <div style={{ color: '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px', lineHeight: '1.4' }}>
+                <div style={{ color: theme.colors.borderDark, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px', lineHeight: '1.4' }}>
                   {encounter.dialogue || 'Une présence imposante...'}
                 </div>
               </div>
@@ -555,8 +542,8 @@ export function CityMenu() {
               gap: '12px',
               padding: '14px 16px',
               background: useGameStore.getState().player.money < 500 ? '#1a1a1a' : '#2E7D32',
-              border: useGameStore.getState().player.money < 500 ? '2px solid #333' : '2px solid #4CAF50',
-              borderRadius: '8px',
+              border: useGameStore.getState().player.money < 500 ? `2px solid ${theme.colors.borderDark}` : `2px solid ${theme.colors.success}`,
+              borderRadius: `${theme.radius.md}px`,
               cursor: useGameStore.getState().player.money < 500 ? 'not-allowed' : 'pointer',
               opacity: useGameStore.getState().player.money < 500 ? 0.5 : 1,
               textAlign: 'left' as const,
@@ -565,16 +552,16 @@ export function CityMenu() {
             <span style={{ fontSize: '20px' }}>S</span>
             <div>
               <div style={{
-                color: '#fff',
-                fontSize: '11px',
-                fontFamily: "'Press Start 2P', monospace",
+                color: theme.colors.textPrimary,
+                fontSize: theme.font.lg,
+                fontFamily: theme.font.family,
               }}>
                 Parc Safari
               </div>
               <div style={{
-                color: '#ccc',
-                fontSize: '8px',
-                fontFamily: "'Press Start 2P', monospace",
+                color: theme.colors.textSecondary,
+                fontSize: theme.font.xs,
+                fontFamily: theme.font.family,
                 marginTop: '4px',
               }}>
                 Cout: 500P
@@ -594,29 +581,29 @@ export function CityMenu() {
             alignItems: 'center',
             gap: '12px',
             padding: '14px 16px',
-            background: '#1a2e2e',
-            border: '2px solid #4CAF50',
-            borderRadius: '8px',
+            background: `${theme.colors.success}14`,
+            border: `2px solid ${theme.colors.success}`,
+            borderRadius: `${theme.radius.md}px`,
             cursor: 'pointer',
             textAlign: 'left',
           }}
         >
-          <span style={{ fontSize: '20px', color: '#4CAF50' }}>+</span>
+          <span style={{ fontSize: '20px', color: theme.colors.success }}>+</span>
           <div>
             <div
               style={{
-                color: '#4CAF50',
-                fontSize: '11px',
-                fontFamily: "'Press Start 2P', monospace",
+                color: theme.colors.success,
+                fontSize: theme.font.lg,
+                fontFamily: theme.font.family,
               }}
             >
               Centre Pokemon
             </div>
             <div
               style={{
-                color: healMessage ? '#4CAF50' : '#888',
-                fontSize: '8px',
-                fontFamily: "'Press Start 2P', monospace",
+                color: healMessage ? theme.colors.success : theme.colors.textDim,
+                fontSize: theme.font.xs,
+                fontFamily: theme.font.family,
                 marginTop: '4px',
               }}
             >
@@ -627,108 +614,6 @@ export function CityMenu() {
 
       </div>
       </div>
-    </div>
-  );
-}
-
-function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogueIndex: number; onAdvance: () => void }) {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
-  const fullText = npc.dialogue[dialogueIndex];
-  const gameSpeed = useGameStore(s => s.settings.gameSpeed);
-
-  useEffect(() => {
-    setDisplayedText('');
-    setIsTyping(true);
-    let current = 0;
-    const interval = setInterval(() => {
-      current++;
-      setDisplayedText(fullText.slice(0, current));
-      if (current >= fullText.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 10 / gameSpeed);
-    return () => clearInterval(interval);
-  }, [fullText, gameSpeed]);
-
-  const handleClick = () => {
-    if (isTyping) {
-      setDisplayedText(fullText);
-      setIsTyping(false);
-    } else {
-      onAdvance();
-    }
-  };
-
-  return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
-      {/* NPC name tag */}
-      <div style={{
-        background: 'linear-gradient(90deg, #FFD600, #FFA000)',
-        padding: '6px 16px',
-        borderRadius: '8px 8px 0 0',
-        display: 'inline-block',
-        alignSelf: 'flex-start',
-      }}>
-        <span style={{ color: '#000', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
-          {npc.name}
-        </span>
-      </div>
-
-      {/* Dialogue box */}
-      <div
-        onClick={handleClick}
-        style={{
-          flex: 1,
-          background: '#0f1923',
-          border: '3px solid #FFD600',
-          borderRadius: '0 12px 12px 12px',
-          padding: '20px',
-          color: '#fff',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '10px',
-          lineHeight: '2',
-          marginBottom: '16px',
-          cursor: 'pointer',
-          minHeight: '120px',
-          position: 'relative',
-          boxShadow: '0 0 15px rgba(255, 214, 0, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        {displayedText}
-        {!isTyping && (
-          <span style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '14px',
-            fontSize: '8px',
-            color: '#FFD600',
-            animation: 'pulse 1s infinite alternate',
-          }}>
-            {dialogueIndex < npc.dialogue.length - 1 ? '\u25BC' : '\u2715'}
-          </span>
-        )}
-      </div>
-
-      {/* Progress dots */}
-      {npc.dialogue.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '12px' }}>
-          {npc.dialogue.map((_, i) => (
-            <div key={i} style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: i === dialogueIndex ? '#FFD600' : i < dialogueIndex ? '#666' : '#333',
-              transition: 'background 0.3s',
-            }} />
-          ))}
-        </div>
-      )}
-
-      <Button onClick={handleClick} style={{ width: '100%' }}>
-        {isTyping ? 'Passer' : dialogueIndex < npc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
-      </Button>
     </div>
   );
 }

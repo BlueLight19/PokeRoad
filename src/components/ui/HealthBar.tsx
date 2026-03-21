@@ -8,9 +8,13 @@ interface HealthBarProps {
   height?: number;
 }
 
+export function getHpColor(ratio: number): string {
+  return ratio > 0.5 ? theme.colors.success : ratio > 0.2 ? theme.colors.warning : theme.colors.danger;
+}
+
 export function HealthBar({ current, max, showText = true, height = 12 }: HealthBarProps) {
   const ratio = Math.max(0, Math.min(1, current / max));
-  const color = ratio > 0.5 ? theme.colors.success : ratio > 0.2 ? theme.colors.warning : theme.colors.danger;
+  const color = getHpColor(ratio);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: `${theme.spacing.sm}px`, width: '100%' }}>

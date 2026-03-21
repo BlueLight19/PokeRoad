@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { getPokemonData, getAllPokemon } from '../../utils/dataLoader';
 import { Button } from './Button';
+import { Modal } from './Modal';
+import { theme } from '../../theme';
+import { typeColors } from '../../utils/typeColors';
 
 export function PokedexScreen() {
     const { progress, setView, inventory, addItem } = useGameStore();
@@ -13,24 +16,26 @@ export function PokedexScreen() {
     const seenCount = progress.seenPokemon.length;
     const caughtCount = progress.caughtPokemon.length;
 
+    const selectedPokemon = selectedId !== null ? allPokemon.find(p => p.id === selectedId) ?? null : null;
+
     return (
-        <div style={{ padding: '16px', maxWidth: '600px', margin: '0 auto', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={{ color: '#e94560', fontSize: '14px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px', textAlign: 'center' }}>
+        <div style={{ padding: `${theme.spacing.lg}px`, maxWidth: '600px', margin: '0 auto', color: theme.colors.textPrimary, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={{ color: theme.colors.primary, fontSize: theme.font.xxl, fontFamily: theme.font.family, marginBottom: `${theme.spacing.sm}px`, textAlign: 'center' }}>
                 Pokédex
             </h2>
-            <div style={{ textAlign: 'center', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", color: '#888', marginBottom: '16px' }}>
+            <div style={{ textAlign: 'center', fontSize: theme.font.xs, fontFamily: theme.font.family, color: theme.colors.textDim, marginBottom: `${theme.spacing.lg}px` }}>
                 Vus: {seenCount} | Pris: {caughtCount}
             </div>
 
             {caughtCount >= 151 && !inventory.some(i => i.itemId === 'chroma-charm') && (
-                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                <div style={{ textAlign: 'center', marginBottom: `${theme.spacing.lg}px` }}>
                     <Button variant="primary" onClick={() => addItem('chroma-charm', 1)}>
                         ⭐ Réclamer le Charme Chroma ! ⭐
                     </Button>
                 </div>
             )}
 
-            <div style={{ flex: 1, overflowY: 'auto', background: 'rgba(22, 33, 62, 0.8)', borderRadius: '8px', padding: '8px', border: '2px solid #333' }}>
+            <div style={{ flex: 1, overflowY: 'auto', background: `${theme.colors.navyBg}cc`, borderRadius: `${theme.radius.md}px`, padding: `${theme.spacing.sm}px`, border: theme.borders.medium(theme.colors.borderDark) }}>
                 {allPokemon.map(p => {
                     const seen = progress.seenPokemon.includes(p.id);
                     const caught = progress.caughtPokemon.includes(p.id);
@@ -39,52 +44,50 @@ export function PokedexScreen() {
                         <div key={p.id}
                             onClick={() => seen && setSelectedId(selectedId === p.id ? null : p.id)}
                             style={{
-                                padding: '8px',
-                                borderBottom: '1px solid #333',
+                                padding: `${theme.spacing.sm}px`,
+                                borderBottom: theme.borders.thin(theme.colors.borderDark),
                                 display: 'flex',
                                 alignItems: 'center',
                                 opacity: seen ? 1 : 0.5,
                                 background: selectedId === p.id ? 'rgba(26, 58, 92, 0.7)' : 'transparent',
                                 cursor: seen ? 'pointer' : 'default'
                             }}>
-                            <div style={{ width: '30px', fontFamily: "'Press Start 2P', monospace", fontSize: '8px', color: '#666' }}>
+                            <div style={{ width: '30px', fontFamily: theme.font.family, fontSize: theme.font.xs, color: theme.colors.textDimmer }}>
                                 {p.id.toString().padStart(3, '0')}
                             </div>
                             <div style={{ width: '20px', textAlign: 'center' }}>
-                                {caught && <span style={{ color: '#FFD600', fontSize: '10px' }}>★</span>}
+                                {caught && <span style={{ color: theme.colors.gold, fontSize: theme.font.md }}>★</span>}
                             </div>
-                            <div style={{ flex: 1, fontFamily: "'Press Start 2P', monospace", fontSize: '9px' }}>
+                            <div style={{ flex: 1, fontFamily: theme.font.family, fontSize: theme.font.sm }}>
                                 {seen ? p.name : '???'}
                             </div>
-
-                            {selectedId === p.id && seen && (
-                                <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(15, 25, 35, 0.9)', border: '2px solid #e94560', padding: '16px', borderRadius: '8px', zIndex: 100, width: '250px', boxShadow: '0 0 20px rgba(0,0,0,0.8)' }}>
-                                    <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                                        <img src={p.spriteUrl} alt={p.name} style={{ width: '96px', height: '96px', imageRendering: 'pixelated' }} />
-                                    </div>
-                                    <div style={{ textAlign: 'center', fontFamily: "'Press Start 2P', monospace", fontSize: '12px', marginBottom: '8px', color: '#fff' }}>
-                                        {p.name}
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
-                                        {p.types.map(t => (
-                                            <span key={t} style={{ fontSize: '8px', padding: '2px 6px', background: '#333', borderRadius: '4px', textTransform: 'uppercase' }}>
-                                                {t}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    {/* Description would go here if we had it in data */}
-
-                                    <div style={{ textAlign: 'center', marginTop: '12px' }}>
-                                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); setSelectedId(null); }}>
-                                            Fermer
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     );
                 })}
             </div>
+
+            <Modal open={selectedPokemon !== null} title={selectedPokemon?.name ?? ''} onClose={() => setSelectedId(null)}>
+                {selectedPokemon && (
+                    <>
+                        <div style={{ textAlign: 'center', marginBottom: `${theme.spacing.md}px` }}>
+                            <img src={selectedPokemon.spriteUrl} alt={selectedPokemon.name} style={{ width: '96px', height: '96px', imageRendering: 'pixelated' }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: `${theme.spacing.sm}px`, marginBottom: `${theme.spacing.md}px` }}>
+                            {selectedPokemon.types.map(t => (
+                                <span key={t} style={{ fontSize: theme.font.xs, padding: '2px 6px', background: typeColors[t] || theme.colors.borderDark, borderRadius: `${theme.radius.sm}px`, textTransform: 'uppercase', color: theme.colors.textPrimary }}>
+                                    {t}
+                                </span>
+                            ))}
+                        </div>
+                        {/* Description would go here if we had it in data */}
+                        <div style={{ textAlign: 'center', marginTop: `${theme.spacing.md}px` }}>
+                            <Button size="sm" variant="secondary" onClick={() => setSelectedId(null)}>
+                                Fermer
+                            </Button>
+                        </div>
+                    </>
+                )}
+            </Modal>
 
         </div>
     );

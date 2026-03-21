@@ -17,6 +17,8 @@ export const theme = {
     dangerDark: '#d32f2f',
     dangerDarker: '#c62828',
     warning: '#FF9800',
+    purple: '#9C27B0',
+    purpleLight: '#CE93D8',
 
     // Backgrounds
     panelBg: '#1a1a2e',

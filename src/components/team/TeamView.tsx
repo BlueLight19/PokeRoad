@@ -5,9 +5,11 @@ import { xpForLevel } from '../../engine/experienceCalculator';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { Button } from '../ui/Button';
+import { Modal } from '../ui/Modal';
 import { soundManager } from '../../utils/SoundManager';
 import { ItemCategory } from '../../types/inventory';
 import { typeColors } from '../../utils/typeColors';
+import { theme } from '../../theme';
 
 export function TeamView() {
   const { team, setView, selectedPokemonIndex, healTeam, switchTeamOrder, setHeldItem, inventory } = useGameStore();
@@ -32,8 +34,8 @@ export function TeamView() {
     const name = pokemon.nickname || data.name;
 
     return (
-      <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+      <div style={{ padding: `${theme.spacing.lg}px`, maxWidth: '500px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: `${theme.spacing.md}px`, marginBottom: `${theme.spacing.lg}px` }}>
           <img
             src={spriteUrl}
             alt={name}
@@ -41,21 +43,21 @@ export function TeamView() {
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
           <div>
-            <div style={{ color: '#fff', fontSize: '14px', fontFamily: "'Press Start 2P', monospace" }}>
+            <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.xxl, fontFamily: theme.font.family }}>
               {name}
             </div>
-            <div style={{ color: '#aaa', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+            <div style={{ color: theme.colors.textMuted, fontSize: theme.font.md, fontFamily: theme.font.family, marginTop: `${theme.spacing.xs}px` }}>
               Niv.{pokemon.level}
             </div>
-            <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+            <div style={{ display: 'flex', gap: `${theme.spacing.xs}px`, marginTop: '6px' }}>
               {data.types.map(t => (
                 <span key={t} style={{
                   padding: '2px 6px',
-                  borderRadius: '4px',
-                  fontSize: '7px',
-                  fontFamily: "'Press Start 2P', monospace",
-                  color: '#fff',
-                  background: typeColors[t] || '#888',
+                  borderRadius: `${theme.radius.sm}px`,
+                  fontSize: theme.font.micro,
+                  fontFamily: theme.font.family,
+                  color: theme.colors.textPrimary,
+                  background: typeColors[t] || theme.colors.textDim,
                   textTransform: 'uppercase',
                 }}>{t}</span>
               ))}
@@ -68,7 +70,7 @@ export function TeamView() {
         <HealthBar current={pokemon.currentHp} max={pokemon.maxHp} />
 
         {/* XP bar */}
-        <div style={{ marginTop: '8px' }}>
+        <div style={{ marginTop: `${theme.spacing.sm}px` }}>
           {(() => {
             const pokData = getPokemonData(pokemon.dataId);
             const currentLevelXp = xpForLevel(pokemon.level, pokData.expGroup);
@@ -77,14 +79,14 @@ export function TeamView() {
             const xpPercent = xpNeeded > 0 ? Math.min(100, (xpProgress / xpNeeded) * 100) : 100;
             return (
               <>
-                <div style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginBottom: '4px' }}>
+                <div style={{ color: theme.colors.textMuted, fontSize: theme.font.xs, fontFamily: theme.font.family, marginBottom: `${theme.spacing.xs}px` }}>
                   XP: {xpProgress} / {xpNeeded}
                 </div>
-                <div style={{ height: '6px', background: '#333', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ height: '6px', background: theme.colors.borderDark, borderRadius: '3px', overflow: 'hidden' }}>
                   <div style={{
                     width: `${xpPercent}%`,
                     height: '100%',
-                    background: '#2196F3',
+                    background: theme.colors.info,
                     borderRadius: '3px',
                   }} />
                 </div>
@@ -94,18 +96,18 @@ export function TeamView() {
         </div>
 
         {/* Stats */}
-        <div style={{ marginTop: '16px' }}>
-          <h4 style={{ color: '#e94560', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+        <div style={{ marginTop: `${theme.spacing.lg}px` }}>
+          <h4 style={{ color: theme.colors.primary, fontSize: theme.font.md, fontFamily: theme.font.family, marginBottom: `${theme.spacing.sm}px` }}>
             Statistiques (IV / EV)
           </h4>
           {(['hp', 'attack', 'defense', 'spAtk', 'spDef', 'speed'] as const).map(stat => (
             <div key={stat} style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0' }}>
-              <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+              <span style={{ color: theme.colors.textMuted, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
                 {statNames[stat]}
               </span>
-              <div style={{ display: 'flex', gap: '8px', color: '#fff', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+              <div style={{ display: 'flex', gap: `${theme.spacing.sm}px`, color: theme.colors.textPrimary, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
                 <span>{pokemon.stats[stat]}</span>
-                <span style={{ color: '#666', fontSize: '7px' }}>
+                <span style={{ color: theme.colors.textDimmer, fontSize: theme.font.micro }}>
                   ({pokemon.ivs[stat]} / {pokemon.evs[stat]})
                 </span>
               </div>
@@ -114,8 +116,8 @@ export function TeamView() {
         </div>
 
         {/* Moves */}
-        <div style={{ marginTop: '16px' }}>
-          <h4 style={{ color: '#e94560', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+        <div style={{ marginTop: `${theme.spacing.lg}px` }}>
+          <h4 style={{ color: theme.colors.primary, fontSize: theme.font.md, fontFamily: theme.font.family, marginBottom: `${theme.spacing.sm}px` }}>
             Capacites
           </h4>
           {pokemon.moves.map((m, i) => {
@@ -125,23 +127,23 @@ export function TeamView() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '4px 8px',
+                padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
                 marginBottom: '3px',
-                background: 'rgba(22, 33, 62, 0.8)',
-                borderRadius: '4px',
-                borderLeft: `3px solid ${typeColors[move.type] || '#888'}`,
+                background: `${theme.colors.navyBg}cc`,
+                borderRadius: `${theme.radius.sm}px`,
+                borderLeft: `3px solid ${typeColors[move.type] || theme.colors.textDim}`,
               }}>
                 <div>
-                  <div style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '4px' }}>
+                  <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.sm, fontFamily: theme.font.family, marginBottom: `${theme.spacing.xs}px` }}>
                     {move.name}
                   </div>
-                  <div style={{ color: '#aaa', fontSize: '7px', fontFamily: "'Press Start 2P', monospace" }}>
-                    {move.type.toUpperCase()} | {move.category.toUpperCase()} 
-                    {move.power ? ` | Pwr: ${move.power}` : ''} 
+                  <div style={{ color: theme.colors.textMuted, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
+                    {move.type.toUpperCase()} | {move.category.toUpperCase()}
+                    {move.power ? ` | Pwr: ${move.power}` : ''}
                     {move.accuracy ? ` | Acc: ${move.accuracy}` : ' | Acc: ∞'}
                   </div>
                 </div>
-                <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+                <span style={{ color: theme.colors.textMuted, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
                   PP {m.currentPp}/{m.maxPp}
                 </span>
               </div>
@@ -150,8 +152,8 @@ export function TeamView() {
         </div>
 
         {/* Held Item */}
-        <div style={{ marginTop: '16px' }}>
-          <h4 style={{ color: '#e94560', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+        <div style={{ marginTop: `${theme.spacing.lg}px` }}>
+          <h4 style={{ color: theme.colors.primary, fontSize: theme.font.md, fontFamily: theme.font.family, marginBottom: `${theme.spacing.sm}px` }}>
             Objet tenu
           </h4>
           {pokemon.heldItem ? (() => {
@@ -160,9 +162,9 @@ export function TeamView() {
             return (
               <div style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '6px 8px', background: 'rgba(22, 33, 62, 0.8)', borderRadius: '4px',
+                padding: '6px 8px', background: `${theme.colors.navyBg}cc`, borderRadius: `${theme.radius.sm}px`,
               }}>
-                <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
+                <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.sm, fontFamily: theme.font.family }}>
                   {itemName}
                 </span>
                 <Button variant="ghost" onClick={() => {
@@ -174,11 +176,11 @@ export function TeamView() {
               </div>
             );
           })() : (
-            <div style={{ color: '#666', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", padding: '6px 8px' }}>
+            <div style={{ color: theme.colors.textDimmer, fontSize: theme.font.sm, fontFamily: theme.font.family, padding: '6px 8px' }}>
               Pas d'objet tenu
             </div>
           )}
-          <div style={{ marginTop: '8px' }}>
+          <div style={{ marginTop: `${theme.spacing.sm}px` }}>
             <Button variant="primary" onClick={() => {
               soundManager.playClick();
               setShowItemPicker(true);
@@ -189,40 +191,30 @@ export function TeamView() {
         </div>
 
         {/* Item Picker Modal */}
-        {showItemPicker && (() => {
-          const holdableItems = inventory
-            .map(inv => {
-              try {
-                const data = getItemData(inv.itemId);
-                return { inv, data };
-              } catch {
-                return null;
-              }
-            })
-            .filter((entry): entry is NonNullable<typeof entry> => {
-              if (!entry || entry.inv.quantity <= 0) return false;
-              return HELD_CATEGORIES.includes(entry.data.category);
-            });
+        <Modal open={showItemPicker} title="Choisir un objet" onClose={() => setShowItemPicker(false)}>
+          {(() => {
+            const holdableItems = inventory
+              .map(inv => {
+                try {
+                  const data = getItemData(inv.itemId);
+                  return { inv, data };
+                } catch {
+                  return null;
+                }
+              })
+              .filter((entry): entry is NonNullable<typeof entry> => {
+                if (!entry || entry.inv.quantity <= 0) return false;
+                return HELD_CATEGORIES.includes(entry.data.category);
+              });
 
-          return (
-            <div style={{
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.85)', zIndex: 1000,
-              display: 'flex', justifyContent: 'center', alignItems: 'center',
-            }}>
-              <div style={{
-                background: '#1a1a2e', border: '2px solid #333', borderRadius: '8px',
-                padding: '16px', maxWidth: '420px', width: '90%', maxHeight: '70vh', overflow: 'auto',
-              }}>
-                <h3 style={{ color: '#2196F3', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", marginBottom: '12px', textAlign: 'center' }}>
-                  Choisir un objet
-                </h3>
+            return (
+              <>
                 {holdableItems.length === 0 ? (
-                  <div style={{ color: '#666', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", textAlign: 'center', padding: '16px' }}>
+                  <div style={{ color: theme.colors.textDimmer, fontSize: theme.font.sm, fontFamily: theme.font.family, textAlign: 'center', padding: `${theme.spacing.lg}px` }}>
                     Aucun objet disponible
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${theme.spacing.xs}px` }}>
                     {holdableItems.map(({ inv, data }) => (
                       <button
                         key={inv.itemId}
@@ -233,37 +225,37 @@ export function TeamView() {
                         }}
                         style={{
                           display: 'flex', flexDirection: 'column', gap: '2px',
-                          padding: '8px', background: 'rgba(22, 33, 62, 0.8)',
-                          border: '1px solid #333', borderRadius: '4px',
+                          padding: `${theme.spacing.sm}px`, background: `${theme.colors.navyBg}cc`,
+                          border: theme.borders.thin(theme.colors.borderDark), borderRadius: `${theme.radius.sm}px`,
                           cursor: 'pointer', textAlign: 'left',
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ color: '#fff', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>
+                          <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.sm, fontFamily: theme.font.family }}>
                             {data.name}
                           </span>
-                          <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+                          <span style={{ color: theme.colors.textMuted, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
                             x{inv.quantity}
                           </span>
                         </div>
-                        <span style={{ color: '#888', fontSize: '7px', fontFamily: "'Press Start 2P', monospace", lineHeight: '1.4' }}>
+                        <span style={{ color: theme.colors.textDim, fontSize: theme.font.micro, fontFamily: theme.font.family, lineHeight: '1.4' }}>
                           {data.description}
                         </span>
                       </button>
                     ))}
                   </div>
                 )}
-                <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <div style={{ marginTop: `${theme.spacing.md}px`, textAlign: 'center' }}>
                   <Button variant="ghost" onClick={() => setShowItemPicker(false)}>
                     Annuler
                   </Button>
                 </div>
-              </div>
-            </div>
-          );
-        })()}
+              </>
+            );
+          })()}
+        </Modal>
 
-        <div style={{ marginTop: '16px' }}>
+        <div style={{ marginTop: `${theme.spacing.lg}px` }}>
           <Button variant="ghost" onClick={() => setSelected(null)}>
             Retour
           </Button>
@@ -274,8 +266,8 @@ export function TeamView() {
 
   // Team list
   return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto' }}>
-      <h2 style={{ color: '#2196F3', fontSize: '14px', fontFamily: "'Press Start 2P', monospace", marginBottom: '16px', textAlign: 'center' }}>
+    <div style={{ padding: `${theme.spacing.lg}px`, maxWidth: '500px', margin: '0 auto' }}>
+      <h2 style={{ color: theme.colors.info, fontSize: theme.font.xxl, fontFamily: theme.font.family, marginBottom: `${theme.spacing.lg}px`, textAlign: 'center' }}>
         Equipe
       </h2>
 
@@ -322,11 +314,11 @@ export function TeamView() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: `${theme.spacing.md}px`,
                 padding: '10px 12px',
-                background: isFainted ? 'rgba(26, 10, 10, 0.7)' : 'rgba(22, 33, 62, 0.8)',
-                border: isDragOver ? '2px solid #2196F3' : isFainted ? '2px solid #f44336' : '2px solid #333',
-                borderRadius: '8px',
+                background: isFainted ? 'rgba(26, 10, 10, 0.7)' : `${theme.colors.navyBg}cc`,
+                border: isDragOver ? `2px solid ${theme.colors.info}` : isFainted ? `2px solid ${theme.colors.danger}` : theme.borders.medium(theme.colors.borderDark),
+                borderRadius: `${theme.radius.md}px`,
                 cursor: 'grab',
                 textAlign: 'left',
                 opacity: isDragging ? 0.5 : 1,
@@ -341,15 +333,15 @@ export function TeamView() {
               />
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ color: '#fff', fontSize: '10px', fontFamily: "'Press Start 2P', monospace" }}>
+                  <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.md, fontFamily: theme.font.family }}>
                     {name}
                   </span>
-                  <span style={{ color: '#aaa', fontSize: '8px', fontFamily: "'Press Start 2P', monospace" }}>
+                  <span style={{ color: theme.colors.textMuted, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
                     Nv.{pokemon.level}
                   </span>
                   <StatusIcon status={pokemon.status} />
                 </div>
-                <div style={{ marginTop: '4px' }}>
+                <div style={{ marginTop: `${theme.spacing.xs}px` }}>
                   <HealthBar current={pokemon.currentHp} max={pokemon.maxHp} height={8} />
                 </div>
               </div>

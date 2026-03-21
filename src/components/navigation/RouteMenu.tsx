@@ -3,8 +3,10 @@ import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getTrainerData, getZoneTrainers } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
+import { NpcDialogue } from '../ui/NpcDialogue';
 import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
 import { soundManager } from '../../utils/SoundManager';
+import { theme } from '../../theme';
 
 export function RouteMenu() {
   const {
@@ -72,7 +74,7 @@ export function RouteMenu() {
 
       const leadLevel = team[0]?.level || 0;
       // Filter out pokemon that are strictly lower level than lead
-      // Note: wildEncounter has minLevel/maxLevel. 
+      // Note: wildEncounter has minLevel/maxLevel.
       // Simplified: if maxLevel < leadLevel, it's blocked.
       const available = wildEncounters.filter(e => e.maxLevel >= leadLevel);
 
@@ -133,8 +135,8 @@ export function RouteMenu() {
     }
 
     if (newSteps <= 0) {
-      // Should we force quit now or after battle? 
-      // Usually after battle. 
+      // Should we force quit now or after battle?
+      // Usually after battle.
       // StartBattle works. When coming back, if steps 0, auto-quit?
       // Let's handle auto-quit in handleEndBattle or here if no encounter.
     }
@@ -182,35 +184,20 @@ export function RouteMenu() {
       <div style={{
           width: '100%',
           maxWidth: '600px',
-          background: 'rgba(13, 17, 23, 0.85)',
+          background: `${theme.colors.deepBg}d9`,
           backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
           backgroundSize: '20px 20px',
           borderRadius: '24px',
-          border: '3px solid #1a2a3a',
+          border: `3px solid ${theme.colors.borderSubtle}`,
           padding: '24px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       }}>
-        {/* Back to Map */}
-        <button
-          onClick={() => { soundManager.playClick(); setView('world_map'); }}
-          style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            background: 'none', border: 'none', cursor: 'pointer',
-            color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace",
-            padding: '4px 0', marginBottom: '12px',
-            transition: 'color 0.15s',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#aaa')}
-        >
-          <span style={{ fontSize: '12px' }}>{'\u2190'}</span> Carte
-        </button>
 
         {/* Header Card */}
         <div style={{
-            background: 'linear-gradient(135deg, #1a2e1a 0%, #0f190f 100%)',
-            borderRadius: '16px',
-            border: '2px solid #4CAF50',
+            background: `linear-gradient(135deg, ${theme.colors.success}14 0%, ${theme.colors.deepBg} 100%)`,
+            borderRadius: `${theme.radius.xl}px`,
+            border: `2px solid ${theme.colors.success}`,
             padding: '20px',
             marginBottom: '24px',
             boxShadow: '0 4px 15px rgba(76, 175, 80, 0.15)',
@@ -221,18 +208,18 @@ export function RouteMenu() {
             <div style={{
                 position: 'absolute',
                 top: 0, left: 0, width: '100%', height: '4px',
-                background: 'linear-gradient(90deg, transparent, #4CAF50, transparent)'
+                background: `linear-gradient(90deg, transparent, ${theme.colors.success}, transparent)`
             }} />
             <h2 style={{
-                color: '#4CAF50',
+                color: theme.colors.success,
                 fontSize: '18px',
-                fontFamily: "'Press Start 2P', monospace",
+                fontFamily: theme.font.family,
                 margin: 0,
                 textShadow: '0 2px 4px rgba(0,0,0,0.5)'
             }}>
                 {zone.name}
             </h2>
-            <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
+            <div style={{ color: theme.colors.textDim, fontSize: theme.font.md, fontFamily: theme.font.family, marginTop: '8px' }}>
                 {isDungeon ? 'Donjon' : 'Zone Sauvage'}
             </div>
         </div>
@@ -246,8 +233,8 @@ export function RouteMenu() {
           gap: '12px',
           padding: '12px 16px',
           background: 'linear-gradient(135deg, #2a1a3a 0%, #1a1030 100%)',
-          border: '2px solid #9C27B0',
-          borderRadius: '12px',
+          border: `2px solid ${theme.colors.purple}`,
+          borderRadius: `${theme.radius.lg}px`,
           marginBottom: '20px',
         }}>
           <button
@@ -259,9 +246,9 @@ export function RouteMenu() {
             style={{
               background: 'none',
               border: 'none',
-              color: currentFloor > 1 ? '#CE93D8' : '#444',
+              color: currentFloor > 1 ? theme.colors.purpleLight : '#444',
               fontSize: '16px',
-              fontFamily: "'Press Start 2P', monospace",
+              fontFamily: theme.font.family,
               cursor: currentFloor > 1 ? 'pointer' : 'default',
               padding: '4px 8px',
             }}
@@ -270,16 +257,16 @@ export function RouteMenu() {
           </button>
           <div style={{ textAlign: 'center' }}>
             <div style={{
-              color: '#CE93D8',
-              fontSize: '12px',
-              fontFamily: "'Press Start 2P', monospace",
+              color: theme.colors.purpleLight,
+              fontSize: theme.font.xl,
+              fontFamily: theme.font.family,
             }}>
               Etage {currentFloor} / {totalFloors}
             </div>
             <div style={{
-              color: allFloorTrainersDefeated ? '#4CAF50' : '#888',
-              fontSize: '8px',
-              fontFamily: "'Press Start 2P', monospace",
+              color: allFloorTrainersDefeated ? theme.colors.success : theme.colors.textDim,
+              fontSize: theme.font.xs,
+              fontFamily: theme.font.family,
               marginTop: '4px',
             }}>
               {allFloorTrainersDefeated ? 'Etage termine' : `${filteredTrainers.filter(t => progress.defeatedTrainers.includes(t.id)).length}/${filteredTrainers.length} dresseurs`}
@@ -296,9 +283,9 @@ export function RouteMenu() {
             style={{
               background: 'none',
               border: 'none',
-              color: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? '#CE93D8' : '#444',
+              color: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? theme.colors.purpleLight : '#444',
               fontSize: '16px',
-              fontFamily: "'Press Start 2P', monospace",
+              fontFamily: theme.font.family,
               cursor: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? 'pointer' : 'default',
               padding: '4px 8px',
             }}
@@ -310,13 +297,13 @@ export function RouteMenu() {
 
       {useGameStore.getState().safariState && (
         <div style={{
-          background: 'linear-gradient(90deg, #FFD700, #FFA000)',
+          background: `linear-gradient(90deg, ${theme.colors.gold}, #FFA000)`,
           color: '#000',
           padding: '12px 16px',
-          borderRadius: '12px',
+          borderRadius: `${theme.radius.lg}px`,
           marginBottom: '20px',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '12px',
+          fontFamily: theme.font.family,
+          fontSize: theme.font.xl,
           display: 'flex',
           justifyContent: 'space-between',
           fontWeight: 'bold',
@@ -347,9 +334,9 @@ export function RouteMenu() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '14px 16px',
-                background: isCompleted ? '#1a1a1a' : '#1a2e1a',
-                border: isCompleted ? '2px solid #333' : '2px solid #4CAF50',
-                borderRadius: '8px',
+                background: isCompleted ? '#1a1a1a' : `${theme.colors.success}14`,
+                border: isCompleted ? `2px solid ${theme.colors.borderDark}` : `2px solid ${theme.colors.success}`,
+                borderRadius: `${theme.radius.md}px`,
                 cursor: 'pointer',
                 textAlign: 'left',
                 opacity: isCompleted ? 0.7 : 1,
@@ -357,10 +344,10 @@ export function RouteMenu() {
             >
               <span style={{ fontSize: '20px' }}>💬</span>
               <div>
-                <div style={{ color: isCompleted ? '#888' : '#4CAF50', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+                <div style={{ color: isCompleted ? theme.colors.textDim : theme.colors.success, fontSize: theme.font.lg, fontFamily: theme.font.family }}>
                   {npc.name}
                 </div>
-                <div style={{ color: '#888', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+                <div style={{ color: theme.colors.textDim, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px' }}>
                   {isCompleted ? 'Deja parle' : 'Interagir'}
                 </div>
               </div>
@@ -381,19 +368,19 @@ export function RouteMenu() {
               gap: '12px',
               padding: '14px 16px',
               background: '#2E7D32',
-              border: '2px solid #4CAF50',
-              borderRadius: '8px',
+              border: `2px solid ${theme.colors.success}`,
+              borderRadius: `${theme.radius.md}px`,
               cursor: 'pointer',
               textAlign: 'left',
             }}
           >
             <span style={{ fontSize: '20px' }}>🦁</span>
             <div>
-              <div style={{ color: '#fff', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+              <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.lg, fontFamily: theme.font.family }}>
                 Chasser un Pokémon
               </div>
               <div style={{
-                color: '#ccc', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px'
+                color: theme.colors.textSecondary, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px'
               }}>
                 Chercher dans les herbes
               </div>
@@ -412,9 +399,9 @@ export function RouteMenu() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '14px 16px',
-                background: '#1a2e1a',
-                border: '2px solid #4CAF50',
-                borderRadius: '8px',
+                background: `${theme.colors.success}14`,
+                border: `2px solid ${theme.colors.success}`,
+                borderRadius: `${theme.radius.md}px`,
                 cursor: 'pointer',
                 textAlign: 'left',
               }}
@@ -423,18 +410,18 @@ export function RouteMenu() {
               <div>
                 <div
                   style={{
-                    color: '#4CAF50',
-                    fontSize: '11px',
-                    fontFamily: "'Press Start 2P', monospace",
+                    color: theme.colors.success,
+                    fontSize: theme.font.lg,
+                    fontFamily: theme.font.family,
                   }}
                 >
                   Hautes herbes
                 </div>
                 <div
                   style={{
-                    color: '#888',
-                    fontSize: '8px',
-                    fontFamily: "'Press Start 2P', monospace",
+                    color: theme.colors.textDim,
+                    fontSize: theme.font.xs,
+                    fontFamily: theme.font.family,
                     marginTop: '4px',
                   }}
                 >
@@ -459,17 +446,17 @@ export function RouteMenu() {
               padding: '14px 16px',
               background: '#0d47a1',
               border: '2px solid #2196f3',
-              borderRadius: '8px',
+              borderRadius: `${theme.radius.md}px`,
               cursor: 'pointer',
               textAlign: 'left',
             }}
           >
             <span style={{ fontSize: '20px' }}>🌊</span>
             <div>
-              <div style={{ color: '#64b5f6', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+              <div style={{ color: '#64b5f6', fontSize: theme.font.lg, fontFamily: theme.font.family }}>
                 Surfer sur l'eau
               </div>
-              <div style={{ color: '#bbdefb', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+              <div style={{ color: '#bbdefb', fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px' }}>
                 Créatures aquatiques
               </div>
             </div>
@@ -490,17 +477,17 @@ export function RouteMenu() {
               padding: '14px 16px',
               background: '#006064',
               border: '2px solid #00bcd4',
-              borderRadius: '8px',
+              borderRadius: `${theme.radius.md}px`,
               cursor: 'pointer',
               textAlign: 'left',
             }}
           >
             <span style={{ fontSize: '20px' }}>🎣</span>
             <div>
-              <div style={{ color: '#4dd0e1', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
+              <div style={{ color: '#4dd0e1', fontSize: theme.font.lg, fontFamily: theme.font.family }}>
                 Pêcher
               </div>
-              <div style={{ color: '#b2ebf2', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
+              <div style={{ color: '#b2ebf2', fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px' }}>
                 Lancer la ligne
               </div>
             </div>
@@ -525,7 +512,7 @@ export function RouteMenu() {
                     const state = useGameStore.getState();
                     // Create pokemon at level
                     // Normally we should expose `createPokemonInstance` but we can't easily import it here cleanly in a JSX dump
-                    // Actually we can, but since this is just UI, the easiest is to call a store action. Let's just trigger a battle for now as "gifts" might need a new action. 
+                    // Actually we can, but since this is just UI, the easiest is to call a store action. Let's just trigger a battle for now as "gifts" might need a new action.
                     // To keep it simple, we'll assume all static encounters trigger battles, and gifts run away?
                     // Let's just trigger a standard battle for simplicity. If it's a gift we could add an action.
                     startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
@@ -540,9 +527,9 @@ export function RouteMenu() {
                   alignItems: 'center',
                   gap: '12px',
                   padding: '14px 16px',
-                  background: encounter.isGift ? 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                  border: encounter.isGift ? '2px solid #81C784' : '2px solid #FFD700',
-                  borderRadius: '8px',
+                  background: encounter.isGift ? `linear-gradient(135deg, ${theme.colors.success} 0%, #2E7D32 100%)` : `linear-gradient(135deg, ${theme.colors.gold} 0%, #FFA500 100%)`,
+                  border: encounter.isGift ? '2px solid #81C784' : `2px solid ${theme.colors.gold}`,
+                  borderRadius: `${theme.radius.md}px`,
                   cursor: 'pointer',
                   textAlign: 'left',
                   boxShadow: encounter.isGift ? '0 0 10px rgba(76, 175, 80, 0.3)' : '0 0 10px rgba(255, 215, 0, 0.3)',
@@ -550,10 +537,10 @@ export function RouteMenu() {
               >
                 <span style={{ fontSize: '20px' }}>{encounter.isGift ? '🎁' : '★'}</span>
                 <div>
-                  <div style={{ color: encounter.isGift ? '#fff' : '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
+                  <div style={{ color: encounter.isGift ? theme.colors.textPrimary : '#000', fontSize: theme.font.lg, fontFamily: theme.font.family, fontWeight: 'bold' }}>
                     {encounter.name}
                   </div>
-                  <div style={{ color: encounter.isGift ? '#eee' : '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px', lineHeight: '1.4' }}>
+                  <div style={{ color: encounter.isGift ? '#eee' : theme.colors.borderDark, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: '4px', lineHeight: '1.4' }}>
                     {encounter.dialogue || (encounter.isGift ? 'Obtenir ce Pokémon ?' : 'Une présence imposante...')}
                   </div>
                 </div>
@@ -580,9 +567,9 @@ export function RouteMenu() {
                   alignItems: 'center',
                   gap: '12px',
                   padding: '14px 16px',
-                  background: defeated ? '#1a1a1a' : '#1a1a2e',
-                  border: defeated ? '2px solid #333' : '2px solid #e94560',
-                  borderRadius: '8px',
+                  background: defeated ? '#1a1a1a' : theme.colors.panelBg,
+                  border: defeated ? `2px solid ${theme.colors.borderDark}` : `2px solid ${theme.colors.primary}`,
+                  borderRadius: `${theme.radius.md}px`,
                   cursor: defeated ? 'default' : 'pointer',
                   opacity: defeated ? 0.5 : 1,
                   textAlign: 'left',
@@ -592,9 +579,9 @@ export function RouteMenu() {
                 <div>
                   <div
                     style={{
-                      color: defeated ? '#666' : '#e94560',
-                      fontSize: '11px',
-                      fontFamily: "'Press Start 2P', monospace",
+                      color: defeated ? theme.colors.textDimmer : theme.colors.primary,
+                      fontSize: theme.font.lg,
+                      fontFamily: theme.font.family,
                       textDecoration: defeated ? 'line-through' : 'none',
                     }}
                   >
@@ -602,9 +589,9 @@ export function RouteMenu() {
                   </div>
                   <div
                     style={{
-                      color: '#888',
-                      fontSize: '8px',
-                      fontFamily: "'Press Start 2P', monospace",
+                      color: theme.colors.textDim,
+                      fontSize: theme.font.xs,
+                      fontFamily: theme.font.family,
                       marginTop: '4px',
                     }}
                   >
@@ -618,108 +605,6 @@ export function RouteMenu() {
 
       </div>
       </div>
-    </div>
-  );
-}
-
-function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogueIndex: number; onAdvance: () => void }) {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
-  const fullText = npc.dialogue[dialogueIndex];
-  const gameSpeed = useGameStore(s => s.settings.gameSpeed);
-
-  useEffect(() => {
-    setDisplayedText('');
-    setIsTyping(true);
-    let current = 0;
-    const interval = setInterval(() => {
-      current++;
-      setDisplayedText(fullText.slice(0, current));
-      if (current >= fullText.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 10 / gameSpeed);
-    return () => clearInterval(interval);
-  }, [fullText, gameSpeed]);
-
-  const handleClick = () => {
-    if (isTyping) {
-      setDisplayedText(fullText);
-      setIsTyping(false);
-    } else {
-      onAdvance();
-    }
-  };
-
-  return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
-      {/* NPC name tag */}
-      <div style={{
-        background: 'linear-gradient(90deg, #FFD600, #FFA000)',
-        padding: '6px 16px',
-        borderRadius: '8px 8px 0 0',
-        display: 'inline-block',
-        alignSelf: 'flex-start',
-      }}>
-        <span style={{ color: '#000', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
-          {npc.name}
-        </span>
-      </div>
-
-      {/* Dialogue box */}
-      <div
-        onClick={handleClick}
-        style={{
-          flex: 1,
-          background: '#0f1923',
-          border: '3px solid #FFD600',
-          borderRadius: '0 12px 12px 12px',
-          padding: '20px',
-          color: '#fff',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '10px',
-          lineHeight: '2',
-          marginBottom: '16px',
-          cursor: 'pointer',
-          minHeight: '120px',
-          position: 'relative',
-          boxShadow: '0 0 15px rgba(255, 214, 0, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        {displayedText}
-        {!isTyping && (
-          <span style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '14px',
-            fontSize: '8px',
-            color: '#FFD600',
-            animation: 'pulse 1s infinite alternate',
-          }}>
-            {dialogueIndex < npc.dialogue.length - 1 ? '▼' : '✕'}
-          </span>
-        )}
-      </div>
-
-      {/* Progress dots */}
-      {npc.dialogue.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '12px' }}>
-          {npc.dialogue.map((_, i) => (
-            <div key={i} style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: i === dialogueIndex ? '#FFD600' : i < dialogueIndex ? '#666' : '#333',
-              transition: 'background 0.3s',
-            }} />
-          ))}
-        </div>
-      )}
-
-      <Button onClick={handleClick} style={{ width: '100%' }}>
-        {isTyping ? 'Passer' : dialogueIndex < npc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
-      </Button>
     </div>
   );
 }

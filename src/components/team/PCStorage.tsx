@@ -4,6 +4,8 @@ import { getPokemonData, getMoveData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { PokemonInstance } from '../../types/pokemon';
 import { BOX_CAPACITY } from '../../engine/pcStorage';
+import { theme } from '../../theme';
+import { getHpColor } from '../ui/HealthBar';
 
 type DragSource = { type: 'team'; index: number } | { type: 'pc'; uid: string; boxId: number; slotId: number };
 type SelectedSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
@@ -54,14 +56,14 @@ export function PCStorage() {
   };
 
   return (
-    <div style={{ padding: '16px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2 style={{ color: '#9C27B0', fontSize: '14px', fontFamily: "'Press Start 2P', monospace", marginBottom: '16px', textAlign: 'center' }}>
+    <div style={{ padding: `${theme.spacing.lg}px`, maxWidth: '600px', margin: '0 auto' }}>
+      <h2 style={{ color: theme.colors.purple, fontSize: theme.font.xxl, fontFamily: theme.font.family, marginBottom: `${theme.spacing.lg}px`, textAlign: 'center' }}>
         PC de Léo
       </h2>
 
       {/* Team section */}
-      <div 
-        style={{ marginBottom: '16px' }}
+      <div
+        style={{ marginBottom: `${theme.spacing.lg}px` }}
         onDragOver={(e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
@@ -75,22 +77,22 @@ export function PCStorage() {
           setDragOverTeamIndex(null);
         }}
       >
-        <div style={{ color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
+        <div style={{ color: theme.colors.textMuted, fontSize: theme.font.sm, fontFamily: theme.font.family, marginBottom: `${theme.spacing.sm}px` }}>
           Équipe ({team.length}/6)
         </div>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '6px',
-          background: 'rgba(26, 42, 58, 0.8)',
-          padding: '8px',
-          borderRadius: '8px',
-          border: '2px solid #333',
+          background: `${theme.colors.navyBg}cc`,
+          padding: `${theme.spacing.sm}px`,
+          borderRadius: `${theme.radius.md}px`,
+          border: `2px solid ${theme.colors.borderDark}`,
         }}>
           {Array.from({ length: 6 }).map((_, idx) => {
             const pokemon = team[idx];
             const isDragOver = dragOverTeamIndex === idx && dragSource?.type === 'team' && dragSource.index !== idx;
-            
+
             if (!pokemon) {
               return (
                 <div key={`team-empty-${idx}`} style={{
@@ -106,7 +108,7 @@ export function PCStorage() {
             const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
             const isSelected = selected?.type === 'team' && selected.index === idx;
             const hpRatio = pokemon.currentHp / pokemon.maxHp;
-            const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+            const hpColor = getHpColor(hpRatio);
             const isDragging = dragSource?.type === 'team' && dragSource.index === idx;
 
             return (
@@ -150,7 +152,7 @@ export function PCStorage() {
                   justifyContent: 'center',
                   cursor: 'grab',
                   position: 'relative',
-                  border: isDragOver ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                  border: isDragOver ? `2px solid ${theme.colors.info}` : isSelected ? `2px solid ${theme.colors.purple}` : `2px solid ${theme.colors.borderDark}`,
                   opacity: isDragging ? 0.5 : 1,
                   transition: 'border-color 0.2s, opacity 0.2s',
                 }}
@@ -167,7 +169,7 @@ export function PCStorage() {
                   left: '2px',
                   right: '2px',
                   height: '3px',
-                  background: '#333',
+                  background: theme.colors.borderDark,
                   borderRadius: '2px',
                   overflow: 'hidden',
                 }}>
@@ -177,9 +179,9 @@ export function PCStorage() {
                   position: 'absolute',
                   top: '1px',
                   right: '2px',
-                  fontSize: '7px',
-                  color: '#aaa',
-                  fontFamily: "'Press Start 2P', monospace",
+                  fontSize: theme.font.micro,
+                  color: theme.colors.textMuted,
+                  fontFamily: theme.font.family,
                 }}>
                   {pokemon.level}
                 </div>
@@ -202,15 +204,15 @@ export function PCStorage() {
       )}
 
       {/* Box section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: `${theme.spacing.sm}px` }}>
         <Button variant="secondary" size="sm" onClick={handlePrevBox}>&lt;</Button>
-        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '10px', color: '#ccc' }}>
+        <div style={{ fontFamily: theme.font.family, fontSize: theme.font.md, color: '#ccc' }}>
           {currentBox.name} ({boxCount}/{BOX_CAPACITY})
         </div>
         <Button variant="secondary" size="sm" onClick={handleNextBox}>&gt;</Button>
       </div>
 
-      <div 
+      <div
         onDragOver={(e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
@@ -233,11 +235,11 @@ export function PCStorage() {
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '6px',
-          background: 'rgba(22, 33, 62, 0.8)',
-          padding: '8px',
-          borderRadius: '8px',
+          background: `${theme.colors.navyBg}cc`,
+          padding: `${theme.spacing.sm}px`,
+          borderRadius: `${theme.radius.md}px`,
           minHeight: '200px',
-          border: isDragOverPc && dragSource?.type === 'team' ? '2px solid #2196F3' : '2px solid #333',
+          border: isDragOverPc && dragSource?.type === 'team' ? `2px solid ${theme.colors.info}` : `2px solid ${theme.colors.borderDark}`,
           transition: 'border-color 0.2s',
         }}
       >
@@ -268,10 +270,10 @@ export function PCStorage() {
                 }}
                 style={{
                   background: 'rgba(15, 23, 42, 0.5)',
-                  borderRadius: '4px',
+                  borderRadius: `${theme.radius.sm}px`,
                   aspectRatio: '1',
                   opacity: isDragOver ? 0.6 : 0.2,
-                  border: isDragOver ? '2px solid #2196F3' : '2px solid transparent',
+                  border: isDragOver ? `2px solid ${theme.colors.info}` : '2px solid transparent',
                   transition: 'border-color 0.2s, opacity 0.2s',
                 }}
               />
@@ -282,7 +284,7 @@ export function PCStorage() {
           const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
           const isSelected = selected?.type === 'pc' && selected.uid === pokemon.uid;
           const hpRatio = pokemon.currentHp / pokemon.maxHp;
-          const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+          const hpColor = getHpColor(hpRatio);
           const isDragging = dragSource?.type === 'pc' && dragSource.uid === pokemon.uid;
 
           return (
@@ -318,7 +320,7 @@ export function PCStorage() {
               onClick={() => setSelected(isSelected ? null : { type: 'pc', uid: pokemon.uid })}
               style={{
                 background: 'rgba(15, 23, 42, 0.7)',
-                borderRadius: '4px',
+                borderRadius: `${theme.radius.sm}px`,
                 aspectRatio: '1',
                 display: 'flex',
                 flexDirection: 'column',
@@ -326,7 +328,7 @@ export function PCStorage() {
                 justifyContent: 'center',
                 cursor: 'grab',
                 position: 'relative',
-                border: isDragOver && !isDragging ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                border: isDragOver && !isDragging ? `2px solid ${theme.colors.info}` : isSelected ? `2px solid ${theme.colors.purple}` : `2px solid ${theme.colors.borderDark}`,
                 opacity: isDragging ? 0.5 : 1,
                 transition: 'border-color 0.2s, opacity 0.2s',
               }}
@@ -343,7 +345,7 @@ export function PCStorage() {
                 left: '2px',
                 right: '2px',
                 height: '3px',
-                background: '#333',
+                background: theme.colors.borderDark,
                 borderRadius: '2px',
                 overflow: 'hidden',
               }}>
@@ -353,9 +355,9 @@ export function PCStorage() {
                 position: 'absolute',
                 top: '1px',
                 right: '2px',
-                fontSize: '7px',
-                color: '#aaa',
-                fontFamily: "'Press Start 2P', monospace",
+                fontSize: theme.font.micro,
+                color: theme.colors.textMuted,
+                fontFamily: theme.font.family,
               }}>
                 {pokemon.level}
               </div>
@@ -386,23 +388,22 @@ function DetailPanel({
   const data = getPokemonData(pokemon.dataId);
   const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
   const hpRatio = pokemon.currentHp / pokemon.maxHp;
-  const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
-  const font = "'Press Start 2P', monospace";
+  const hpColor = getHpColor(hpRatio);
 
   const canDeposit = source.type === 'team' && teamLength > 1;
   const canWithdraw = source.type === 'pc' && teamLength < 6;
 
   return (
     <div style={{
-      background: 'rgba(15, 25, 35, 0.9)',
-      border: '2px solid #9C27B0',
-      borderRadius: '10px',
-      padding: '12px',
-      marginBottom: '16px',
+      background: `${theme.colors.deepBg}e6`,
+      border: `2px solid ${theme.colors.purple}`,
+      borderRadius: `${theme.radius.lg}px`,
+      padding: `${theme.spacing.md}px`,
+      marginBottom: `${theme.spacing.lg}px`,
       animation: 'fadeIn 0.2s ease',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: `${theme.spacing.md}px`, marginBottom: '10px' }}>
         <img
           src={spriteUrl}
           alt={data.name}
@@ -410,23 +411,23 @@ function DetailPanel({
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
         />
         <div style={{ flex: 1 }}>
-          <div style={{ color: '#fff', fontSize: '11px', fontFamily: font }}>
+          <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.lg, fontFamily: theme.font.family }}>
             {pokemon.nickname || data.name}
           </div>
-          <div style={{ color: '#888', fontSize: '8px', fontFamily: font, marginTop: '4px' }}>
+          <div style={{ color: theme.colors.textDim, fontSize: theme.font.xs, fontFamily: theme.font.family, marginTop: `${theme.spacing.xs}px` }}>
             Nv.{pokemon.level}
             {pokemon.status !== null && (
-              <span style={{ color: '#e94560', marginLeft: '8px' }}>
+              <span style={{ color: theme.colors.primary, marginLeft: `${theme.spacing.sm}px` }}>
                 [{pokemon.status.toUpperCase()}]
               </span>
             )}
           </div>
           {/* HP bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
-            <div style={{ flex: 1, height: '6px', background: '#333', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ flex: 1, height: '6px', background: theme.colors.borderDark, borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '3px' }} />
             </div>
-            <span style={{ color: '#aaa', fontSize: '7px', fontFamily: font }}>
+            <span style={{ color: theme.colors.textMuted, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
               {pokemon.currentHp}/{pokemon.maxHp}
             </span>
           </div>
@@ -437,7 +438,7 @@ function DetailPanel({
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '4px',
+        gap: `${theme.spacing.xs}px`,
         marginBottom: '10px',
       }}>
         {([
@@ -450,36 +451,36 @@ function DetailPanel({
         ] as [string, number][]).map(([label, value]) => (
           <div key={label} style={{
             background: 'rgba(26, 42, 58, 0.7)',
-            borderRadius: '4px',
-            padding: '4px 6px',
+            borderRadius: `${theme.radius.sm}px`,
+            padding: `${theme.spacing.xs}px 6px`,
             display: 'flex',
             justifyContent: 'space-between',
           }}>
-            <span style={{ color: '#888', fontSize: '7px', fontFamily: font }}>{label}</span>
-            <span style={{ color: '#fff', fontSize: '7px', fontFamily: font }}>{value}</span>
+            <span style={{ color: theme.colors.textDim, fontSize: theme.font.micro, fontFamily: theme.font.family }}>{label}</span>
+            <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.micro, fontFamily: theme.font.family }}>{value}</span>
           </div>
         ))}
       </div>
 
       {/* Moves */}
       <div style={{ marginBottom: '10px' }}>
-        <div style={{ color: '#888', fontSize: '7px', fontFamily: font, marginBottom: '4px' }}>
+        <div style={{ color: theme.colors.textDim, fontSize: theme.font.micro, fontFamily: theme.font.family, marginBottom: `${theme.spacing.xs}px` }}>
           Capacites
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: `${theme.spacing.xs}px` }}>
           {pokemon.moves.map((move, i) => {
             let moveData;
             try { moveData = getMoveData(move.moveId); } catch { return null; }
             return (
               <div key={i} style={{
                 background: 'rgba(26, 42, 58, 0.7)',
-                borderRadius: '4px',
-                padding: '4px 6px',
+                borderRadius: `${theme.radius.sm}px`,
+                padding: `${theme.spacing.xs}px 6px`,
               }}>
-                <div style={{ color: '#fff', fontSize: '7px', fontFamily: font }}>
+                <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
                   {moveData.name}
                 </div>
-                <div style={{ color: '#666', fontSize: '6px', fontFamily: font, marginTop: '2px' }}>
+                <div style={{ color: theme.colors.textDimmer, fontSize: '6px', fontFamily: theme.font.family, marginTop: '2px' }}>
                   PP {move.currentPp}/{move.maxPp}
                 </div>
               </div>
@@ -489,7 +490,7 @@ function DetailPanel({
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: `${theme.spacing.sm}px`, justifyContent: 'center' }}>
         {source.type === 'team' && (
           <Button
             variant="danger"
