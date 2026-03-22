@@ -113,13 +113,14 @@ export interface TrainerPokemon {
 }
 
 export interface UnlockCondition {
-  type: 'trainers' | 'badge' | 'gym' | 'item' | 'event';
+  type: 'trainers' | 'badge' | 'gym' | 'item' | 'event' | 'hm';
   defeatedTrainers?: string[];
   badge?: string;
   gymId?: string;
   zones?: string[];
   itemId?: string; // Require a specific item in absolute inventory (e.g. silph-scope)
   eventId?: string; // Require a specific story event flag
+  hmMove?: string; // Require a team member knowing this HM move (e.g. 'surf')
 }
 
 // ===== Save Data =====

@@ -148,6 +148,8 @@ export interface GameState {
   checkForSave: () => Promise<boolean>;
 }
 
+const HM_MOVE_IDS: Record<string, number> = { surf: 57, strength: 70, cut: 15, fly: 19, flash: 148, waterfall: 127, whirlpool: 250, rock_smash: 249, dive: 291 };
+
 // Helper: fire-and-forget save (non-blocking)
 function fireAndForgetSave(state: GameState) {
   saveGame({
@@ -474,6 +476,13 @@ export const useGameStore = create<GameState>((set, get) => ({
             changed = true;
           }
         }
+        if (condition.type === 'hm' && condition.hmMove) {
+          const moveId = HM_MOVE_IDS[condition.hmMove];
+          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId))) {
+            newProgress.unlockedZones.push(zoneId);
+            changed = true;
+          }
+        }
       } catch { }
     }
     if (changed) {
@@ -720,6 +729,13 @@ export const useGameStore = create<GameState>((set, get) => ({
             newProgress.unlockedZones.push(zoneId);
           }
         }
+
+        if (condition.type === 'hm' && condition.hmMove) {
+          const moveId = HM_MOVE_IDS[condition.hmMove];
+          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId)) && !newProgress.unlockedZones.includes(zoneId)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
       } catch {
         // Zone not found, skip
       }
@@ -789,6 +805,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
         if (condition.type === 'item' && condition.itemId) {
           if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
+            newProgress.unlockedZones.push(zoneId);
+          }
+        }
+        if (condition.type === 'hm' && condition.hmMove) {
+          const moveId = HM_MOVE_IDS[condition.hmMove];
+          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId))) {
             newProgress.unlockedZones.push(zoneId);
           }
         }
@@ -1116,6 +1138,29 @@ export const useGameStore = create<GameState>((set, get) => ({
       set({ team: newTeam, pendingMoveLearn: null });
     }
     get().saveGameState();
+
+    // Re-check zone unlocks for HM conditions after learning a move
+    if (forgetIndex !== null) {
+      const allZones = getAllZones();
+      const prog = { ...get().progress };
+      let changed = false;
+      for (const zone of allZones) {
+        if (prog.unlockedZones.includes(zone.id)) continue;
+        if (!zone.connectedZones.some(z => prog.unlockedZones.includes(z))) continue;
+        const condition = (zone as any).unlockCondition;
+        if (condition?.type === 'hm' && condition.hmMove) {
+          const moveId = HM_MOVE_IDS[condition.hmMove];
+          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId))) {
+            prog.unlockedZones.push(zone.id);
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
+        set({ progress: prog });
+        get().saveGameState();
+      }
+    }
   },
 
   handleGameCleared: () => {
