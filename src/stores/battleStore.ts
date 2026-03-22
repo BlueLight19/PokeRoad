@@ -621,7 +621,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     if (first.currentHp > 0 && first.ability) {
       const firstName = first.nickname || getPokemonData(first.dataId).name;
       const etResult = triggerAbility(first.ability, 'end-turn', {
-        pokemon: first, trigger: 'end-turn', pokemonName: firstName,
+        pokemon: first, trigger: 'end-turn', pokemonName: firstName, weather: currentWeather,
       });
       addStepForAttack(etResult.logs, first);
     }
@@ -654,7 +654,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       if (second.currentHp > 0 && second.ability) {
         const secondName = second.nickname || getPokemonData(second.dataId).name;
         const etResult2 = triggerAbility(second.ability, 'end-turn', {
-          pokemon: second, trigger: 'end-turn', pokemonName: secondName,
+          pokemon: second, trigger: 'end-turn', pokemonName: secondName, weather: currentWeather,
         });
         addStepForAttack(etResult2.logs, second);
       }

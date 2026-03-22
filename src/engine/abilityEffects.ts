@@ -256,8 +256,8 @@ const abilityHandlers: Record<string, Partial<Record<AbilityTrigger, AbilityHand
   },
 
   'sniper': {
-    // Handled via DamageResult.isCritical check in damageCalculator — simplified here
     'modify-damage': (_ctx) => {
+      // Sniper 1.5x on crits is handled in damageCalculator after crit multiplier
       return { logs: [] };
     },
   },
@@ -602,36 +602,194 @@ const abilityHandlers: Record<string, Partial<Record<AbilityTrigger, AbilityHand
     },
   },
 
-  // No-op abilities (effects too niche or out-of-battle only)
+  // ===== Synchronize: copy status back to attacker =====
+  'synchronize': {
+    'on-status': (ctx) => {
+      // Synchronize doesn't prevent the status — it copies it to the opponent
+      // We set a flag; the actual copy happens after status is applied (in battleEngine)
+      return { logs: [] };
+    },
+  },
+
+  // ===== Trace: copy opponent's ability on switch-in =====
+  'trace': {
+    'switch-in': (ctx) => {
+      if (!ctx.opponent || ctx.opponent.currentHp <= 0) return { logs: [] };
+      const oppAbility = ctx.opponent.ability;
+      if (!oppAbility || oppAbility === 'trace' || oppAbility === 'imposter') return { logs: [] };
+      ctx.pokemon.ability = oppAbility;
+      const oppName = ctx.opponentName || 'l\'adversaire';
+      return { logs: [{ message: `${ctx.pokemonName} copie ${oppAbility} de ${oppName} grâce à Calque !`, type: 'info' }] };
+    },
+  },
+
+  // ===== Download: boost Atk or SpAtk based on opponent's lower defense =====
+  'download': {
+    'switch-in': (ctx) => {
+      if (!ctx.opponent || ctx.opponent.currentHp <= 0) return { logs: [] };
+      const oppDef = ctx.opponent.stats.defense;
+      const oppSpDef = ctx.opponent.stats.spDef;
+      if (oppDef <= oppSpDef) {
+        ctx.pokemon.statStages.attack = Math.min(6, ctx.pokemon.statStages.attack + 1);
+        return { logs: [{ message: `Téléchargement booste l'Attaque de ${ctx.pokemonName} !`, type: 'info' }] };
+      } else {
+        ctx.pokemon.statStages.spAtk = Math.min(6, ctx.pokemon.statStages.spAtk + 1);
+        return { logs: [{ message: `Téléchargement booste l'Attaque Spé. de ${ctx.pokemonName} !`, type: 'info' }] };
+      }
+    },
+  },
+
+  // ===== Shield Dust: block secondary effects =====
+  'shield-dust': {
+    // Checked inline in battleEngine when applying secondary effects
+    'modify-damage': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Own Tempo: prevent confusion =====
+  'own-tempo': {
+    'on-status': (ctx) => {
+      if (ctx.statusToApply === 'confusion') {
+        return { logs: [{ message: `Tempo Perso protège ${ctx.pokemonName} de la confusion !`, type: 'info' }], prevented: true };
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Early Bird: halve sleep turns =====
+  'early-bird': {
+    // Checked inline in checkStatusBlock when decrementing sleep turns
+    'on-status': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Damp: prevent Self-Destruct/Explosion =====
+  'damp': {
+    // Checked inline in battleEngine before self-destruct moves execute
+    'before-move': (ctx) => {
+      if (ctx.move && (ctx.move.id === 120 || ctx.move.id === 153)) { // Self-Destruct, Explosion
+        return { logs: [{ message: `Moiteur empêche l'explosion !`, type: 'info' }], prevented: true };
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Liquid Ooze: damage drain users =====
+  'liquid-ooze': {
+    // Checked inline in drain effect handler
+    'modify-damage': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Scrappy: Normal/Fighting hit Ghost =====
+  'scrappy': {
+    // Checked inline in type effectiveness calculation
+    'modify-damage': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Cursed Body: 30% chance to disable on contact =====
+  'cursed-body': {
+    'after-hit': (ctx) => {
+      if (!ctx.opponent || ctx.opponent.currentHp <= 0) return { logs: [] };
+      if (!ctx.move) return { logs: [] };
+      if (Math.random() < 0.3) {
+        if (!ctx.opponent.volatile.disabled) {
+          ctx.opponent.volatile.disabled = { moveId: ctx.move.id, turns: 4 };
+          const oppName = ctx.opponentName || 'l\'adversaire';
+          return { logs: [{ message: `Corps Maudit désactive ${ctx.move.name} de ${oppName} !`, type: 'info' }] };
+        }
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Anger Point: max attack on crit received =====
+  'anger-point': {
+    'after-hit': (ctx) => {
+      // This needs isCritical context — we'll check via a flag set in battleEngine
+      return { logs: [] };
+    },
+  },
+
+  // ===== Leaf Guard: block status in sun =====
+  'leaf-guard': {
+    'on-status': (ctx) => {
+      if (ctx.weather === 'sun') {
+        return { logs: [{ message: `Feuille Garde protège ${ctx.pokemonName} au soleil !`, type: 'info' }], prevented: true };
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Hydration: cure status in rain at end of turn =====
+  'hydration': {
+    'end-turn': (ctx) => {
+      if (ctx.weather === 'rain' && ctx.pokemon.status) {
+        ctx.pokemon.status = null;
+        ctx.pokemon.statusTurns = 0;
+        return { logs: [{ message: `${ctx.pokemonName} guérit grâce à Hydratation !`, type: 'info' }] };
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Marvel Scale: 1.5x Defense when statused =====
+  'marvel-scale': {
+    'modify-damage': (ctx) => {
+      // Only boosts defense when defender is statused — checked for incoming physical moves
+      if (ctx.pokemon.status && ctx.move?.category === 'physical') {
+        return { logs: [], damageMultiplier: 0.67 }; // ~1.5x defense = ~0.67x damage taken
+      }
+      return { logs: [] };
+    },
+  },
+
+  // ===== Serene Grace: double secondary effect chances =====
+  'serene-grace': {
+    // Checked inline in battleEngine/moveEffects when applying secondary effects
+    'modify-damage': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Pressure: extra PP drain =====
+  'pressure': {
+    'switch-in': (ctx) => {
+      return { logs: [{ message: `${ctx.pokemonName} exerce une Pression !`, type: 'info' }] };
+    },
+    // PP drain checked inline in executeMove
+  },
+
+  // ===== Arena Trap / Magnet Pull: trapping =====
+  'arena-trap': {
+    // Trapping checked via isTrappedByAbility in battleStore
+    'switch-in': (_ctx) => ({ logs: [] }),
+  },
+  'magnet-pull': {
+    // Trapping checked via isTrappedByAbility in battleStore
+    'switch-in': (_ctx) => ({ logs: [] }),
+  },
+
+  // ===== Soundproof: block sound moves =====
+  'soundproof': {
+    'before-move': (ctx) => {
+      if (!ctx.move) return { logs: [] };
+      const soundMoves = [45, 46, 47, 48, 103, 173, 195, 215, 253, 304, 310, 319, 336, 405, 497, 547, 555, 574, 586]; // Growl, Screech, Snore, Perish Song, Heal Bell, Uproar, Hyper Voice, Bug Buzz, etc.
+      if (soundMoves.includes(ctx.move.id)) {
+        return { logs: [{ message: `Anti-Bruit protège ${ctx.pokemonName} !`, type: 'info' }], prevented: true };
+      }
+      return { logs: [] };
+    },
+  },
+
+  // No-op abilities (out-of-battle only or very niche)
   'run-away': {},
   'pickup': {},
   'illuminate': {},
   'stench': {},
   'sticky-hold': {},
-  'damp': {},
   'cloud-nine': {},
-  'shield-dust': {},
-  'own-tempo': {},
   'suction-cups': {},
-  'soundproof': {},
   'inner-focus': {
     'after-hit': (_ctx) => ({ logs: [] }), // Prevents flinch — handled in flinch check
   },
-  'early-bird': {},
-  'synchronize': {},
-  'trace': {},
-  'download': {},
   'imposter': {},
-  'arena-trap': {},
-  'magnet-pull': {},
-  'liquid-ooze': {},
-  'leaf-guard': {},
-  'scrappy': {},
   'forewarn': {},
-  'hydration': {},
-  'cursed-body': {},
-  'marvel-scale': {},
-  'serene-grace': {},
 };
 
 // ===== Public API =====
@@ -706,4 +864,39 @@ export function abilityBlocksFlinch(abilityName: string): boolean {
  */
 export function abilityIsSturdy(abilityName: string): boolean {
   return abilityName === 'sturdy';
+}
+
+/**
+ * Shield Dust: blocks secondary effects from opponent's moves
+ */
+export function abilityIsShieldDust(abilityName: string): boolean {
+  return abilityName === 'shield-dust';
+}
+
+/**
+ * Serene Grace: double secondary effect chances
+ */
+export function abilityIsSereneGrace(abilityName: string): boolean {
+  return abilityName === 'serene-grace';
+}
+
+/**
+ * Scrappy: Normal/Fighting moves hit Ghost types
+ */
+export function abilityIsScrappy(abilityName: string): boolean {
+  return abilityName === 'scrappy';
+}
+
+/**
+ * Liquid Ooze: drain moves damage the attacker instead of healing
+ */
+export function abilityIsLiquidOoze(abilityName: string): boolean {
+  return abilityName === 'liquid-ooze';
+}
+
+/**
+ * Early Bird: halve sleep duration
+ */
+export function abilityIsEarlyBird(abilityName: string): boolean {
+  return abilityName === 'early-bird';
 }

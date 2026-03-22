@@ -90,7 +90,7 @@ export interface GymPokemon {
 
 export interface TrainerCondition {
   type: 'hm' | 'item' | 'event' | 'badge';
-  value: string; // e.g. 'surf', 'hm-03', 'champion-defeated', 'badge-cascade'
+  value: string; // e.g. 'surf', 'champion-defeated', 'badge-cascade'
   label?: string; // Display label, e.g. 'Surf requis'
 }
 

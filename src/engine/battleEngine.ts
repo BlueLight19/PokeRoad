@@ -7,7 +7,9 @@ import { getEffectHandler, EffectContext } from './moveEffects';
 import {
   triggerAbility, abilityIsNoGuard, abilityIsCompoundEyes,
   abilityIsSkillLink, abilityBlocksFlinch, abilityBlocksRecoil,
-  abilityIsSturdy, abilityIsMoldBreaker,
+  abilityIsSturdy, abilityIsMoldBreaker, abilityIsShieldDust,
+  abilityIsSereneGrace, abilityIsScrappy, abilityIsLiquidOoze,
+  abilityIsEarlyBird,
 } from './abilityEffects';
 import { triggerHeldItem, heldItemBlocksHazards, isChoiceItem } from './heldItemEffects';
 
@@ -75,13 +77,18 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     }
   }
 
-  // Leech Seed drain (1/8 max HP, heal opponent)
+  // Leech Seed drain (1/8 max HP, heal opponent — Liquid Ooze: damage opponent instead)
   if (pokemon.volatile.leechSeed && pokemon.currentHp > 0) {
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 8));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
     pushLog(logs, { message: `Vampigraine draine ${name} ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
     if (opponent && opponent.currentHp > 0) {
-      opponent.currentHp = Math.min(opponent.maxHp, opponent.currentHp + damage);
+      if (pokemon.ability === 'liquid-ooze') {
+        opponent.currentHp = Math.max(0, opponent.currentHp - damage);
+        pushLog(logs, { message: `Suintement blesse l'adversaire !`, type: 'damage' }, pokemon, opponent);
+      } else {
+        opponent.currentHp = Math.min(opponent.maxHp, opponent.currentHp + damage);
+      }
     }
   }
 
@@ -227,7 +234,8 @@ export function checkStatusBlock(pokemon: PokemonInstance, moveId?: number): { b
   }
 
   if (pokemon.status === 'sleep') {
-    pokemon.statusTurns--;
+    // Early Bird: decrement sleep turns twice as fast
+    pokemon.statusTurns -= abilityIsEarlyBird(pokemon.ability) ? 2 : 1;
     if (pokemon.statusTurns <= 0) {
       pokemon.status = null;
       pokemon.statusTurns = 0;
@@ -262,7 +270,9 @@ export function checkStatusBlock(pokemon: PokemonInstance, moveId?: number): { b
  */
 export function tryApplyStatus(
   target: PokemonInstance,
-  move: MoveData
+  move: MoveData,
+  weather?: string | null,
+  attacker?: PokemonInstance
 ): BattleLogEntry[] {
   const logs: BattleLogEntry[] = [];
   const name = target.nickname || getPokemonData(target.dataId).name;
@@ -283,6 +293,11 @@ export function tryApplyStatus(
   // Handle Confusion (Volatile)
   // Cast to specific comparison because string might be 'confusion' coming from JSON
   if ((move.effect.status as string) === 'confusion') {
+    // Own Tempo blocks confusion
+    if (target.ability === 'own-tempo') {
+      logs.push({ message: `Tempo Perso protège ${name} de la confusion !`, type: 'info' });
+      return logs;
+    }
     if (target.volatile.confusion > 0) {
       logs.push({ message: `${name} est déjà confus !`, type: 'info' });
       return logs;
@@ -301,6 +316,7 @@ export function tryApplyStatus(
       pokemon: target, trigger: 'on-status',
       statusToApply: move.effect.status as string,
       pokemonName: name,
+      weather,
     });
     if (abilityResult.prevented) {
       logs.push(...abilityResult.logs);
@@ -355,7 +371,37 @@ export function tryApplyStatus(
     type: 'status',
   });
 
+  // Synchronize: copy burn/paralysis/poison back to attacker
+  if (target.ability === 'synchronize' && attacker && target.status) {
+    logs.push(...applySynchronize(attacker, target.status));
+  }
+
   return logs;
+}
+
+/**
+ * Apply Synchronize: copy burn/paralysis/poison to the attacker after the target is statused.
+ * Call this after tryApplyStatus succeeds, passing the move user as syncTarget.
+ */
+export function applySynchronize(
+  syncTarget: PokemonInstance,
+  statusApplied: StatusCondition
+): BattleLogEntry[] {
+  if (!statusApplied) return [];
+  // Only Synchronize copies burn, paralysis, poison/toxic
+  if (!['burn', 'paralysis', 'poison', 'toxic'].includes(statusApplied)) return [];
+  if (syncTarget.status !== null) return [];
+  const targetData = getPokemonData(syncTarget.dataId);
+  const targetTypes = targetData.types as string[];
+  // Type immunities still apply
+  if (statusApplied === 'burn' && targetTypes.includes('fire')) return [];
+  if (statusApplied === 'paralysis' && targetTypes.includes('electric')) return [];
+  if ((statusApplied === 'poison' || statusApplied === 'toxic') && (targetTypes.includes('poison') || targetTypes.includes('steel'))) return [];
+
+  syncTarget.status = statusApplied;
+  if (statusApplied === 'toxic') syncTarget.volatile.toxicCounter = 0;
+  const syncName = syncTarget.nickname || targetData.name;
+  return [{ message: `Synchro inflige ${statusApplied === 'burn' ? 'une brûlure' : statusApplied === 'paralysis' ? 'la paralysie' : 'l\'empoisonnement'} à ${syncName} !`, type: 'status' }];
 }
 
 /**
@@ -383,6 +429,19 @@ export function tryApplyStatChange(
   if (!isUser && stages < 0 && target.volatile.mistTurns > 0) {
     logs.push({ message: `La Brume protège ${targetName} !`, type: 'info' });
     return logs;
+  }
+
+  // Ability blocks stat drops (Clear Body, Hyper Cutter, Keen Eye, etc.)
+  if (!isUser && stages < 0 && target.ability) {
+    const abilityResult = triggerAbility(target.ability, 'on-stat-drop', {
+      pokemon: target, trigger: 'on-stat-drop',
+      statDrop: { stat, stages },
+      pokemonName: targetName,
+    });
+    if (abilityResult.prevented) {
+      logs.push(...abilityResult.logs);
+      return logs;
+    }
   }
 
   // Apply stage (supports accuracy/evasion as extended battle stats)
@@ -452,8 +511,9 @@ export function executeMove(
 
   pushLog(logs, { message: `${attackerName} utilise ${move.name} !`, type: 'info' }, attacker, defender);
 
-  // Deduct PP
-  moveInstance.currentPp = Math.max(0, moveInstance.currentPp - 1);
+  // Deduct PP (Pressure: extra PP deducted when targeting a Pressure Pokemon)
+  const ppCost = (defender.ability === 'pressure' && !abilityIsMoldBreaker(attacker.ability)) ? 2 : 1;
+  moveInstance.currentPp = Math.max(0, moveInstance.currentPp - ppCost);
 
   // Track last move used (for Disable)
   attacker.volatile.lastMoveUsed = move.id;
@@ -524,6 +584,12 @@ export function executeMove(
     }
   }
 
+  // Damp: prevent Self-Destruct/Explosion
+  if (move.effect?.type === 'self_destruct' && defender.ability === 'damp' && !abilityIsMoldBreaker(attacker.ability)) {
+    pushLog(logs, { message: `Moiteur empêche ${attackerName} d'exploser !`, type: 'info' }, attacker, defender);
+    return { logs, defenderFainted: false };
+  }
+
   // OHKO moves: special accuracy + instant KO
   if (move.effect?.type === 'ohko') {
     if (defender.level > attacker.level) {
@@ -550,7 +616,8 @@ export function executeMove(
         return { logs, defenderFainted: false };
       }
     }
-    const fixedAmount = move.effect.amount ?? 40;
+    // amount 65535 = level-based damage (Seismic Toss, Night Shade)
+    const fixedAmount = (move.effect.amount === 65535) ? attacker.level : (move.effect.amount ?? 40);
     defender.currentHp = Math.max(0, defender.currentHp - fixedAmount);
     pushLog(logs, { message: `${defenderName} perd ${fixedAmount} PV !`, type: 'damage' }, attacker, defender);
     const defenderFainted = defender.currentHp <= 0;
@@ -647,7 +714,7 @@ export function executeMove(
         logs.push(...getEffectHandler(move.effect.type)!(ctx));
       } else {
         // Fallback: generic self-targeting status/stat moves (e.g., Swords Dance)
-        logs.push(...tryApplyStatus(attacker, move));
+        logs.push(...tryApplyStatus(attacker, move, weather));
         logs.push(...tryApplyStatChange(attacker, move, true));
       }
     } else {
@@ -660,7 +727,7 @@ export function executeMove(
         };
         logs.push(...getEffectHandler(move.effect.type)!(ctx));
       } else {
-        logs.push(...tryApplyStatus(defender, move));
+        logs.push(...tryApplyStatus(defender, move, weather));
         logs.push(...tryApplyStatChange(defender, move, false));
       }
     }
@@ -691,9 +758,11 @@ export function executeMove(
     let totalDamage = 0;
     let hitCount = 0;
     const defenderHpBefore = defender.currentHp;
+    let anyCrit = false;
 
     for (let i = 0; i < hits; i++) {
       const result = calculateDamage(attacker, defender, move, attackerBadges, weather, defenderSide);
+      if (result.isCritical) anyCrit = true;
       // Knock Off (282): 1.5x damage if target holds an item
       if (move.id === 282 && defender.heldItem) {
         result.damage = Math.floor(result.damage * 1.5);
@@ -768,14 +837,29 @@ export function executeMove(
 
     // Apply effect via registry for damaging moves
     if (move.effect && move.effect.type !== 'multi' && move.effect.type !== 'charge' && move.effect.type !== 'recharge') {
-      const handler = getEffectHandler(move.effect.type);
-      if (handler) {
-        const ctx: EffectContext = {
-          attacker, defender, move, damageDealt: totalDamage,
-          defenderHpBefore, attackerName, defenderName,
-          attackerSide, defenderSide,
-        };
-        logs.push(...handler(ctx));
+      // Shield Dust: block secondary effects (chance < 100%) on the defender
+      const isSecondary = move.effect.chance !== undefined && move.effect.chance < 100;
+      const shieldDustBlocks = isSecondary && defender.ability && abilityIsShieldDust(defender.ability) && !abilityIsMoldBreaker(attacker.ability);
+
+      if (!shieldDustBlocks) {
+        // Serene Grace: double secondary effect chances
+        const originalChance = move.effect.chance;
+        if (isSecondary && attacker.ability && abilityIsSereneGrace(attacker.ability)) {
+          (move.effect as any).chance = Math.min(100, (move.effect.chance ?? 100) * 2);
+        }
+
+        const handler = getEffectHandler(move.effect.type);
+        if (handler) {
+          const ctx: EffectContext = {
+            attacker, defender, move, damageDealt: totalDamage,
+            defenderHpBefore, attackerName, defenderName,
+            attackerSide, defenderSide,
+          };
+          logs.push(...handler(ctx));
+        }
+
+        // Restore original chance to avoid permanent mutation
+        if (originalChance !== undefined) (move.effect as any).chance = originalChance;
       }
     }
 
@@ -820,13 +904,19 @@ export function executeMove(
       logs.push(...pinchResult.logs);
     }
 
-    // Contact abilities: Static, Flame Body, Poison Point, Effect Spore
-    if (totalDamage > 0 && defender.currentHp > 0 && defender.ability && move.category === 'physical') {
+    // Contact abilities: Static, Flame Body, Poison Point, Effect Spore, Cursed Body
+    if (totalDamage > 0 && defender.currentHp > 0 && defender.ability && move.category !== 'status') {
       const contactResult = triggerAbility(defender.ability, 'after-hit', {
         pokemon: defender, opponent: attacker, trigger: 'after-hit',
         move, pokemonName: defenderName, opponentName: attackerName,
       });
       logs.push(...contactResult.logs);
+    }
+
+    // Anger Point: max attack on crit received
+    if (anyCrit && defender.currentHp > 0 && defender.ability === 'anger-point') {
+      defender.statStages.attack = 6;
+      pushLog(logs, { message: `Colérique maximise l'Attaque de ${defenderName} !`, type: 'info' }, attacker, defender);
     }
 
     // Rocky Helmet: contact damage to attacker

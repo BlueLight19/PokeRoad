@@ -271,7 +271,7 @@ function convertItem(raw: DBItem): ItemData {
  *
  * Condition types:
  *   hm    — player team has a Pokemon that knows the HM move (e.g. 'surf', 'strength')
- *   item  — player inventory contains the item (e.g. 'hm-03')
+ *   item  — player inventory contains the item (e.g. 'silph-scope')
  *   event — player has triggered the event (e.g. 'champion-defeated')
  *   badge — player has the badge (e.g. 'badge-cascade')
  */

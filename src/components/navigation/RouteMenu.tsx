@@ -153,7 +153,7 @@ export function RouteMenu() {
   const lockedTrainers = new Set(filteredTrainers.filter(t => !isTrainerAccessible(t, team, inventory, { events: progress.events, badges: player.badges })).map(t => t.id));
   const allFloorTrainersDefeated = accessibleTrainers.every(t => progress.defeatedTrainers.includes(t.id));
 
-  const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
+  const hasSurf = team.some(p => p.moves.some(m => m.moveId === 57)); // Surf = move 57
   const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
 
   const handleWildEncounter = () => {
