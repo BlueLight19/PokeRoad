@@ -156,6 +156,8 @@ export function RouteMenu() {
   const hasSurf = team.some(p => p.moves.some(m => m.moveId === 57)); // Surf = move 57
   const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
 
+  const devSkip = useGameStore(s => s.settings.devSkipBattle);
+
   const handleWildEncounter = () => {
     if (wildEncounters.length === 0) return;
     if (progress.repelSteps > 0) {
@@ -170,26 +172,26 @@ export function RouteMenu() {
     } else {
       startWildBattle(wildEncounters, team);
     }
-    setView('battle');
+    if (!devSkip) setView('battle');
   };
 
   const handleWaterEncounter = () => {
     if (waterEncounters.length === 0) return;
     startWildBattle(waterEncounters, team);
-    setView('battle');
+    if (!devSkip) setView('battle');
   };
 
   const handleFishingEncounter = () => {
     if (fishingEncounters.length === 0) return;
     startWildBattle(fishingEncounters, team);
-    setView('battle');
+    if (!devSkip) setView('battle');
   };
 
   const handleTrainerBattle = (trainerId: string) => {
     if (isTrainerDefeated(trainerId)) return;
     const trainer = getTrainerData(trainerId);
     startTrainerBattle(trainer, team);
-    setView('battle');
+    if (!devSkip) setView('battle');
   };
 
   const handleSafariSearch = () => {
@@ -203,7 +205,7 @@ export function RouteMenu() {
     useGameStore.setState({ safariState: { ...safariState, steps: newSteps } });
     if (wildEncounters.length > 0) {
       startWildBattle(wildEncounters, team);
-      setView('battle');
+      if (!devSkip) setView('battle');
     }
   };
 
@@ -445,7 +447,7 @@ export function RouteMenu() {
                 variant={encounter.isGift ? 'default' : 'gold'}
                 onClick={() => {
                   startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
-                  setView('battle');
+                  if (!devSkip) setView('battle');
                 }}
               />
             );

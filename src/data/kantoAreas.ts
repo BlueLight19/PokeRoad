@@ -13,7 +13,7 @@ export const KANTO_AREAS: KantoArea[] = [
   { id: 'argenta', name: 'Argenta & Mont Selenite', zoneIds: ['argenta', 'route-3', 'mt-moon', 'route-4'] },
   { id: 'azuria', name: 'Azuria & Ponts', zoneIds: ['azuria', 'route-24', 'route-25'] },
   { id: 'carmin', name: 'Carmin sur Mer & Environs', zoneIds: ['route-5', 'route-6', 'carmin', 'route-11', 'cave-diglett'] },
-  { id: 'lavanville', name: 'Lavanville & Tunnels', zoneIds: ['route-9', 'route-10', 'rock-tunnel', 'lavanville'] },
+  { id: 'lavanville', name: 'Lavanville & Tour Pokémon', zoneIds: ['route-9', 'route-10', 'rock-tunnel', 'lavanville', 'pokemon-tower'] },
   { id: 'safrania', name: 'Safrania & Celadopole', zoneIds: ['route-8', 'safrania', 'route-7', 'celadopole'] },
   { id: 'parmanie', name: 'Parmanie & Piste Cyclable', zoneIds: ['route-16', 'route-17', 'route-18', 'parmanie', 'route-15', 'route-14', 'route-13', 'route-12'] },
   { id: 'iles', name: "Iles Ecume & Cramois'Ile", zoneIds: ['route-19', 'route-20', 'seafoam-islands', 'cramois-ile', 'pokemon-mansion', 'route-21'] },
@@ -61,6 +61,7 @@ export const ZONE_COORDS: Record<string, { x: number; y: number }> = {
   'safrania': { x: 58, y: 44 },
   'route-8': { x: 66, y: 44 },
   'lavanville': { x: 76, y: 45 },
+  'pokemon-tower': { x: 82, y: 45 },
 
   // ---- Cycling Road (west, going south) ----
   'route-16': { x: 33, y: 48 },
@@ -134,6 +135,9 @@ export const ZONE_CONNECTIONS: [string, string][] = [
   ['rock-tunnel', 'route-10'],
   ['route-10', 'lavanville'],
   ['route-10', 'power-plant'],
+
+  // Lavender → Pokemon Tower
+  ['lavanville', 'pokemon-tower'],
 
   // Lavender → Saffron → Celadon
   ['lavanville', 'route-8'],

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
-import { getZoneData, getGymData, getZoneTrainers } from '../../utils/dataLoader';
+import { getZoneData, getGymData, getZoneTrainers, isTrainerAccessible } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { NpcDialogue } from '../ui/NpcDialogue';
 import { NPCData, CityData, RouteData, StaticEncounter } from '../../types/game';
@@ -216,6 +216,7 @@ function TrainerCard({
 
 export function CityMenu() {
   const { selectedZone, team, player, progress, setView, addItem, givePlayerPokemon, triggerEvent, addNotification } = useGameStore();
+  const devSkip = useGameStore(s => s.settings.devSkipBattle);
   const { startGymBattle, startWildBattle } = useBattleStore();
   const [healMessage, setHealMessage] = useState('');
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
@@ -270,7 +271,7 @@ export function CityMenu() {
   const handleGymBattle = () => {
     if (!gym || gymDefeated || gymLocked) return;
     startGymBattle(gym, team);
-    setView('battle');
+    if (!devSkip) setView('battle');
   };
 
   const handleHeal = () => {
@@ -399,7 +400,8 @@ export function CityMenu() {
 
           {/* Gym section */}
           {gym && (() => {
-            const allTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t.id));
+            const accessibleTrainers = filteredTrainers.filter(t => isTrainerAccessible(t, team, useGameStore.getState().inventory, { events: progress.events, badges: player.badges }));
+            const allTrainersDefeated = accessibleTrainers.every(t => progress.defeatedTrainers.includes(t.id));
             const trainerCount = filteredTrainers.length;
             const gymColor = gymDefeated ? theme.colors.gold : gymLocked ? theme.colors.textDimmer : theme.colors.primary;
 
@@ -501,7 +503,7 @@ export function CityMenu() {
                           onClick={() => {
                             const { startTrainerBattle } = useBattleStore.getState();
                             startTrainerBattle(trainer, team);
-                            setView('battle');
+                            if (!devSkip) setView('battle');
                           }}
                         />
                       );
@@ -581,7 +583,7 @@ export function CityMenu() {
                   if (defeated) return;
                   const { startTrainerBattle } = useBattleStore.getState();
                   startTrainerBattle(trainer, team);
-                  setView('battle');
+                  if (!devSkip) setView('battle');
                 }}
                 completed={defeated}
                 disabled={defeated}
@@ -603,7 +605,7 @@ export function CityMenu() {
                 variant="gold"
                 onClick={() => {
                   startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
-                  setView('battle');
+                  if (!devSkip) setView('battle');
                 }}
               />
             );

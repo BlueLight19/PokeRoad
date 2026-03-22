@@ -293,35 +293,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const isSafari = !!safariState;
 
     if (gameStore.settings.devSkipBattle && !isSafari) {
-      const xpEntry = {
-        pokemonIndex: activeIdx >= 0 ? activeIdx : 0,
-        defeatedId: chosen.pokemonId,
-        defeatedLevel: level,
-      };
-
-      set({
-        active: true,
-        type: 'wild',
-        phase: 'victory',
-        playerTeam: playerTeam.map(deepCopyPokemon),
-        activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
-        enemyTeam: [wildPokemon],
-        activeEnemyIndex: 0,
-        logs: [
-          { message: `Un ${wildName} sauvage apparaît !`, type: 'info' },
-          { message: 'Passage du combat (Mode Dev)...', type: 'info' },
-          { message: 'Vous avez gagné le combat !', type: 'info' }
-        ],
-        xpGained: [xpEntry],
-        turnNumber: 1,
-        moneyGained: 0,
-        encounterId,
-        weather: null,
-        weatherTurns: 0,
-        playerSide: freshSideConditions(),
-        enemySide: freshSideConditions(),
-        trickRoom: 0,
-      });
+      // Instant resolve — no battle screen
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      gameStore.grantXpAndProcess(idx, chosen.pokemonId, level, false);
       return;
     }
 
@@ -394,40 +368,20 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     const gameStore = useGameStore.getState();
     if (gameStore.settings.devSkipBattle) {
-      const xpGained = enemyTeam.map(e => ({
-        pokemonIndex: activeIdx >= 0 ? activeIdx : 0,
-        defeatedId: e.dataId,
-        defeatedLevel: e.level,
-      }));
-
-      set({
-        active: true,
-        type: 'trainer',
-        phase: 'victory',
-        playerTeam: playerTeam.map(deepCopyPokemon),
-        activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
-        enemyTeam,
-        activeEnemyIndex: enemyTeam.length - 1,
-        logs: [
-          { message: `${trainer.trainerClass} ${trainer.name} veut se battre !`, type: 'info' },
-          { message: 'Passage du combat (Mode Dev)...', type: 'info' },
-          { message: `Vous avez battu ${trainer.trainerClass} ${trainer.name} !`, type: 'info' },
-          { message: `Vous gagnez ${trainer.reward}₽ !`, type: 'xp' }
-        ],
-        xpGained,
-        turnNumber: 1,
-        trainerId: trainer.id,
-        trainerName: `${trainer.trainerClass} ${trainer.name}`,
-        trainerReward: trainer.reward,
-        isGym: false,
-        gymId: null,
-        moneyGained: trainer.reward,
-        weather: null,
-        weatherTurns: 0,
-        playerSide: freshSideConditions(),
-        enemySide: freshSideConditions(),
-        trickRoom: 0,
-      });
+      // Instant resolve — no battle screen
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      for (const e of enemyTeam) {
+        gameStore.grantXpAndProcess(idx, e.dataId, e.level, true);
+      }
+      gameStore.addMoney(trainer.reward);
+      gameStore.markTrainerDefeated(trainer.id);
+      if (trainer.id.startsWith('league-')) {
+        gameStore.advanceLeagueProgress();
+        if (useGameStore.getState().progress.leagueProgress >= 5) {
+          useGameStore.getState().setView('hall_of_fame');
+          return;
+        }
+      }
       return;
     }
 
@@ -492,40 +446,17 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     const gameStore = useGameStore.getState();
     if (gameStore.settings.devSkipBattle) {
-      const xpGained = enemyTeam.map(e => ({
-        pokemonIndex: activeIdx >= 0 ? activeIdx : 0,
-        defeatedId: e.dataId,
-        defeatedLevel: e.level,
-      }));
-
-      set({
-        active: true,
-        type: 'gym',
-        phase: 'victory',
-        playerTeam: playerTeam.map(deepCopyPokemon),
-        activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
-        enemyTeam,
-        activeEnemyIndex: enemyTeam.length - 1,
-        logs: [
-          { message: `Champion ${gym.leader} veut se battre !`, type: 'info' },
-          { message: 'Passage du combat (Mode Dev)...', type: 'info' },
-          { message: `Vous avez battu Champion ${gym.leader} !`, type: 'info' },
-          { message: `Vous gagnez ${gym.reward}₽ !`, type: 'xp' }
-        ],
-        xpGained,
-        turnNumber: 1,
-        trainerId: null,
-        trainerName: `Champion ${gym.leader}`,
-        trainerReward: gym.reward,
-        isGym: true,
-        gymId: gym.id,
-        moneyGained: gym.reward,
-        weather: null,
-        weatherTurns: 0,
-        playerSide: freshSideConditions(),
-        enemySide: freshSideConditions(),
-        trickRoom: 0,
-      });
+      // Instant resolve — no battle screen
+      const idx = activeIdx >= 0 ? activeIdx : 0;
+      for (const e of enemyTeam) {
+        gameStore.grantXpAndProcess(idx, e.dataId, e.level, true);
+      }
+      gameStore.addMoney(gym.reward);
+      gameStore.markGymDefeated(gym.id);
+      // Re-enter the zone to refresh UI
+      if (gameStore.selectedZone) {
+        gameStore.selectZone(gameStore.selectedZone);
+      }
       return;
     }
 

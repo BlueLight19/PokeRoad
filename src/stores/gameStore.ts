@@ -190,7 +190,23 @@ function cascadeZoneUnlocks(
             try {
               const zoneData = getZoneData(z) as any;
               const zoneTrainers: string[] = zoneData.trainers || [];
-              return zoneTrainers.every((t: string) => newProgress.defeatedTrainers.includes(t));
+              // Only require trainers whose conditions are met (or have no condition)
+              const requiredTrainers = zoneTrainers.filter((t: string) => {
+                try {
+                  const td = getTrainerData(t);
+                  if (!td.requireCondition) return true;
+                  const rc = td.requireCondition;
+                  if (rc.type === 'badge') return getState().player.badges.includes(rc.value);
+                  if (rc.type === 'event') return !!newProgress.events[rc.value];
+                  if (rc.type === 'item') return getState().inventory.some(i => i.itemId === rc.value && i.quantity > 0);
+                  if (rc.type === 'hm') {
+                    const mid = HM_MOVE_IDS[rc.value];
+                    return !!(mid && getState().team.some(p => p.moves.some(m => m.moveId === mid)));
+                  }
+                  return true;
+                } catch { return true; }
+              });
+              return requiredTrainers.every((t: string) => newProgress.defeatedTrainers.includes(t));
             } catch { return true; }
           });
         }

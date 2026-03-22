@@ -21,7 +21,7 @@ export const LeagueMenu: React.FC = () => {
 
         // Start battle
         startTrainerBattle(trainer, useGameStore.getState().team);
-        setView('battle');
+        if (!useGameStore.getState().settings.devSkipBattle) setView('battle');
     };
 
     const elite4 = [
