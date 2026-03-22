@@ -155,7 +155,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
     }
 
-    // Check for Chroma Charms
+    // Check for shiny Charms
     const gameStore = useGameStore.getState();
     const inventory = gameStore.inventory;
     const shinyCharms = inventory.find(i => i.itemId === 'shiny-charm')?.quantity || 0;

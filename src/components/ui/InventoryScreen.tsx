@@ -84,7 +84,7 @@ export function InventoryScreen() {
         if (result.success) {
             setTargetMode(false);
             setSelectedItemId(null);
-
+            
             const state = useGameStore.getState();
             if (state.pendingEvolution || state.pendingMoveLearn) {
                 setView('world_map');
