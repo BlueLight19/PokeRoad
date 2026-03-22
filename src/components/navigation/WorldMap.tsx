@@ -60,6 +60,18 @@ const SHORT_NAMES: Record<string, string> = {
     'victory-road': 'Route Victoire',
 };
 
+// Kanto badge display data (shapes are SVG polygon points for distinct badge silhouettes)
+const KANTO_BADGES = [
+    { name: 'Roche',  color: '#B8A038', shape: '10,2 18,7 14,18 6,18 2,7' },         // pentagon
+    { name: 'Cascade', color: '#6890F0', shape: '10,1 16,6 16,14 10,19 4,14 4,6' },   // hexagon tall
+    { name: 'Foudre', color: '#F8D030', shape: '10,1 19,10 10,8 10,19 1,10 10,8' },    // lightning bolt
+    { name: 'Prisme', color: '#78C850', shape: '10,2 18,10 10,18 2,10' },              // diamond
+    { name: 'Ame',    color: '#F85888', shape: '10,4 14,2 17,6 15,11 10,18 5,11 3,6 6,2' }, // heart-ish
+    { name: 'Marais', color: '#F8D030', shape: '3,3 17,3 17,17 3,17' },                // square
+    { name: 'Volcan', color: '#F08030', shape: '10,1 18,18 2,18' },                     // triangle
+    { name: 'Terre',  color: '#78C850', shape: '10,2 15,5 18,10 15,15 10,18 5,15 2,10 5,5' }, // octagon
+];
+
 interface TooltipData {
     zone: any;
     x: number;
@@ -169,71 +181,149 @@ export function WorldMap() {
                     background: `linear-gradient(135deg, ${theme.colors.navyBg} 0%, ${theme.colors.deepBg} 100%)`,
                     borderRadius: `${theme.radius.xl}px`,
                     border: theme.borders.medium(theme.colors.borderSubtle),
-                    padding: '16px 20px',
+                    padding: '14px 16px',
                     marginBottom: `${theme.spacing.lg}px`,
                     boxShadow: theme.shadows.cardMd,
                     position: 'relative',
                     overflow: 'hidden',
                 }}>
+                    {/* Decorative top accent */}
                     <div style={{
-                        position: 'absolute', top: 0, left: 0,
-                        width: '100px', height: '3px',
-                        background: `linear-gradient(90deg, ${theme.colors.primary}, transparent)`,
+                        position: 'absolute', top: 0, left: 0, right: 0,
+                        height: '2px',
+                        background: `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.primary}44, transparent)`,
                     }} />
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
+                    {/* Player info row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: `${theme.spacing.md}px`, marginBottom: `${theme.spacing.md}px` }}>
+                        {/* Player avatar circle */}
+                        <div style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: theme.radius.round,
+                            background: `linear-gradient(135deg, ${theme.colors.primary}22, ${theme.colors.primary}08)`,
+                            border: `2px solid ${theme.colors.primary}44`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}>
+                            <span style={{ fontSize: '18px', lineHeight: 1 }}>🎒</span>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{
-                                color: theme.colors.primary,
-                                fontSize: theme.font.xxl,
+                                color: theme.colors.textPrimary,
+                                fontSize: theme.font.xl,
                                 fontFamily: theme.font.family,
-                                marginBottom: `${theme.spacing.sm}px`,
+                                marginBottom: '3px',
                             }}>
                                 {player.name}
                             </div>
-                            <div style={{
-                                color: theme.colors.gold,
-                                fontSize: theme.font.lg,
-                                fontFamily: theme.font.family,
-                                display: 'flex', alignItems: 'center', gap: '4px',
-                            }}>
-                                <span style={{ color: theme.colors.goldDim, fontSize: theme.font.xs }}>$</span>
-                                {player.money} P
-                            </div>
-                            <div style={{
-                                color: theme.colors.textDim,
-                                fontSize: theme.font.xs,
-                                fontFamily: theme.font.family,
-                                marginTop: '4px',
-                            }}>
-                                {team.length} Pokemon | {progress.caughtPokemon.length} captures
+                            <div style={{ display: 'flex', gap: `${theme.spacing.md}px`, alignItems: 'center', flexWrap: 'wrap' }}>
+                                <span style={{
+                                    color: theme.colors.gold,
+                                    fontSize: theme.font.sm,
+                                    fontFamily: theme.font.family,
+                                }}>
+                                    {player.money.toLocaleString()} P
+                                </span>
+                                <span style={{ color: theme.colors.borderDark }}>|</span>
+                                <span style={{
+                                    color: theme.colors.textDim,
+                                    fontSize: theme.font.xs,
+                                    fontFamily: theme.font.family,
+                                }}>
+                                    {team.length} Pkmn
+                                </span>
+                                <span style={{ color: theme.colors.borderDark }}>|</span>
+                                <span style={{
+                                    color: theme.colors.textDim,
+                                    fontSize: theme.font.xs,
+                                    fontFamily: theme.font.family,
+                                }}>
+                                    {progress.caughtPokemon.length} captures
+                                </span>
                             </div>
                         </div>
+                    </div>
 
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{
+                    {/* Badge case */}
+                    <div style={{
+                        background: `linear-gradient(180deg, rgba(15,23,42,0.5) 0%, rgba(15,23,42,0.3) 100%)`,
+                        borderRadius: `${theme.radius.md}px`,
+                        padding: '10px 12px',
+                        border: theme.borders.thin(theme.colors.borderDark),
+                    }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '8px',
+                        }}>
+                            <span style={{
                                 color: theme.colors.textDimmer,
                                 fontSize: theme.font.micro,
                                 fontFamily: theme.font.family,
-                                marginBottom: '6px',
-                            }}>BADGES</div>
-                            <div style={{ display: 'flex', gap: '5px' }}>
-                                {[...Array(8)].map((_, i) => {
-                                    const earned = i < player.badges.length;
-                                    return (
-                                        <div key={i} style={{
-                                            width: '18px', height: '18px',
-                                            borderRadius: theme.radius.round,
-                                            background: earned
-                                                ? `linear-gradient(135deg, ${theme.colors.gold}, #FFA000)`
-                                                : theme.colors.panelBg,
-                                            border: earned ? `1px solid ${theme.colors.gold}` : theme.borders.thin(theme.colors.borderDark),
-                                            boxShadow: earned ? theme.shadows.glow(theme.colors.gold) : 'none',
-                                            transition: 'all 0.3s ease',
-                                        }} />
-                                    );
-                                })}
-                            </div>
+                                textTransform: 'uppercase',
+                                letterSpacing: '1px',
+                            }}>
+                                Badges Kanto
+                            </span>
+                            <span style={{
+                                color: player.badges.length === 8 ? theme.colors.gold : theme.colors.textDimmer,
+                                fontSize: theme.font.micro,
+                                fontFamily: theme.font.family,
+                            }}>
+                                {player.badges.length}/8
+                            </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '4px' }}>
+                            {KANTO_BADGES.map((badge, i) => {
+                                const earned = i < player.badges.length;
+                                return (
+                                    <div key={i} style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '3px',
+                                        flex: 1,
+                                    }}>
+                                        <div style={{
+                                            width: '22px',
+                                            height: '22px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}>
+                                            <svg width="20" height="20" viewBox="0 0 20 20">
+                                                <polygon
+                                                    points={badge.shape}
+                                                    fill={earned ? badge.color : theme.colors.panelBg}
+                                                    stroke={earned ? badge.color : theme.colors.borderDark}
+                                                    strokeWidth="1"
+                                                    opacity={earned ? 1 : 0.35}
+                                                />
+                                                {earned && (
+                                                    <polygon
+                                                        points={badge.shape}
+                                                        fill="white"
+                                                        opacity={0.2}
+                                                    />
+                                                )}
+                                            </svg>
+                                        </div>
+                                        <span style={{
+                                            fontSize: '5px',
+                                            fontFamily: theme.font.family,
+                                            color: earned ? badge.color : theme.colors.borderDark,
+                                            textAlign: 'center',
+                                            lineHeight: 1,
+                                        }}>
+                                            {badge.name}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
