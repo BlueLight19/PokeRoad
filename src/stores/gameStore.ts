@@ -70,6 +70,7 @@ export interface GameState {
   // Settings
   settings: {
     gameSpeed: number;
+    devShinyRate?: number;
   };
 
   // UI state
@@ -88,6 +89,7 @@ export interface GameState {
   startSafari: () => void;
   quitSafari: () => void;
   setGameSpeed: (speed: number) => void;
+  setDevShinyRate: (rate?: number) => void;
 
   // Team management
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
@@ -254,6 +256,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   setView: (view: GameView) => set({ currentView: view }),
 
   setGameSpeed: (speed: number) => set({ settings: { ...get().settings, gameSpeed: speed } }),
+  setDevShinyRate: (rate?: number) => set({ settings: { ...get().settings, devShinyRate: rate } }),
 
   addNotification: (notification) => {
     const id = Math.random().toString(36).substring(2, 9);

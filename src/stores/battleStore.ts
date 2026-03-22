@@ -272,7 +272,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     // Base rate 1/4096. 1 charm = +75% (x1.75).
     const shinyRate = (1 / 4096) * Math.pow(1.75, shinyCharms);
-    const isShiny = Math.random() < shinyRate;
+    const devShinyRate = gameStore.settings.devShinyRate;
+    const isShiny = devShinyRate !== undefined ? Math.random() < (devShinyRate / 100) : Math.random() < shinyRate;
 
     const level = chosen.minLevel + Math.floor(Math.random() * (chosen.maxLevel - chosen.minLevel + 1));
     const wildPokemon = createPokemonInstance(chosen.pokemonId, level, undefined, isShiny);

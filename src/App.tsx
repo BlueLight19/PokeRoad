@@ -97,6 +97,8 @@ function DevTools() {
     const currentView = useGameStore(s => s.currentView);
     const setGameSpeed = useGameStore(s => s.setGameSpeed);
     const gameSpeed = useGameStore(s => s.settings.gameSpeed);
+    const devShinyRate = useGameStore(s => s.settings.devShinyRate);
+    const setDevShinyRate = useGameStore(s => s.setDevShinyRate);
 
     if (currentView === 'title') return null;
 
@@ -262,6 +264,32 @@ function DevTools() {
                     <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
                     <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
                     <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 16 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(16); }}>16x</button>
+                </div>
+            </div>
+
+            <div style={sectionStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#aaa', fontSize: '7px' }}>Taux de Shiny (Rencontres sauvages)</span>
+                    <button 
+                        style={{ background: 'none', border: 'none', color: '#e94560', fontSize: '7px', cursor: 'pointer', fontFamily: "'Press Start 2P', monospace" }}
+                        onClick={() => setDevShinyRate(undefined)}
+                    >
+                        Reset
+                    </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        value={devShinyRate ?? 0} 
+                        onChange={e => setDevShinyRate(parseInt(e.target.value))} 
+                        style={{ flex: 1 }} 
+                    />
+                    <span style={{ color: '#fff', fontSize: '7px', minWidth: '24px', textAlign: 'right' }}>
+                        {devShinyRate ?? 'Défaut'}%
+                    </span>
                 </div>
             </div>
 

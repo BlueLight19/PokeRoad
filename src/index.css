@@ -86,6 +86,21 @@ button {
 ::-webkit-scrollbar-thumb:hover { background: #555; }
 ::selection { background: #e94560; color: #fff; }
 
+.shiny-star {
+  position: absolute;
+  color: #FFD700;
+  font-size: 16px;
+  animation: shinyStarAnim 1.5s ease-in-out infinite;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+  opacity: 0;
+}
+
+@keyframes shinyStarAnim {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
 /* ====== ANIMATIONS ====== */
 
 @keyframes fadeIn {

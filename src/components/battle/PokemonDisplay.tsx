@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PokemonInstance } from '../../types/pokemon';
 import { getPokemonData, getItemData } from '../../utils/dataLoader';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { typeColors } from '../../utils/typeColors';
+import { soundManager } from '../../utils/SoundManager';
 
 interface PokemonDisplayProps {
   pokemon: PokemonInstance;
@@ -12,6 +13,13 @@ interface PokemonDisplayProps {
 
 export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
   const [showStats, setShowStats] = useState(false);
+
+  useEffect(() => {
+    if (pokemon.isShiny) {
+      soundManager.playShiny();
+    }
+  }, [pokemon.uid, pokemon.isShiny]);
+
   const data = getPokemonData(pokemon.dataId);
   const name = pokemon.nickname || data.name;
   const isFainted = pokemon.currentHp <= 0;
@@ -111,19 +119,15 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
         {pokemon.isShiny && (
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: '-20px',
             pointerEvents: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '32px',
-            animation: 'pulse 1s infinite alternate',
-            textShadow: '0 0 10px gold',
             zIndex: 10
-          }}>✨</div>
+          }}>
+            <div className="shiny-star" style={{ top: '10%', left: '10%', animationDelay: '0s' }}>✨</div>
+            <div className="shiny-star" style={{ top: '20%', right: '10%', animationDelay: '0.4s' }}>✨</div>
+            <div className="shiny-star" style={{ bottom: '15%', left: '15%', animationDelay: '0.8s' }}>✨</div>
+            <div className="shiny-star" style={{ bottom: '10%', right: '20%', animationDelay: '1.2s' }}>✨</div>
+          </div>
         )}
       </div>
 
@@ -140,6 +144,11 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
           }}>
             {name}
           </span>
+          {pokemon.isShiny && (
+            <span style={{ color: '#FFD700', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", textShadow: '1px 1px 0px #000', animation: 'pulse 2s infinite' }}>
+              Shiny !
+            </span>
+          )}
           <StatusIcon status={pokemon.status} />
         </div>
 

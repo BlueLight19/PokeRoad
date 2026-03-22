@@ -7,7 +7,7 @@ import { theme } from '../theme';
 import profBoreImg from '../assets/Prof_Bore.png';
 
 const PROF_DIALOGUE = [
-  "Bienvenue dans le monde des Pokemon ! Je suis le Professeur Bore, chercheur en Pokemon.",
+  "Bienvenue dans le monde des Pokemon ! Je suis le Professeur Bero, chercheur en Pokemon.",
   "Ce monde est vaste et regorge de creatures extraordinaires que l'on appelle Pokemon.",
   "Certains les utilisent comme animaux de compagnie, d'autres les font combattre. Quant a moi... je les etudie !",
   "Mon reve est de constituer l'encyclopedie la plus complete de tous les Pokemon existants, a travers toutes les regions du monde.",
@@ -105,7 +105,7 @@ export function TitleScreen() {
           }}>
             <img
               src={profBoreImg}
-              alt="Professeur Bore"
+              alt="Professeur Bero"
               style={{
                 width: '160px',
                 height: 'auto',
@@ -129,7 +129,7 @@ export function TitleScreen() {
               fontFamily: theme.font.family,
               fontWeight: 'bold',
             }}>
-              Prof. Bore
+              Prof. Bero
             </span>
           </div>
 
