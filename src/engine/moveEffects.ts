@@ -208,8 +208,12 @@ const effectHandlers: Record<string, EffectHandler> = {
   },
 
   force_switch: (ctx) => {
-    // Roar/Whirlwind: actual switch logic handled in battleStore
-    // This handler just returns the message; battleStore checks for force_switch after execution
+    // Pivot moves (U-Turn 369, Volt Switch 521, Flip Turn 812): damaging + attacker switches out
+    const PIVOT_MOVES = [369, 521, 812];
+    if (PIVOT_MOVES.includes(ctx.move.id)) {
+      return [{ message: `${ctx.attackerName} revient !`, type: 'pivot' as any }];
+    }
+    // Phaze moves (Roar/Whirlwind/Dragon Tail): defender is forced out
     return [{ message: `${ctx.defenderName} est forcé de reculer !`, type: 'force_switch' as any }];
   },
 
@@ -750,9 +754,7 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
 
   // Baton Pass (Relais) — ID 226
   if (moveId === 226 || moveName.includes('relais') || moveName.includes('baton pass')) {
-    // In singles, simplified: just signals a switch keeping stat changes
-    // The actual switch is handled by force_switch logic in battleStore
-    return [{ message: `${ctx.attackerName} passe le relais !`, type: 'info' }];
+    return [{ message: `${ctx.attackerName} passe le relais !`, type: 'baton_pass' as any }];
   }
 
   // ===== Type / Ability Manipulation =====

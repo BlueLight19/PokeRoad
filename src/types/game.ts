@@ -88,6 +88,12 @@ export interface GymPokemon {
   moves: number[];
 }
 
+export interface TrainerCondition {
+  type: 'hm' | 'item' | 'event' | 'badge';
+  value: string; // e.g. 'surf', 'hm-03', 'champion-defeated', 'badge-cascade'
+  label?: string; // Display label, e.g. 'Surf requis'
+}
+
 export interface TrainerData {
   id: string;
   name: string;
@@ -97,6 +103,7 @@ export interface TrainerData {
   zone: string;
   category: string; // 'route' | 'gym' | 'rival' | 'elite4'
   floor: number;
+  requireCondition?: TrainerCondition;
 }
 
 export interface TrainerPokemon {

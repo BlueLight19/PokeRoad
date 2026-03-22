@@ -1,5 +1,5 @@
 import { PokemonData, MoveData } from '../types/pokemon';
-import { RouteData, CityData, GymData, TrainerData, WildEncounter } from '../types/game';
+import { RouteData, CityData, GymData, TrainerData, TrainerCondition, WildEncounter } from '../types/game';
 import { ItemData } from '../types/inventory';
 import { PokemonType } from '../types/pokemon';
 import {
@@ -264,8 +264,20 @@ function convertItem(raw: DBItem): ItemData {
   };
 }
 
+/**
+ * Trainer access conditions — keyed by trainer ID.
+ * Trainers with conditions appear locked in the UI until the condition is met.
+ * Locked trainers are NOT required to progress to the next zone.
+ *
+ * Condition types:
+ *   hm    — player team has a Pokemon that knows the HM move (e.g. 'surf', 'strength')
+ *   item  — player inventory contains the item (e.g. 'hm-03')
+ *   event — player has triggered the event (e.g. 'champion-defeated')
+ *   badge — player has the badge (e.g. 'badge-cascade')
+ */
+
 function convertTrainer(raw: DBTrainer): TrainerData {
-  return {
+  const data: TrainerData = {
     id: raw.id,
     name: raw.name,
     trainerClass: raw.trainer_class,
@@ -279,6 +291,14 @@ function convertTrainer(raw: DBTrainer): TrainerData {
       moves: t.moves,
     })),
   };
+  if (raw.require_condition) {
+    data.requireCondition = {
+      type: raw.require_condition.type as TrainerCondition['type'],
+      value: raw.require_condition.value,
+      label: raw.require_condition.label,
+    };
+  }
+  return data;
 }
 
 function convertGym(raw: DBGym): GymData {
@@ -560,6 +580,29 @@ export function getMoveData(id: number): MoveData {
 
 export function getAllMoveIds(): number[] {
   return Array.from(moveRegistry.keys());
+}
+
+/** Check if a trainer's access condition is met. Returns true if accessible. */
+export function isTrainerAccessible(trainer: TrainerData, team: { moves: { moveId: number }[] }[], inventory: { itemId: string }[], progress: { events: Record<string, boolean>; badges: string[] }): boolean {
+  const cond = trainer.requireCondition;
+  if (!cond) return true;
+  switch (cond.type) {
+    case 'hm': {
+      // Check if any team member knows a move matching the HM name
+      const hmMoveIds: Record<string, number> = { surf: 57, strength: 70, cut: 15, fly: 19, flash: 148, waterfall: 127, whirlpool: 250, rock_smash: 249, dive: 291 };
+      const targetMoveId = hmMoveIds[cond.value];
+      if (!targetMoveId) return false;
+      return team.some(p => p.moves.some(m => m.moveId === targetMoveId));
+    }
+    case 'item':
+      return inventory.some(i => i.itemId === cond.value);
+    case 'event':
+      return !!progress.events[cond.value];
+    case 'badge':
+      return progress.badges.includes(cond.value);
+    default:
+      return true;
+  }
 }
 
 export function getTrainerData(id: string): TrainerData {

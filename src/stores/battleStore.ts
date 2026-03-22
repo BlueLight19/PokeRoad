@@ -23,7 +23,7 @@ import { getMoveData, getPokemonData, getItemData } from '../utils/dataLoader';
 import { WildEncounter, TrainerData, GymData } from '../types/game';
 import { useGameStore } from './gameStore';
 import { triggerAbility } from '../engine/abilityEffects';
-import { triggerHeldItem } from '../engine/heldItemEffects';
+import { triggerHeldItem, isChoiceItem } from '../engine/heldItemEffects';
 
 export interface BattleStore {
   // State
@@ -58,6 +58,9 @@ export interface BattleStore {
 
   // Field effects
   trickRoom: number; // Turns remaining (0 = inactive)
+
+  // Baton Pass: preserved stat stages + volatiles for next switch-in
+  batonPassData?: { statStages: PokemonInstance['statStages']; substituteHp: number; leechSeed: boolean; aquaRing: boolean; ingrain: boolean; focusEnergy: boolean } | null;
 
   // Safari
   safariCatchFactor?: number; // Modified by Rock/Bait
@@ -114,6 +117,19 @@ function processSwitchInAbility(
   else if (pokemon.ability === 'drought') weather = 'sun';
   else if (pokemon.ability === 'sand-stream') weather = 'sandstorm';
   return { logs: result.logs, weather };
+}
+
+/** Check if a Pokemon is trapped by the opponent's ability (Shadow Tag, Arena Trap, Magnet Pull). */
+function isTrappedByAbility(pokemon: PokemonInstance, opponent: PokemonInstance): boolean {
+  if (!opponent.ability) return false;
+  const pokeData = getPokemonData(pokemon.dataId);
+  const types = pokeData.types as string[];
+  // Ghost types are immune to trapping
+  if (types.includes('ghost')) return false;
+  if (opponent.ability === 'shadow-tag' && pokemon.ability !== 'shadow-tag') return true;
+  if (opponent.ability === 'arena-trap' && !types.includes('flying') && pokemon.ability !== 'levitate' && pokemon.volatile.magnetRise <= 0) return true;
+  if (opponent.ability === 'magnet-pull' && types.includes('steel')) return true;
+  return false;
 }
 
 /** Execute the enemy's turn: choose move, attack, apply status damage, animate logs, check KO.
@@ -232,6 +248,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   playerSide: freshSideConditions(),
   enemySide: freshSideConditions(),
   trickRoom: 0,
+  batonPassData: null,
   safariCatchFactor: 1,
   safariFleeFactor: 1,
 
@@ -298,7 +315,8 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       playerSide: freshSideConditions(),
       enemySide: freshSideConditions(),
       trickRoom: 0,
-      safariCatchFactor: 1,
+      batonPassData: null,
+  safariCatchFactor: 1,
       safariFleeFactor: 1
     });
 
@@ -471,10 +489,38 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
     }
 
+    // Choice lock: force same move if locked by Choice Band/Specs/Scarf
+    if (!playerUseStruggle && playerMove && player.volatile.choiceLock && player.volatile.choiceLock !== playerMove.moveId) {
+      const lockedMove = getMoveData(player.volatile.choiceLock);
+      set(s => ({ logs: [...s.logs, { message: `${lockedMove.name} est la seule attaque utilisable !`, type: 'info' }] }));
+      return;
+    }
+
+    // Assault Vest: block status moves
+    if (!playerUseStruggle && playerMove) {
+      const moveData = getMoveData(playerMove.moveId);
+      if (player.heldItem === 'assault-vest' && moveData.category === 'status') {
+        set(s => ({ logs: [...s.logs, { message: `La Veste de Combat empêche l'utilisation de ${moveData.name} !`, type: 'info' }] }));
+        return;
+      }
+    }
+
     set({ phase: 'executing' });
 
+    // Set Choice lock on first move used with a Choice item
+    if (!playerUseStruggle && playerMove && isChoiceItem(player.heldItem) && !player.volatile.choiceLock) {
+      set(s => {
+        const newTeam = [...s.playerTeam];
+        newTeam[s.activePlayerIndex] = {
+          ...newTeam[s.activePlayerIndex],
+          volatile: { ...newTeam[s.activePlayerIndex].volatile, choiceLock: playerMove!.moveId },
+        };
+        return { playerTeam: newTeam };
+      });
+    }
+
     // Use clones for calculation
-    const playerClone = deepCopyPokemon(state.playerTeam[state.activePlayerIndex]);
+    const playerClone = deepCopyPokemon(get().playerTeam[get().activePlayerIndex]);
     const enemyClone = deepCopyPokemon(enemy);
     if (!playerUseStruggle) playerMove = playerClone.moves[moveIndex];
     const playerBadges = useGameStore.getState().player.badges;
@@ -833,6 +879,104 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       }
     }
 
+    // Pivot moves (U-Turn, Volt Switch, Flip Turn): attacker switches out after dealing damage
+    for (const m of usedMoves) {
+      if (!m) continue;
+      const mData = getMoveData(m.moveId);
+      if (mData.effect?.type === 'force_switch' && [369, 521, 812].includes(m.moveId)) {
+        const pvState = get();
+        // Determine who used the pivot
+        const playerUsedPivot = (order === 'player' && m === firstMove) || (order === 'enemy' && m === secondMove);
+        if (playerUsedPivot) {
+          // Player used pivot: go to switching phase so player can choose replacement
+          const hasAlive = pvState.playerTeam.some((p, i) => i !== pvState.activePlayerIndex && p.currentHp > 0);
+          if (hasAlive && pvState.playerTeam[pvState.activePlayerIndex].currentHp > 0) {
+            set(s => ({
+              phase: 'switching' as BattlePhase,
+              logs: [...s.logs, { message: 'Choisissez un Pokémon de remplacement !', type: 'info' }],
+              turnNumber: s.turnNumber + 1,
+            }));
+            return;
+          }
+        } else {
+          // Enemy used pivot: auto-switch to random alive teammate
+          const nextIdx = pvState.enemyTeam.findIndex((p, i) => i !== pvState.activeEnemyIndex && p.currentHp > 0);
+          if (nextIdx >= 0 && pvState.enemyTeam[pvState.activeEnemyIndex].currentHp > 0) {
+            const incomingEnemy = pvState.enemyTeam[nextIdx];
+            const eSidePv = { ...pvState.enemySide };
+            const hazardPv = applyEntryHazards(incomingEnemy, eSidePv);
+            const pvPlayer = pvState.playerTeam[pvState.activePlayerIndex];
+            const pvEntry = processSwitchInAbility(incomingEnemy, pvPlayer);
+            const pvLogs: BattleLogEntry[] = [
+              { message: `${pvState.trainerName || 'L\'adversaire'} envoie ${getPokemonData(incomingEnemy.dataId).name} !`, type: 'info' },
+              ...hazardPv.logs, ...pvEntry.logs,
+            ];
+            set(s => ({
+              activeEnemyIndex: nextIdx,
+              enemySide: { ...eSidePv },
+              ...(pvEntry.weather ? { weather: pvEntry.weather, weatherTurns: 5 } : {}),
+              enemyTeam: s.enemyTeam.map((e, i) => i === nextIdx ? { ...e, volatile: freshVolatile(), statStages: freshStatStages() } : e),
+              logs: [...s.logs, ...pvLogs],
+            }));
+          }
+        }
+      }
+    }
+
+    // Baton Pass: attacker switches out, passing stat stages + certain volatiles
+    for (const m of usedMoves) {
+      if (!m) continue;
+      if (m.moveId === 226) { // Baton Pass
+        const bpState = get();
+        const playerUsedBP = (order === 'player' && m === firstMove) || (order === 'enemy' && m === secondMove);
+        if (playerUsedBP) {
+          const bpPlayer = bpState.playerTeam[bpState.activePlayerIndex];
+          if (bpPlayer.currentHp > 0) {
+            const hasAlive = bpState.playerTeam.some((p, i) => i !== bpState.activePlayerIndex && p.currentHp > 0);
+            if (hasAlive) {
+              set({
+                batonPassData: {
+                  statStages: { ...bpPlayer.statStages },
+                  substituteHp: bpPlayer.volatile.substituteHp,
+                  leechSeed: bpPlayer.volatile.leechSeed,
+                  aquaRing: bpPlayer.volatile.aquaRing,
+                  ingrain: bpPlayer.volatile.ingrain,
+                  focusEnergy: bpPlayer.volatile.focusEnergy,
+                },
+                phase: 'switching' as BattlePhase,
+                turnNumber: bpState.turnNumber + 1,
+              });
+              return;
+            }
+          }
+        } else {
+          // Enemy Baton Pass: auto-switch with stat transfer
+          const bpEnemy = bpState.enemyTeam[bpState.activeEnemyIndex];
+          if (bpEnemy.currentHp > 0) {
+            const nextIdx = bpState.enemyTeam.findIndex((p, i) => i !== bpState.activeEnemyIndex && p.currentHp > 0);
+            if (nextIdx >= 0) {
+              set(s => {
+                const newET = [...s.enemyTeam];
+                newET[nextIdx] = {
+                  ...newET[nextIdx],
+                  statStages: { ...bpEnemy.statStages },
+                  volatile: {
+                    ...freshVolatile(),
+                    substituteHp: bpEnemy.volatile.substituteHp,
+                    leechSeed: bpEnemy.volatile.leechSeed,
+                    aquaRing: bpEnemy.volatile.aquaRing,
+                    ingrain: bpEnemy.volatile.ingrain,
+                    focusEnergy: bpEnemy.volatile.focusEnergy,
+                  },
+                };
+                return { enemyTeam: newET, activeEnemyIndex: nextIdx };
+              });
+            }
+          }
+        }
+      }
+    }
+
     // Final result checks (win/loss/switch)
     const currentState = get();
     const finalPlayer = currentState.playerTeam[currentState.activePlayerIndex];
@@ -959,10 +1103,12 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const target = state.playerTeam[teamIndex];
     if (!target || target.currentHp <= 0) return;
 
-    // Block voluntary switching if trapped (Mean Look, Block, Ingrain, etc.) — unless forced (fainted)
+    // Block voluntary switching if trapped (Mean Look, Block, Ingrain, trapping abilities) — unless forced (fainted)
     const leaving = state.playerTeam[state.activePlayerIndex];
     if (leaving && leaving.currentHp > 0 && state.phase === 'choosing') {
-      if (leaving.volatile.trapped || leaving.volatile.ingrain) {
+      const opponent = state.enemyTeam[state.activeEnemyIndex];
+      const trappedByAbility = opponent && opponent.currentHp > 0 && isTrappedByAbility(leaving, opponent);
+      if (leaving.volatile.trapped || leaving.volatile.ingrain || trappedByAbility) {
         set(s => ({ logs: [...s.logs, { message: `${leaving.nickname || getPokemonData(leaving.dataId).name} ne peut pas être rappelé !`, type: 'info' }] }));
         return;
       }
@@ -986,15 +1132,24 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
       logs: [...state.logs, ...newLogs],
     });
 
-    // Reset volatile status for the switched-in Pokemon
+    // Reset volatile status for the switched-in Pokemon (Baton Pass preserves stat stages + certain volatiles)
+    const bpData = get().batonPassData;
     set(s => {
       const newTeam = [...s.playerTeam];
+      const vol = freshVolatile();
+      if (bpData) {
+        vol.substituteHp = bpData.substituteHp;
+        vol.leechSeed = bpData.leechSeed;
+        vol.aquaRing = bpData.aquaRing;
+        vol.ingrain = bpData.ingrain;
+        vol.focusEnergy = bpData.focusEnergy;
+      }
       newTeam[teamIndex] = {
         ...newTeam[teamIndex],
-        volatile: freshVolatile(),
-        statStages: freshStatStages()
+        volatile: vol,
+        statStages: bpData ? { ...bpData.statStages } : freshStatStages(),
       };
-      return { playerTeam: newTeam };
+      return { playerTeam: newTeam, batonPassData: null };
     });
 
     // We must await log delay for the switch message
@@ -1210,8 +1365,9 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
     const enemy = state.enemyTeam[state.activeEnemyIndex];
     if (!player || !enemy) return;
 
-    // Trapped: cannot flee (Mean Look, Block, Bind, etc.)
-    if (player.volatile.trapped || player.volatile.ingrain || player.volatile.bound > 0) {
+    // Trapped: cannot flee (Mean Look, Block, Bind, trapping abilities, etc.)
+    const trappedByAbility = isTrappedByAbility(player, enemy);
+    if (player.volatile.trapped || player.volatile.ingrain || player.volatile.bound > 0 || trappedByAbility) {
       set(s => ({ logs: [...s.logs, { message: 'Impossible de fuir !', type: 'info' }] }));
       return;
     }

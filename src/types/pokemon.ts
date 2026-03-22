@@ -125,6 +125,7 @@ export interface VolatileStatus {
   aquaRing: boolean; // Heal 1/16 per turn
   magnetRise: number; // Ground immunity turns remaining
   futureAttack?: { moveId: number; damage: number; turnsLeft: number; moveName: string }; // Prescience / Voeu Destructeur
+  choiceLock?: number; // moveId locked by Choice Band/Specs/Scarf (0/undefined = not locked)
 }
 
 export function freshVolatile(): VolatileStatus {

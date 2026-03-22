@@ -9,7 +9,7 @@ import {
   abilityIsSkillLink, abilityBlocksFlinch, abilityBlocksRecoil,
   abilityIsSturdy, abilityIsMoldBreaker,
 } from './abilityEffects';
-import { triggerHeldItem, heldItemBlocksHazards } from './heldItemEffects';
+import { triggerHeldItem, heldItemBlocksHazards, isChoiceItem } from './heldItemEffects';
 
 /**
  * Core battle engine - handles turn execution, status effects, etc.
@@ -458,6 +458,11 @@ export function executeMove(
   // Track last move used (for Disable)
   attacker.volatile.lastMoveUsed = move.id;
 
+  // Choice lock: lock to this move if holding a Choice item
+  if (isChoiceItem(attacker.heldItem) && !attacker.volatile.choiceLock) {
+    attacker.volatile.choiceLock = move.id;
+  }
+
   // Protect check: if defender is protected, block the move
   if (defender.volatile.protected && move.target !== 'self') {
     pushLog(logs, { message: `${defenderName} se protège !`, type: 'info' }, attacker, defender);
@@ -689,6 +694,10 @@ export function executeMove(
 
     for (let i = 0; i < hits; i++) {
       const result = calculateDamage(attacker, defender, move, attackerBadges, weather, defenderSide);
+      // Knock Off (282): 1.5x damage if target holds an item
+      if (move.id === 282 && defender.heldItem) {
+        result.damage = Math.floor(result.damage * 1.5);
+      }
       hitCount++;
 
       // Substitute absorbs damage
@@ -709,10 +718,17 @@ export function executeMove(
           target: 'defender' as any
         }}, attacker, defender);
       } else {
-        defender.currentHp = Math.max(0, defender.currentHp - result.damage);
-        totalDamage += result.damage;
+        // False Swipe (206) / Hold Back (610): always leave defender at 1 HP minimum
+        let actualDamage = result.damage;
+        if ((move.id === 206 || move.id === 610) && defender.currentHp - result.damage <= 0 && defender.currentHp > 1) {
+          actualDamage = defender.currentHp - 1;
+          defender.currentHp = 1;
+        } else {
+          defender.currentHp = Math.max(0, defender.currentHp - result.damage);
+        }
+        totalDamage += actualDamage;
 
-        let combinedMessage = `${defenderName} perd ${result.damage} PV !`;
+        let combinedMessage = `${defenderName} perd ${actualDamage} PV !`;
         if (result.isCritical) combinedMessage += ' Coup critique !';
         if (i === 0) {
           if (result.effectiveness > 1) combinedMessage += ' C\'est super efficace !';
@@ -761,6 +777,13 @@ export function executeMove(
         };
         logs.push(...handler(ctx));
       }
+    }
+
+    // Knock Off (282): remove defender's held item after damage
+    if (move.id === 282 && defender.heldItem && defender.currentHp > 0) {
+      const removedItem = getItemData(defender.heldItem);
+      pushLog(logs, { message: `${defenderName} perd son ${removedItem.name} !`, type: 'info' }, attacker, defender);
+      defender.heldItem = null;
     }
 
     // Recharge moves: attacker must skip next turn (Hyper Beam, Giga Impact)
@@ -876,9 +899,19 @@ export function determineOrder(
   const playerMove = getMoveData(playerMoveId);
   const enemyMove = getMoveData(enemyMoveId);
 
+  // Ability-based priority modification
+  let playerPriority = playerMove.priority;
+  let enemyPriority = enemyMove.priority;
+  // Prankster: +1 priority on status moves
+  if (playerPokemon.ability === 'prankster' && playerMove.category === 'status') playerPriority += 1;
+  if (enemyPokemon.ability === 'prankster' && enemyMove.category === 'status') enemyPriority += 1;
+  // Gale Wings: +1 priority on Flying-type moves at full HP
+  if (playerPokemon.ability === 'gale-wings' && playerMove.type === 'flying' && playerPokemon.currentHp >= playerPokemon.maxHp) playerPriority += 1;
+  if (enemyPokemon.ability === 'gale-wings' && enemyMove.type === 'flying' && enemyPokemon.currentHp >= enemyPokemon.maxHp) enemyPriority += 1;
+
   // Priority check
-  if (playerMove.priority !== enemyMove.priority) {
-    return playerMove.priority > enemyMove.priority ? 'player' : 'enemy';
+  if (playerPriority !== enemyPriority) {
+    return playerPriority > enemyPriority ? 'player' : 'enemy';
   }
 
   // Speed check (accounts for stat stages, paralysis, Tailwind, and speed abilities)
@@ -941,6 +974,14 @@ export function chooseEnemyMove(pokemon: PokemonInstance, defender?: PokemonInst
     pokemon.volatile.encoreMoveId = undefined;
   }
 
+  // Choice lock: must use the locked move
+  if (pokemon.volatile.choiceLock) {
+    const idx = pokemon.moves.findIndex(m => m.moveId === pokemon.volatile.choiceLock);
+    if (idx >= 0 && pokemon.moves[idx].currentPp > 0) return idx;
+    // If locked move has no PP, can pick any — lock will be cleared
+    pokemon.volatile.choiceLock = undefined;
+  }
+
   let available = pokemon.moves
     .map((m, i) => ({ ...m, index: i }))
     .filter(m => m.currentPp > 0)
@@ -948,6 +989,15 @@ export function chooseEnemyMove(pokemon: PokemonInstance, defender?: PokemonInst
 
   // Taunt: block status moves
   if (pokemon.volatile.tauntTurns > 0) {
+    const nonStatus = available.filter(m => {
+      const mData = getMoveData(m.moveId);
+      return mData.category !== 'status';
+    });
+    if (nonStatus.length > 0) available = nonStatus;
+  }
+
+  // Assault Vest: block status moves
+  if (pokemon.heldItem === 'assault-vest') {
     const nonStatus = available.filter(m => {
       const mData = getMoveData(m.moveId);
       return mData.category !== 'status';

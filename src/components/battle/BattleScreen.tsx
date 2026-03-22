@@ -118,6 +118,9 @@ export function BattleScreen() {
     // Check if player just became champion
     if (useGameStore.getState().progress.leagueProgress >= 5) {
       useGameStore.getState().setView('hall_of_fame');
+    } else if (gameStore.selectedZone) {
+      // Return to the zone where the battle started
+      useGameStore.getState().selectZone(gameStore.selectedZone);
     } else {
       useGameStore.getState().setView('world_map');
     }
@@ -280,7 +283,7 @@ export function BattleScreen() {
         <div className="battle-frame" style={frameStyle}>
           <BattleLog logs={battle.logs} />
           <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <Button variant="ghost" onClick={() => { battle.clearBattle(); gameStore.setView('world_map'); }}>
+            <Button variant="ghost" onClick={() => { battle.clearBattle(); gameStore.selectedZone ? gameStore.selectZone(gameStore.selectedZone) : gameStore.setView('world_map'); }}>
               Continuer
             </Button>
           </div>

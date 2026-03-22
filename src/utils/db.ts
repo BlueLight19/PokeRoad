@@ -112,6 +112,7 @@ export interface DBTrainer {
   team: Array<{ pokemonId: number; level: number; moves: number[] }>;
   category?: string; // 'route' | 'gym' | 'rival' | 'elite4'
   floor?: number;
+  require_condition?: { type: string; value: string; label?: string } | null;
 }
 
 // Player stores

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
-import { getZoneData, getTrainerData, getZoneTrainers } from '../../utils/dataLoader';
+import { getZoneData, getTrainerData, getZoneTrainers, isTrainerAccessible } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { NpcDialogue } from '../ui/NpcDialogue';
 import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
@@ -148,7 +148,10 @@ export function RouteMenu() {
     ? getZoneTrainers(selectedZone, player.starter, currentFloor)
     : getZoneTrainers(selectedZone, player.starter);
 
-  const allFloorTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t.id));
+  const inventory = useGameStore(s => s.inventory);
+  const accessibleTrainers = filteredTrainers.filter(t => isTrainerAccessible(t, team, inventory, { events: progress.events, badges: player.badges }));
+  const lockedTrainers = new Set(filteredTrainers.filter(t => !isTrainerAccessible(t, team, inventory, { events: progress.events, badges: player.badges })).map(t => t.id));
+  const allFloorTrainersDefeated = accessibleTrainers.every(t => progress.defeatedTrainers.includes(t.id));
 
   const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
   const hasRod = useGameStore.getState().inventory.some(i => ['old-rod', 'good-rod', 'super-rod'].includes(i.itemId));
@@ -447,26 +450,27 @@ export function RouteMenu() {
           {/* Trainers */}
           {filteredTrainers.map(trainer => {
             const defeated = isTrainerDefeated(trainer.id);
+            const locked = lockedTrainers.has(trainer.id);
             return (
               <ActionCard
                 key={trainer.id}
                 icon={<div style={{
                   width: '22px', height: '22px',
                   borderRadius: theme.radius.round,
-                  background: defeated ? theme.colors.borderDark : `${theme.colors.primary}22`,
-                  border: `1.5px solid ${defeated ? theme.colors.borderDark : theme.colors.primary}`,
+                  background: locked ? `${theme.colors.textMuted}15` : defeated ? theme.colors.borderDark : `${theme.colors.primary}22`,
+                  border: `1.5px solid ${locked ? theme.colors.textMuted : defeated ? theme.colors.borderDark : theme.colors.primary}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '10px', color: defeated ? theme.colors.borderDark : theme.colors.primary,
+                  fontSize: locked ? '12px' : '10px', color: locked ? theme.colors.textMuted : defeated ? theme.colors.borderDark : theme.colors.primary,
                   fontFamily: theme.font.family,
                 }}>
-                  {defeated ? '\u2713' : '!'}
+                  {locked ? '🔒' : defeated ? '\u2713' : '!'}
                 </div>}
                 title={`${trainer.trainerClass} ${trainer.name}`}
-                subtitle={defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
-                accentColor={theme.colors.primary}
-                onClick={() => handleTrainerBattle(trainer.id)}
+                subtitle={locked ? (trainer.requireCondition?.label || 'Inaccessible') : defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
+                accentColor={locked ? theme.colors.textMuted : theme.colors.primary}
+                onClick={locked ? undefined : () => handleTrainerBattle(trainer.id)}
                 completed={defeated}
-                disabled={defeated}
+                disabled={defeated || locked}
               />
             );
           })}
