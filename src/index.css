@@ -6,13 +6,25 @@
 
 html {
   background: #000;
+  background-attachment: fixed;
+  overscroll-behavior: none;
+}
+
+html::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, #0a0a15, #000);
+  z-index: -10;
+  pointer-events: none;
 }
 
 body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    background: linear-gradient(to bottom, #111, #000);
+    background: transparent;
+    isolation: isolate;
     color: #fff;
     font-family: 'Press Start 2P', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -22,17 +34,38 @@ body {
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    overscroll-behavior: none;
 }
 
 body::before {
     content: "";
     position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    pointer-events: none;
+    background-image:
+        radial-gradient(1.5px 1.5px at 20% 30%, rgba(233, 69, 96, 0.4) 50%, transparent 100%),
+        radial-gradient(1px 1px at 40% 70%, rgba(255, 255, 255, 0.3) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 60% 20%, rgba(255, 214, 0, 0.25) 50%, transparent 100%),
+        radial-gradient(1px 1px at 80% 50%, rgba(255, 255, 255, 0.25) 50%, transparent 100%),
+        radial-gradient(1px 1px at 10% 80%, rgba(233, 69, 96, 0.2) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 70% 85%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+    background-size: 200px 200px, 160px 180px, 220px 210px, 180px 160px, 250px 230px, 190px 200px;
+    opacity: 0.7;
+    animation: driftStars 60s linear infinite;
+    z-index: -2;
+}
+
+body::after {
+    content: "";
+    position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none;
-    background-image: radial-gradient(circle, white 2px, transparent 2px);
-    background-size: 100px 100px;
-    opacity: 0.1;
-    animation: panBackground 10s linear infinite;
+    background:
+        radial-gradient(ellipse at 20% 80%, rgba(233, 69, 96, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(22, 33, 62, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 214, 0, 0.03) 0%, transparent 60%);
+    animation: auroraShift 20s ease-in-out infinite alternate;
     z-index: -1;
 }
 
@@ -182,9 +215,15 @@ img {
   100% { transform: translate(0, 0); }
 }
 
-@keyframes panBackground {
-    from { background-position: 0 0; }
-    to { background-position: -100px 100px; }
+@keyframes driftStars {
+    from { transform: translate(0, 0); }
+    to { transform: translate(50%, -50%); }
+}
+
+@keyframes auroraShift {
+    0% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0.6; transform: scale(1); }
 }
 
 .anim-shake {

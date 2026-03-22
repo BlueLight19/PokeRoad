@@ -168,7 +168,7 @@ export function NavBar() {
                 padding: '12px 0 14px',
                 background: 'transparent',
                 border: 'none',
-                borderTop: `2px solid ${isActive ? theme.colors.primary : 'transparent'}`,
+                borderTop: '2px solid transparent',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 position: 'relative',
