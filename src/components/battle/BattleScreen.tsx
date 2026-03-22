@@ -29,7 +29,7 @@ export function BattleScreen() {
       for (const log of newLogs) {
         if (log.type === 'damage') {
           soundManager.playDamage();
-          
+
           if (log.state?.target === 'enemy') {
             setShakeEnemy(true);
             setTimeout(() => setShakeEnemy(false), 500);
@@ -455,11 +455,11 @@ export function BattleScreen() {
             flexShrink: 0,
             border: itemData.category === 'pokeball' ? '1px solid rgba(233, 69, 96, 0.5)' : '1px solid rgba(76, 175, 80, 0.5)',
           }}>
-            <img 
+            <img
               src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${itemData.id.replace('super-potion', 'super-potion').replace('hyper-potion', 'hyper-potion').replace('max-potion', 'max-potion')}.png`}
               alt={itemData.name}
               style={{ width: '22px', height: '22px', imageRendering: 'pixelated' }}
-              onError={(e) => { 
+              onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 if ((e.target as HTMLImageElement).parentElement) {
                   const span = document.createElement('span');

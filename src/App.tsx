@@ -19,6 +19,7 @@ import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
 import { NotificationOverlay } from './components/ui/NotificationOverlay';
+import { NavBar } from './components/ui/NavBar';
 
 // --- LOADING SCREEN ---
 function LoadingScreen({ progress, table }: { progress: number; table: string }) {
@@ -99,6 +100,9 @@ function DevTools() {
 
     if (currentView === 'title') return null;
 
+    const hasNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+    const devBottom = hasNavBar ? '70px' : '10px';
+
     if (!isOpen) {
         return (
             <button
@@ -107,7 +111,7 @@ function DevTools() {
                     setIsOpen(true);
                 }}
                 style={{
-                    position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+                    position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
                     background: '#e94560', color: '#fff', border: '2px solid #fff',
                     padding: '6px 10px', fontFamily: "'Press Start 2P', monospace", fontSize: '8px',
                     cursor: 'pointer', borderRadius: '4px', boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
@@ -178,7 +182,7 @@ function DevTools() {
     if (!isAuthenticated) {
         return (
             <div style={{
-                position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+                position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
                 background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
                 padding: '10px', display: 'flex', flexDirection: 'column', width: '200px',
                 boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
@@ -209,7 +213,7 @@ function DevTools() {
 
     return (
         <div style={{
-            position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+            position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
             background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
             padding: '10px', display: 'flex', flexDirection: 'column',
             boxShadow: '0 4px 10px rgba(0,0,0,0.5)', width: '240px', maxHeight: '80vh', overflowY: 'auto'
@@ -223,55 +227,55 @@ function DevTools() {
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Objet</span>
                 <input style={inputStyle} type="text" placeholder="ID de l'objet (ex: potion)" value={itemId} onChange={e => setItemId(e.target.value)} />
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, width: '60px', marginBottom: 0}} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
-                    <button style={{...btnStyle, flex: 1}} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
+                    <input style={{ ...inputStyle, width: '60px', marginBottom: 0 }} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
+                    <button style={{ ...btnStyle, flex: 1 }} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Pokémon</span>
                 <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
                 </div>
                 <button style={btnStyle} onClick={() => { soundManager.playClick(); givePlayerPokemon(pokeId, pokeLevel); }}>Donner Pokémon</button>
             </div>
 
-        <div style={sectionStyle}>
-            <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
-            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
-                {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
-            </button>
-        </div>
+            <div style={sectionStyle}>
+                <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
+                <button style={{ ...btnStyle, opacity: isGenerating ? 0.5 : 1 }} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
+                    {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
+                </button>
+            </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
-                    <button style={{...btnStyle, width: 'auto'}} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
+                    <button style={{ ...btnStyle, width: 'auto' }} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Vitesse du Jeu (Combat & Dialogues)</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
                 </div>
             </div>
 
             <div>
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
-                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px'}}
+                    style={{ ...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px' }}
                     onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const items = getAllItems();
                             if (items.length === 0) {
@@ -287,8 +291,8 @@ function DevTools() {
                     Lister Ids Recus
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const ball = getItemData('poke-ball');
                             const pot = getItemData('potion');
@@ -301,8 +305,8 @@ function DevTools() {
                     Tester Registre Items
                 </button>
                 <button
-                    style={{...btnStyle, background: '#4a148c', borderColor: '#7c43bd'}}
-                    onClick={async () => { 
+                    style={{ ...btnStyle, background: '#4a148c', borderColor: '#7c43bd' }}
+                    onClick={async () => {
                         if (window.confirm("Cela va vider TOUTE la base de données locale (incluant les données de jeu) et forcer un rechargement depuis Supabase. Continuer ?")) {
                             await forceFullSync();
                             window.location.reload();
@@ -434,6 +438,8 @@ function App() {
         }
     };
 
+    const showNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+
     return (
         <div
             style={{
@@ -444,13 +450,16 @@ function App() {
                 maxWidth: '900px',
                 margin: '0 auto',
                 padding: '0 8px',
+                paddingBottom: showNavBar ? '66px' : '0',
             }}
         >
-            {renderView()}
+            <div key={currentView} className="view-enter">
+                {renderView()}
+            </div>
             {pendingEvolution && <EvolutionModal />}
             {pendingMoveLearn && <MoveLearnModal />}
             <NotificationOverlay />
-
+            <NavBar />
             <DevTools />
         </div>
     );

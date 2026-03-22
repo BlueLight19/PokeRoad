@@ -1,4 +1,4 @@
-import { PokemonInstance, BaseStats, freshVolatile } from '../types/pokemon';
+import { PokemonInstance, BaseStats, StatStages, freshVolatile } from '../types/pokemon';
 import { ItemData } from '../types/inventory';
 import { checkStoneEvolution, evolvePokemon } from './evolutionEngine';
 import { recalculateStats, processLevelUp, xpForLevel, LevelUpResult } from './experienceCalculator';
@@ -47,13 +47,13 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
 
         const value = item.effect.value || 0;
         const oldHp = target.currentHp;
-        
+
         if (value >= 900) { // Max Potion / Full Restore equivalent in some schemas
             target.currentHp = target.maxHp;
         } else {
             target.currentHp = Math.min(target.maxHp, target.currentHp + value);
         }
-        
+
         const healed = target.currentHp - oldHp;
         return { success: true, message: `${healed} PV restaurés.`, consumed: true };
     }
@@ -132,13 +132,13 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
         if (target.level >= 100) {
             return { success: false, message: "Ce Pokémon est déjà au niveau max.", consumed: false };
         }
-        
+
         const data = getPokemonData(target.dataId);
-        
+
         // Create a temporary clone with boosted XP to check results
         const targetXp = target.xpToNextLevel;
         const tempClone = { ...target, xp: targetXp };
-        
+
         const result = processLevelUp(tempClone);
         if (result) {
             const hpDiff = result.newMaxHp - target.maxHp;
@@ -148,16 +148,16 @@ export function useItem(item: ItemData, target: PokemonInstance): ItemUseResult 
             target.maxHp = result.newMaxHp;
             target.currentHp = Math.min(target.maxHp, target.currentHp + hpDiff);
             target.xpToNextLevel = result.newXpToNextLevel;
-            
+
             const name = target.nickname || data.name;
-            return { 
-                success: true, 
-                message: `${name} monte au niveau ${target.level} !`, 
+            return {
+                success: true,
+                message: `${name} monte au niveau ${target.level} !`,
                 consumed: true,
                 levelUpResult: result
             };
         }
-        
+
         return { success: false, message: "Ça n'aura aucun effet.", consumed: false };
     }
 
@@ -244,7 +244,7 @@ export function useBattleItem(item: ItemData, target: PokemonInstance): ItemUseR
 
     // Battle stat boost (X Attack, X Defense, X Speed, X Special, etc.)
     if (item.effect.type === 'battle_stat') {
-        const stat = item.effect.stat as keyof BaseStats;
+        const stat = item.effect.stat as keyof StatStages;
         const stages = item.effect.stages ?? 1;
 
         if (!stat || !(stat in target.statStages)) {

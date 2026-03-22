@@ -15,7 +15,9 @@
       "WebFetch(domain:pokeapi.co)",
       "Bash(node:*)",
       "Bash(npm run:*)",
-      "mcp__supabase__apply_migration"
+      "mcp__supabase__apply_migration",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/Tomer/Documents/GitHub/PokeRoad/Kanto_map.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/Tomer/Documents/GitHub/PokeRoad/src/assets/kantoMap.png)"
     ]
   },
   "enableAllProjectMcpServers": true,

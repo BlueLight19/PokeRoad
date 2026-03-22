@@ -3,24 +3,118 @@ import { useGameStore } from '../../stores/gameStore';
 import { useBattleStore } from '../../stores/battleStore';
 import { getZoneData, getTrainerData, getZoneTrainers } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
+import { NpcDialogue } from '../ui/NpcDialogue';
 import { WildEncounter, StaticEncounter, RouteData, CityData, NPCData } from '../../types/game';
 import { soundManager } from '../../utils/SoundManager';
+import { theme } from '../../theme';
+
+// SVG icons
+function IconGrass() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path d="M5 18C5 18 6 10 11 6C16 10 17 18 17 18" stroke={theme.colors.success} strokeWidth="1.5" fill={`${theme.colors.success}18`} />
+      <line x1="11" y1="6" x2="11" y2="18" stroke={theme.colors.success} strokeWidth="1" />
+      <path d="M8 14C8 14 9 11 11 9" stroke={theme.colors.success} strokeWidth="1" fill="none" />
+      <path d="M14 14C14 14 13 11 11 9" stroke={theme.colors.success} strokeWidth="1" fill="none" />
+    </svg>
+  );
+}
+
+function IconWater() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path d="M11 3C11 3 5 10 5 14C5 17.3 7.7 20 11 20C14.3 20 17 17.3 17 14C17 10 11 3 11 3Z" stroke={theme.colors.info} strokeWidth="1.5" fill={`${theme.colors.info}18`} />
+    </svg>
+  );
+}
+
+function IconFishing() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <line x1="6" y1="2" x2="6" y2="14" stroke="#00bcd4" strokeWidth="1.5" />
+      <path d="M6 14C6 14 10 16 10 19" stroke="#00bcd4" strokeWidth="1.5" fill="none" />
+      <circle cx="12" cy="19" r="2" stroke="#00bcd4" strokeWidth="1" fill="#00bcd418" />
+      <line x1="6" y1="2" x2="12" y2="5" stroke="#00bcd4" strokeWidth="1" />
+    </svg>
+  );
+}
+
+function IconNpc({ color }: { color: string }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <circle cx="11" cy="7" r="4" stroke={color} strokeWidth="1.5" fill={`${color}18`} />
+      <path d="M4 19c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke={color} strokeWidth="1.5" fill="none" />
+    </svg>
+  );
+}
+
+function IconStar({ color }: { color: string }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <polygon points="11,2 13.5,8 20,8.5 15,13 16.5,20 11,16 5.5,20 7,13 2,8.5 8.5,8" stroke={color} strokeWidth="1.2" fill={`${color}30`} />
+    </svg>
+  );
+}
+
+// Shared action card
+function ActionCard({
+  icon, title, subtitle, accentColor, onClick,
+  disabled = false, completed = false, variant = 'default',
+}: {
+  icon: React.ReactNode; title: string; subtitle: string; accentColor: string;
+  onClick: () => void; disabled?: boolean; completed?: boolean; variant?: 'default' | 'gold';
+}) {
+  const isGold = variant === 'gold';
+  return (
+    <button
+      onClick={() => { if (!disabled) { soundManager.playClick(); onClick(); } }}
+      disabled={disabled}
+      style={{
+        display: 'flex', alignItems: 'center',
+        gap: `${theme.spacing.md}px`, padding: '12px 14px',
+        background: isGold
+          ? `linear-gradient(135deg, ${theme.colors.gold}18 0%, ${theme.colors.deepBg} 80%)`
+          : completed ? theme.colors.deepBg
+            : `linear-gradient(135deg, ${accentColor}0a 0%, ${theme.colors.deepBg} 80%)`,
+        border: completed ? theme.borders.thin(theme.colors.borderDark)
+          : isGold ? `2px solid ${theme.colors.gold}66`
+            : `2px solid ${accentColor}44`,
+        borderLeft: completed ? `3px solid ${theme.colors.borderDark}`
+          : isGold ? `3px solid ${theme.colors.gold}`
+            : `3px solid ${accentColor}`,
+        borderRadius: `${theme.radius.md}px`,
+        cursor: disabled ? 'default' : 'pointer',
+        opacity: completed ? 0.55 : disabled ? 0.5 : 1,
+        textAlign: 'left', width: '100%',
+        transition: 'opacity 0.2s, border-color 0.2s',
+      }}
+    >
+      <div style={{ flexShrink: 0 }}>{icon}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          color: completed ? theme.colors.textDimmer : isGold ? theme.colors.gold : accentColor,
+          fontSize: theme.font.md, fontFamily: theme.font.family,
+          textDecoration: completed ? 'line-through' : 'none',
+        }}>
+          {title}
+        </div>
+        <div style={{
+          color: theme.colors.textDim, fontSize: theme.font.micro,
+          fontFamily: theme.font.family, marginTop: '3px', lineHeight: '1.4',
+        }}>
+          {subtitle}
+        </div>
+      </div>
+    </button>
+  );
+}
 
 export function RouteMenu() {
   const {
-    selectedZone,
-    progress,
-    team,
-    setView,
-    isTrainerDefeated,
-    decrementRepelSteps,
-    setRepelSteps, // In case we want to show it
-    addItem,
-    givePlayerPokemon,
-    triggerEvent,
-    addNotification,
-    setCurrentFloor,
-    isFloorUnlocked,
+    selectedZone, progress, team, setView, isTrainerDefeated,
+    decrementRepelSteps, setRepelSteps,
+    addItem, givePlayerPokemon, triggerEvent, addNotification,
+    setCurrentFloor, isFloorUnlocked,
   } = useGameStore();
   const { startWildBattle, startTrainerBattle } = useBattleStore();
   const [activeNpc, setActiveNpc] = useState<NPCData | null>(null);
@@ -32,14 +126,12 @@ export function RouteMenu() {
   const isDungeon = zone.type === 'dungeon';
   const totalFloors = isDungeon ? ((zone as CityData).totalFloors ?? 1) : 1;
   const hasMultipleFloors = totalFloors > 1;
-
   const currentFloor = useGameStore(s => s.progress.currentFloors[selectedZone!] ?? 1);
 
   const allWildEncounters: WildEncounter[] = (zone as RouteData).wildEncounters || [];
   const allWaterEncounters: WildEncounter[] = (zone as RouteData).waterEncounters || [];
   const allFishingEncounters: WildEncounter[] = (zone as RouteData).fishingEncounters || [];
 
-  // Filter encounters by floor for dungeons
   const filterByFloor = (encounters: WildEncounter[]) => {
     if (!hasMultipleFloors) return encounters;
     return encounters.filter(e => !e.floor || e.floor === currentFloor);
@@ -52,12 +144,10 @@ export function RouteMenu() {
   const npcs: NPCData[] = (zone as RouteData).npcs || [];
   const player = useGameStore(s => s.player);
 
-  // Filter trainers by floor for dungeons
   const filteredTrainers = hasMultipleFloors
     ? getZoneTrainers(selectedZone, player.starter, currentFloor)
     : getZoneTrainers(selectedZone, player.starter);
 
-  // Check if all trainers on current floor are defeated
   const allFloorTrainersDefeated = filteredTrainers.every(t => progress.defeatedTrainers.includes(t.id));
 
   const hasSurf = progress.events['hm-03-acquired'] || useGameStore.getState().inventory.some(i => i.itemId === 'hm-03');
@@ -65,33 +155,18 @@ export function RouteMenu() {
 
   const handleWildEncounter = () => {
     if (wildEncounters.length === 0) return;
-
-    // Repel Logic
     if (progress.repelSteps > 0) {
       decrementRepelSteps();
-
       const leadLevel = team[0]?.level || 0;
-      // Filter out pokemon that are strictly lower level than lead
-      // Note: wildEncounter has minLevel/maxLevel. 
-      // Simplified: if maxLevel < leadLevel, it's blocked.
       const available = wildEncounters.filter(e => e.maxLevel >= leadLevel);
-
       if (available.length === 0) {
-        // All blocked
-        if (progress.repelSteps === 1) {
-          alert("L'effet du Repousse se dissipe.");
-        }
+        if (progress.repelSteps === 1) alert("L'effet du Repousse se dissipe.");
         return;
       }
-
-      // If we are here, some pokemon can appear.
-      // We should probably pass the filtered list to startWildBattle?
-      // Yes.
       startWildBattle(available, team);
     } else {
       startWildBattle(wildEncounters, team);
     }
-
     setView('battle');
   };
 
@@ -121,595 +196,282 @@ export function RouteMenu() {
       alert("Safari terminé !");
       return;
     }
-
-    // Decrement steps
     const newSteps = safariState.steps - 1;
     useGameStore.setState({ safariState: { ...safariState, steps: newSteps } });
-
-    // Trigger encounter
     if (wildEncounters.length > 0) {
       startWildBattle(wildEncounters, team);
       setView('battle');
     }
-
-    if (newSteps <= 0) {
-      // Should we force quit now or after battle? 
-      // Usually after battle. 
-      // StartBattle works. When coming back, if steps 0, auto-quit?
-      // Let's handle auto-quit in handleEndBattle or here if no encounter.
-    }
   };
 
-  const handleNpcClick = (npc: NPCData) => {
-    setActiveNpc(npc);
-    setDialogueIndex(0);
-  };
+  const handleNpcClick = (npc: NPCData) => { setActiveNpc(npc); setDialogueIndex(0); };
 
   const advanceDialogue = () => {
     if (!activeNpc) return;
-
     if (dialogueIndex < activeNpc.dialogue.length - 1) {
       setDialogueIndex(prev => prev + 1);
     } else {
-      // End of dialogue, give rewards if any
       if (activeNpc.setsEvent && !progress.events[activeNpc.setsEvent]) {
         triggerEvent(activeNpc.setsEvent);
-        if (activeNpc.givesItem) {
-          addItem(activeNpc.givesItem, 1);
-          addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: 1 });
-        }
-        if (activeNpc.givesPokemon) {
-          givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level);
-          addNotification({ type: 'pokemon', pokemonId: activeNpc.givesPokemon.pokemonId, level: activeNpc.givesPokemon.level });
-        }
+        if (activeNpc.givesItem) { addItem(activeNpc.givesItem, 1); addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: 1 }); }
+        if (activeNpc.givesPokemon) { givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level); addNotification({ type: 'pokemon', pokemonId: activeNpc.givesPokemon.pokemonId, level: activeNpc.givesPokemon.level }); }
       }
       setActiveNpc(null);
     }
   };
 
   if (activeNpc) {
-    return (
-      <NpcDialogue
-        npc={activeNpc}
-        dialogueIndex={dialogueIndex}
-        onAdvance={advanceDialogue}
-      />
-    );
+    return <NpcDialogue npc={activeNpc} dialogueIndex={dialogueIndex} onAdvance={advanceDialogue} />;
   }
 
+  // Header color by zone type
+  const headerColor = isDungeon ? theme.colors.purple : theme.colors.success;
+  const zoneLabel = isDungeon ? 'Donjon' : 'Zone Sauvage';
+
+  // Header icon
+  const HeaderIcon = isDungeon ? (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L2 8v14h20V8L12 2z" stroke={headerColor} strokeWidth="1.5" fill={`${headerColor}15`} />
+      <rect x="9" y="12" width="6" height="10" stroke={headerColor} strokeWidth="1" fill="none" />
+      <circle cx="12" cy="7" r="2" stroke={headerColor} strokeWidth="1" fill="none" />
+    </svg>
+  ) : (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 20C3 20 6 8 12 4C18 8 21 20 21 20" stroke={headerColor} strokeWidth="1.5" fill={`${headerColor}15`} />
+      <line x1="12" y1="4" x2="12" y2="20" stroke={headerColor} strokeWidth="1" />
+    </svg>
+  );
+
   return (
-    <div style={{ padding: '24px', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{
-          width: '100%',
-          maxWidth: '600px',
-          background: 'rgba(13, 17, 23, 0.85)',
-          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-          borderRadius: '24px',
-          border: '3px solid #1a2a3a',
-          padding: '24px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-      }}>
-        {/* Header Card */}
-        <div style={{
-            background: 'linear-gradient(135deg, #1a2e1a 0%, #0f190f 100%)',
-            borderRadius: '16px',
-            border: '2px solid #4CAF50',
-            padding: '20px',
-            marginBottom: '24px',
-            boxShadow: '0 4px 15px rgba(76, 175, 80, 0.15)',
-            textAlign: 'center',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-            <div style={{
-                position: 'absolute',
-                top: 0, left: 0, width: '100%', height: '4px',
-                background: 'linear-gradient(90deg, transparent, #4CAF50, transparent)'
-            }} />
-            <h2 style={{
-                color: '#4CAF50',
-                fontSize: '18px',
-                fontFamily: "'Press Start 2P', monospace",
-                margin: 0,
-                textShadow: '0 2px 4px rgba(0,0,0,0.5)'
-            }}>
-                {zone.name}
-            </h2>
-            <div style={{ color: '#888', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", marginTop: '8px' }}>
-                {isDungeon ? 'Donjon' : 'Zone Sauvage'}
-            </div>
-        </div>
+    <div style={{ padding: `${theme.spacing.xl}px`, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '500px' }}>
 
-      {/* Floor Navigation for multi-floor dungeons */}
-      {hasMultipleFloors && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '12px',
-          padding: '12px 16px',
-          background: 'linear-gradient(135deg, #2a1a3a 0%, #1a1030 100%)',
-          border: '2px solid #9C27B0',
-          borderRadius: '12px',
-          marginBottom: '20px',
-        }}>
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              if (currentFloor > 1) setCurrentFloor(selectedZone!, currentFloor - 1);
-            }}
-            disabled={currentFloor <= 1}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: currentFloor > 1 ? '#CE93D8' : '#444',
-              fontSize: '16px',
-              fontFamily: "'Press Start 2P', monospace",
-              cursor: currentFloor > 1 ? 'pointer' : 'default',
-              padding: '4px 8px',
-            }}
-          >
-            {'<'}
-          </button>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              color: '#CE93D8',
-              fontSize: '12px',
-              fontFamily: "'Press Start 2P', monospace",
-            }}>
-              Etage {currentFloor} / {totalFloors}
-            </div>
-            <div style={{
-              color: allFloorTrainersDefeated ? '#4CAF50' : '#888',
-              fontSize: '8px',
-              fontFamily: "'Press Start 2P', monospace",
-              marginTop: '4px',
-            }}>
-              {allFloorTrainersDefeated ? 'Etage termine' : `${filteredTrainers.filter(t => progress.defeatedTrainers.includes(t.id)).length}/${filteredTrainers.length} dresseurs`}
-            </div>
+        {/* ====== HEADER ====== */}
+        <div style={{ textAlign: 'center', marginBottom: `${theme.spacing.xl}px` }}>
+          <div style={{
+            width: '48px', height: '48px',
+            margin: '0 auto 10px',
+            borderRadius: theme.radius.round,
+            background: `linear-gradient(135deg, ${headerColor}22, ${headerColor}08)`,
+            border: `2px solid ${headerColor}44`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {HeaderIcon}
           </div>
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              if (currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1)) {
-                setCurrentFloor(selectedZone!, currentFloor + 1);
-              }
-            }}
-            disabled={currentFloor >= totalFloors || !isFloorUnlocked(selectedZone!, currentFloor + 1)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? '#CE93D8' : '#444',
-              fontSize: '16px',
-              fontFamily: "'Press Start 2P', monospace",
-              cursor: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1) ? 'pointer' : 'default',
-              padding: '4px 8px',
-            }}
-          >
-            {'>'}
-          </button>
+          <h2 style={{
+            color: headerColor,
+            fontSize: theme.font.hero,
+            fontFamily: theme.font.family,
+            margin: 0,
+            textShadow: `0 2px 8px ${headerColor}22`,
+          }}>
+            {zone.name}
+          </h2>
+          <div style={{
+            width: '50px', height: '2px',
+            background: `linear-gradient(90deg, transparent, ${headerColor}, transparent)`,
+            margin: '8px auto 0',
+          }} />
+          <div style={{
+            color: theme.colors.textDimmer,
+            fontSize: theme.font.xs,
+            fontFamily: theme.font.family,
+            marginTop: '8px',
+          }}>
+            {zoneLabel}
+          </div>
         </div>
-      )}
 
-      {useGameStore.getState().safariState && (
-        <div style={{
-          background: 'linear-gradient(90deg, #FFD700, #FFA000)',
-          color: '#000',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          marginBottom: '20px',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '12px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 10px rgba(255, 215, 0, 0.2)'
-        }}>
-          <span>Safari Balls: {useGameStore.getState().safariState?.balls}</span>
-          <span>Pas restants: {useGameStore.getState().safariState?.steps}</span>
-        </div>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-        {/* NPCs */}
-        {npcs.map(npc => {
-          if (npc.requiredEvent && !progress.events[npc.requiredEvent]) return null;
-
-          const isCompleted = npc.setsEvent ? progress.events[npc.setsEvent] : false;
-
-          return (
+        {/* Floor navigation */}
+        {hasMultipleFloors && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: `${theme.spacing.lg}px`,
+            padding: '10px 16px',
+            background: `linear-gradient(135deg, ${theme.colors.purple}0c 0%, ${theme.colors.deepBg} 80%)`,
+            border: `2px solid ${theme.colors.purple}44`,
+            borderLeft: `3px solid ${theme.colors.purple}`,
+            borderRadius: `${theme.radius.md}px`,
+            marginBottom: `${theme.spacing.lg}px`,
+          }}>
             <button
-              key={npc.id}
-              onClick={() => {
-                soundManager.playClick();
-                handleNpcClick(npc);
-              }}
+              onClick={() => { soundManager.playClick(); if (currentFloor > 1) setCurrentFloor(selectedZone!, currentFloor - 1); }}
+              disabled={currentFloor <= 1}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '14px 16px',
-                background: isCompleted ? '#1a1a1a' : '#1a2e1a',
-                border: isCompleted ? '2px solid #333' : '2px solid #4CAF50',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                textAlign: 'left',
-                opacity: isCompleted ? 0.7 : 1,
+                background: 'none', border: 'none',
+                color: currentFloor > 1 ? theme.colors.purpleLight : theme.colors.borderDark,
+                fontSize: theme.font.xl, fontFamily: theme.font.family,
+                cursor: currentFloor > 1 ? 'pointer' : 'default',
+                padding: '4px 8px',
               }}
             >
-              <span style={{ fontSize: '20px' }}>💬</span>
-              <div>
-                <div style={{ color: isCompleted ? '#888' : '#4CAF50', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
-                  {npc.name}
-                </div>
-                <div style={{ color: '#888', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
-                  {isCompleted ? 'Deja parle' : 'Interagir'}
-                </div>
-              </div>
+              ◀
             </button>
-          );
-        })}
-
-        {/* Safari Action */}
-        {useGameStore.getState().safariState ? (
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              handleSafariSearch();
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '14px 16px',
-              background: '#2E7D32',
-              border: '2px solid #4CAF50',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>🦁</span>
-            <div>
-              <div style={{ color: '#fff', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
-                Chasser un Pokémon
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: theme.colors.purpleLight, fontSize: theme.font.md, fontFamily: theme.font.family }}>
+                Etage {currentFloor}/{totalFloors}
               </div>
               <div style={{
-                color: '#ccc', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px'
+                color: allFloorTrainersDefeated ? theme.colors.success : theme.colors.textDim,
+                fontSize: theme.font.micro, fontFamily: theme.font.family, marginTop: '2px',
               }}>
-                Chercher dans les herbes
+                {allFloorTrainersDefeated
+                  ? 'Etage termine'
+                  : `${filteredTrainers.filter(t => progress.defeatedTrainers.includes(t.id)).length}/${filteredTrainers.length} dresseurs`}
               </div>
             </div>
-          </button>
-        ) : (
-          /* Standard Wild encounters */
-          wildEncounters.length > 0 && (
             <button
               onClick={() => {
                 soundManager.playClick();
-                handleWildEncounter();
+                if (currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1))
+                  setCurrentFloor(selectedZone!, currentFloor + 1);
               }}
+              disabled={currentFloor >= totalFloors || !isFloorUnlocked(selectedZone!, currentFloor + 1)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '14px 16px',
-                background: '#1a2e1a',
-                border: '2px solid #4CAF50',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                textAlign: 'left',
+                background: 'none', border: 'none',
+                color: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1)
+                  ? theme.colors.purpleLight : theme.colors.borderDark,
+                fontSize: theme.font.xl, fontFamily: theme.font.family,
+                cursor: currentFloor < totalFloors && isFloorUnlocked(selectedZone!, currentFloor + 1)
+                  ? 'pointer' : 'default',
+                padding: '4px 8px',
               }}
             >
-              <span style={{ fontSize: '20px' }}>~</span>
-              <div>
-                <div
-                  style={{
-                    color: '#4CAF50',
-                    fontSize: '11px',
-                    fontFamily: "'Press Start 2P', monospace",
-                  }}
-                >
-                  Hautes herbes
-                </div>
-                <div
-                  style={{
-                    color: '#888',
-                    fontSize: '8px',
-                    fontFamily: "'Press Start 2P', monospace",
-                    marginTop: '4px',
-                  }}
-                >
-                  Pokemon sauvages
-                </div>
-              </div>
+              ▶
             </button>
-          ))
-        }
-
-        {/* Surf Encounters */}
-        {!useGameStore.getState().safariState && waterEncounters.length > 0 && hasSurf && (
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              handleWaterEncounter();
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '14px 16px',
-              background: '#0d47a1',
-              border: '2px solid #2196f3',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>🌊</span>
-            <div>
-              <div style={{ color: '#64b5f6', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
-                Surfer sur l'eau
-              </div>
-              <div style={{ color: '#bbdefb', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
-                Créatures aquatiques
-              </div>
-            </div>
-          </button>
+          </div>
         )}
 
-        {/* Fishing Encounters */}
-        {!useGameStore.getState().safariState && fishingEncounters.length > 0 && hasRod && (
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              handleFishingEncounter();
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '14px 16px',
-              background: '#006064',
-              border: '2px solid #00bcd4',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>🎣</span>
-            <div>
-              <div style={{ color: '#4dd0e1', fontSize: '11px', fontFamily: "'Press Start 2P', monospace" }}>
-                Pêcher
-              </div>
-              <div style={{ color: '#b2ebf2', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px' }}>
-                Lancer la ligne
-              </div>
-            </div>
-          </button>
-        )}
-
-        {/* Dynamic Static Encounters (Legendaries/Snorlax) */}
-        {
-          staticEncounters.map((encounter: StaticEncounter) => {
-            // Check if already captured/defeated/completed
-            if (progress.events[encounter.id]) return null;
-            // Check if required item is in inventory
-            if (encounter.requiredItem && !useGameStore.getState().inventory.some(i => i.itemId === encounter.requiredItem && i.quantity > 0)) return null;
-
-            return (
-              <button
-                key={encounter.id}
-                onClick={() => {
-                  soundManager.playClick();
-                  if (encounter.isGift) {
-                    // Direct add without battle
-                    const state = useGameStore.getState();
-                    // Create pokemon at level
-                    // Normally we should expose `createPokemonInstance` but we can't easily import it here cleanly in a JSX dump
-                    // Actually we can, but since this is just UI, the easiest is to call a store action. Let's just trigger a battle for now as "gifts" might need a new action. 
-                    // To keep it simple, we'll assume all static encounters trigger battles, and gifts run away?
-                    // Let's just trigger a standard battle for simplicity. If it's a gift we could add an action.
-                    startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
-                    setView('battle');
-                  } else {
-                    startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
-                    setView('battle');
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '14px 16px',
-                  background: encounter.isGift ? 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' : 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                  border: encounter.isGift ? '2px solid #81C784' : '2px solid #FFD700',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  boxShadow: encounter.isGift ? '0 0 10px rgba(76, 175, 80, 0.3)' : '0 0 10px rgba(255, 215, 0, 0.3)',
-                }}
-              >
-                <span style={{ fontSize: '20px' }}>{encounter.isGift ? '🎁' : '★'}</span>
-                <div>
-                  <div style={{ color: encounter.isGift ? '#fff' : '#000', fontSize: '11px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
-                    {encounter.name}
-                  </div>
-                  <div style={{ color: encounter.isGift ? '#eee' : '#333', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", marginTop: '4px', lineHeight: '1.4' }}>
-                    {encounter.dialogue || (encounter.isGift ? 'Obtenir ce Pokémon ?' : 'Une présence imposante...')}
-                  </div>
-                </div>
-              </button>
-            );
-          })
-        }
-
-        {/* Trainers (filtered: no gym/elite4, rival matched to starter) */}
-        {
-          filteredTrainers.map(trainer => {
-            const defeated = isTrainerDefeated(trainer.id);
-
-            return (
-              <button
-                key={trainer.id}
-                onClick={() => {
-                  soundManager.playClick();
-                  handleTrainerBattle(trainer.id);
-                }}
-                disabled={defeated}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '14px 16px',
-                  background: defeated ? '#1a1a1a' : '#1a1a2e',
-                  border: defeated ? '2px solid #333' : '2px solid #e94560',
-                  borderRadius: '8px',
-                  cursor: defeated ? 'default' : 'pointer',
-                  opacity: defeated ? 0.5 : 1,
-                  textAlign: 'left',
-                }}
-              >
-                <span style={{ fontSize: '20px' }}>{defeated ? 'x' : '!'}</span>
-                <div>
-                  <div
-                    style={{
-                      color: defeated ? '#666' : '#e94560',
-                      fontSize: '11px',
-                      fontFamily: "'Press Start 2P', monospace",
-                      textDecoration: defeated ? 'line-through' : 'none',
-                    }}
-                  >
-                    {trainer.trainerClass} {trainer.name}
-                  </div>
-                  <div
-                    style={{
-                      color: '#888',
-                      fontSize: '8px',
-                      fontFamily: "'Press Start 2P', monospace",
-                      marginTop: '4px',
-                    }}
-                  >
-                    {defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
-                  </div>
-                </div>
-              </button>
-            );
-          })
-        }
-
-        {/* Back button */}
-        <div style={{ marginTop: '12px' }}>
-          <Button variant="ghost" onClick={() => setView('world_map')}>
-            Retour
-          </Button>
-        </div>
-      </div>
-      </div>
-    </div>
-  );
-}
-
-function NpcDialogue({ npc, dialogueIndex, onAdvance }: { npc: NPCData; dialogueIndex: number; onAdvance: () => void }) {
-  const [displayedText, setDisplayedText] = useState('');
-  const [isTyping, setIsTyping] = useState(true);
-  const fullText = npc.dialogue[dialogueIndex];
-  const gameSpeed = useGameStore(s => s.settings.gameSpeed);
-
-  useEffect(() => {
-    setDisplayedText('');
-    setIsTyping(true);
-    let current = 0;
-    const interval = setInterval(() => {
-      current++;
-      setDisplayedText(fullText.slice(0, current));
-      if (current >= fullText.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 10 / gameSpeed);
-    return () => clearInterval(interval);
-  }, [fullText, gameSpeed]);
-
-  const handleClick = () => {
-    if (isTyping) {
-      setDisplayedText(fullText);
-      setIsTyping(false);
-    } else {
-      onAdvance();
-    }
-  };
-
-  return (
-    <div style={{ padding: '16px', maxWidth: '500px', margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '300px' }}>
-      {/* NPC name tag */}
-      <div style={{
-        background: 'linear-gradient(90deg, #FFD600, #FFA000)',
-        padding: '6px 16px',
-        borderRadius: '8px 8px 0 0',
-        display: 'inline-block',
-        alignSelf: 'flex-start',
-      }}>
-        <span style={{ color: '#000', fontSize: '10px', fontFamily: "'Press Start 2P', monospace", fontWeight: 'bold' }}>
-          {npc.name}
-        </span>
-      </div>
-
-      {/* Dialogue box */}
-      <div
-        onClick={handleClick}
-        style={{
-          flex: 1,
-          background: '#0f1923',
-          border: '3px solid #FFD600',
-          borderRadius: '0 12px 12px 12px',
-          padding: '20px',
-          color: '#fff',
-          fontFamily: "'Press Start 2P', monospace",
-          fontSize: '10px',
-          lineHeight: '2',
-          marginBottom: '16px',
-          cursor: 'pointer',
-          minHeight: '120px',
-          position: 'relative',
-          boxShadow: '0 0 15px rgba(255, 214, 0, 0.1), inset 0 0 30px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        {displayedText}
-        {!isTyping && (
-          <span style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '14px',
-            fontSize: '8px',
-            color: '#FFD600',
-            animation: 'pulse 1s infinite alternate',
+        {/* Safari banner */}
+        {useGameStore.getState().safariState && (
+          <div style={{
+            background: `linear-gradient(135deg, ${theme.colors.gold}18 0%, ${theme.colors.deepBg} 80%)`,
+            border: `2px solid ${theme.colors.gold}66`,
+            borderLeft: `3px solid ${theme.colors.gold}`,
+            borderRadius: `${theme.radius.md}px`,
+            padding: '10px 14px',
+            marginBottom: `${theme.spacing.lg}px`,
+            display: 'flex', justifyContent: 'space-between',
+            fontFamily: theme.font.family, fontSize: theme.font.md,
+            color: theme.colors.gold,
           }}>
-            {dialogueIndex < npc.dialogue.length - 1 ? '▼' : '✕'}
-          </span>
+            <span>Balls: {useGameStore.getState().safariState?.balls}</span>
+            <span>Pas: {useGameStore.getState().safariState?.steps}</span>
+          </div>
         )}
-      </div>
 
-      {/* Progress dots */}
-      {npc.dialogue.length > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginBottom: '12px' }}>
-          {npc.dialogue.map((_, i) => (
-            <div key={i} style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              background: i === dialogueIndex ? '#FFD600' : i < dialogueIndex ? '#666' : '#333',
-              transition: 'background 0.3s',
-            }} />
-          ))}
+        {/* ====== ACTIONS ====== */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+          {/* NPCs */}
+          {npcs.map(npc => {
+            if (npc.requiredEvent && !progress.events[npc.requiredEvent]) return null;
+            const isCompleted = npc.setsEvent ? progress.events[npc.setsEvent] : false;
+            return (
+              <ActionCard
+                key={npc.id}
+                icon={<IconNpc color={isCompleted ? theme.colors.textDimmer : theme.colors.success} />}
+                title={npc.name}
+                subtitle={isCompleted ? 'Deja parle' : 'Interagir'}
+                accentColor={theme.colors.success}
+                onClick={() => handleNpcClick(npc)}
+                completed={!!isCompleted}
+              />
+            );
+          })}
+
+          {/* Safari encounter */}
+          {useGameStore.getState().safariState ? (
+            <ActionCard
+              icon={<IconGrass />}
+              title="Chasser un Pokemon"
+              subtitle="Chercher dans les herbes"
+              accentColor={theme.colors.success}
+              onClick={handleSafariSearch}
+            />
+          ) : (
+            /* Wild encounters */
+            wildEncounters.length > 0 && (
+              <ActionCard
+                icon={<IconGrass />}
+                title="Hautes herbes"
+                subtitle="Pokemon sauvages"
+                accentColor={theme.colors.success}
+                onClick={handleWildEncounter}
+              />
+            )
+          )}
+
+          {/* Water encounters */}
+          {!useGameStore.getState().safariState && waterEncounters.length > 0 && hasSurf && (
+            <ActionCard
+              icon={<IconWater />}
+              title="Surfer sur l'eau"
+              subtitle="Creatures aquatiques"
+              accentColor={theme.colors.info}
+              onClick={handleWaterEncounter}
+            />
+          )}
+
+          {/* Fishing encounters */}
+          {!useGameStore.getState().safariState && fishingEncounters.length > 0 && hasRod && (
+            <ActionCard
+              icon={<IconFishing />}
+              title="Pecher"
+              subtitle="Lancer la ligne"
+              accentColor="#00bcd4"
+              onClick={handleFishingEncounter}
+            />
+          )}
+
+          {/* Static encounters */}
+          {staticEncounters.map((encounter: StaticEncounter) => {
+            if (progress.events[encounter.id]) return null;
+            if (encounter.requiredItem && !useGameStore.getState().inventory.some(i => i.itemId === encounter.requiredItem && i.quantity > 0)) return null;
+            return (
+              <ActionCard
+                key={encounter.id}
+                icon={<IconStar color={encounter.isGift ? theme.colors.success : theme.colors.gold} />}
+                title={encounter.name}
+                subtitle={encounter.dialogue || (encounter.isGift ? 'Obtenir ce Pokemon ?' : 'Une presence imposante...')}
+                accentColor={encounter.isGift ? theme.colors.success : theme.colors.gold}
+                variant={encounter.isGift ? 'default' : 'gold'}
+                onClick={() => {
+                  startWildBattle([{ pokemonId: encounter.pokemonId, minLevel: encounter.level, maxLevel: encounter.level, rate: 100 }], team, encounter.id);
+                  setView('battle');
+                }}
+              />
+            );
+          })}
+
+          {/* Trainers */}
+          {filteredTrainers.map(trainer => {
+            const defeated = isTrainerDefeated(trainer.id);
+            return (
+              <ActionCard
+                key={trainer.id}
+                icon={<div style={{
+                  width: '22px', height: '22px',
+                  borderRadius: theme.radius.round,
+                  background: defeated ? theme.colors.borderDark : `${theme.colors.primary}22`,
+                  border: `1.5px solid ${defeated ? theme.colors.borderDark : theme.colors.primary}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '10px', color: defeated ? theme.colors.borderDark : theme.colors.primary,
+                  fontFamily: theme.font.family,
+                }}>
+                  {defeated ? '\u2713' : '!'}
+                </div>}
+                title={`${trainer.trainerClass} ${trainer.name}`}
+                subtitle={defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
+                accentColor={theme.colors.primary}
+                onClick={() => handleTrainerBattle(trainer.id)}
+                completed={defeated}
+                disabled={defeated}
+              />
+            );
+          })}
         </div>
-      )}
-
-      <Button onClick={handleClick} style={{ width: '100%' }}>
-        {isTyping ? 'Passer' : dialogueIndex < npc.dialogue.length - 1 ? 'Suivant' : 'Fermer'}
-      </Button>
+      </div>
     </div>
   );
 }

@@ -3,9 +3,26 @@ import { useGameStore } from '../stores/gameStore';
 import { Button } from './ui/Button';
 import { soundManager } from '../utils/SoundManager';
 import { hasSave } from '../utils/saveManager';
+import { theme } from '../theme';
+import profBoreImg from '../assets/Prof_Bore.png';
+
+const PROF_DIALOGUE = [
+  "Bienvenue dans le monde des Pokemon ! Je suis le Professeur Bore, chercheur en Pokemon.",
+  "Ce monde est vaste et regorge de creatures extraordinaires que l'on appelle Pokemon.",
+  "Certains les utilisent comme animaux de compagnie, d'autres les font combattre. Quant a moi... je les etudie !",
+  "Mon reve est de constituer l'encyclopedie la plus complete de tous les Pokemon existants, a travers toutes les regions du monde.",
+  "Pour cela, j'ai besoin de dresseurs courageux prets a parcourir chaque region, de Kanto jusqu'a Paldea.",
+  "Chaque region possede ses propres Pokemon, ses propres champions et sa propre Ligue. Tu devras tous les affronter !",
+  "Ton voyage commence ici, a Kanto. Mais ce n'est que le debut d'une longue aventure a travers le monde entier.",
+  "Es-tu pret a relever ce defi ? Alors choisis ton premier Pokemon et pars a l'aventure !",
+];
 
 export function TitleScreen() {
   const { startNewGame, loadGameState } = useGameStore();
+  const [showProfIntro, setShowProfIntro] = useState(false);
+  const [profDialogueIndex, setProfDialogueIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(true);
   const [showNewGame, setShowNewGame] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [selectedStarter, setSelectedStarter] = useState<number | null>(null);
@@ -18,6 +35,36 @@ export function TitleScreen() {
       setSaveChecked(true);
     });
   }, []);
+
+  // Professor intro typewriter effect
+  useEffect(() => {
+    if (!showProfIntro) return;
+    const fullText = PROF_DIALOGUE[profDialogueIndex];
+    setDisplayedText('');
+    setIsTyping(true);
+    let current = 0;
+    const interval = setInterval(() => {
+      current++;
+      setDisplayedText(fullText.slice(0, current));
+      if (current >= fullText.length) {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 25);
+    return () => clearInterval(interval);
+  }, [showProfIntro, profDialogueIndex]);
+
+  const handleProfClick = () => {
+    if (isTyping) {
+      setDisplayedText(PROF_DIALOGUE[profDialogueIndex]);
+      setIsTyping(false);
+    } else if (profDialogueIndex < PROF_DIALOGUE.length - 1) {
+      setProfDialogueIndex(i => i + 1);
+    } else {
+      setShowProfIntro(false);
+      setShowNewGame(true);
+    }
+  };
 
   const starters = [
     { id: 1, name: 'Bulbizarre', type: 'plante', color: '#78C850', desc: 'PV et Spe. equilibres' },
@@ -33,6 +80,122 @@ export function TitleScreen() {
   const handleContinue = async () => {
     await loadGameState();
   };
+
+  // ====== PROFESSOR INTRO ======
+  if (showProfIntro) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        padding: '20px',
+        background: 'transparent',
+      }}>
+        <div style={{
+          maxWidth: '500px',
+          width: '100%',
+          animation: 'fadeIn 0.5s ease',
+        }}>
+          {/* Professor sprite */}
+          <div style={{
+            textAlign: 'center',
+            marginBottom: `${theme.spacing.lg}px`,
+          }}>
+            <img
+              src={profBoreImg}
+              alt="Professeur Bore"
+              style={{
+                width: '160px',
+                height: 'auto',
+                imageRendering: 'auto',
+                filter: `drop-shadow(0 0 20px ${theme.colors.primary}33)`,
+                animation: 'slideDown 0.6s ease',
+              }}
+            />
+          </div>
+
+          {/* Name tag */}
+          <div style={{
+            background: `linear-gradient(90deg, ${theme.colors.gold}, #FFA000)`,
+            padding: `6px ${theme.spacing.lg}px`,
+            borderRadius: `${theme.radius.md}px ${theme.radius.md}px 0 0`,
+            display: 'inline-block',
+          }}>
+            <span style={{
+              color: '#000',
+              fontSize: theme.font.md,
+              fontFamily: theme.font.family,
+              fontWeight: 'bold',
+            }}>
+              Prof. Bore
+            </span>
+          </div>
+
+          {/* Dialogue box */}
+          <div
+            onClick={handleProfClick}
+            style={{
+              background: theme.colors.deepBg,
+              border: theme.borders.thick(theme.colors.gold),
+              borderRadius: `0 ${theme.radius.lg}px ${theme.radius.lg}px ${theme.radius.lg}px`,
+              padding: `${theme.spacing.xl}px`,
+              color: theme.colors.textPrimary,
+              fontFamily: theme.font.family,
+              fontSize: theme.font.md,
+              lineHeight: '2.2',
+              marginBottom: `${theme.spacing.lg}px`,
+              cursor: 'pointer',
+              minHeight: '120px',
+              position: 'relative',
+              boxShadow: `0 0 15px ${theme.colors.goldDim}22, inset 0 0 30px rgba(0, 0, 0, 0.3)`,
+            }}
+          >
+            {displayedText}
+            {!isTyping && (
+              <span style={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '14px',
+                fontSize: theme.font.xs,
+                color: theme.colors.gold,
+                animation: 'pulse 1s infinite alternate',
+              }}>
+                {profDialogueIndex < PROF_DIALOGUE.length - 1 ? '\u25BC' : '\u2715'}
+              </span>
+            )}
+          </div>
+
+          {/* Progress dots */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '6px',
+            marginBottom: `${theme.spacing.md}px`,
+          }}>
+            {PROF_DIALOGUE.map((_, i) => (
+              <div key={i} style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: theme.radius.round,
+                background: i === profDialogueIndex
+                  ? theme.colors.gold
+                  : i < profDialogueIndex
+                    ? theme.colors.textDimmer
+                    : theme.colors.borderDark,
+                transition: 'background 0.3s',
+              }} />
+            ))}
+          </div>
+
+          <Button onClick={handleProfClick} style={{ width: '100%' }}>
+            {isTyping ? 'Passer' : profDialogueIndex < PROF_DIALOGUE.length - 1 ? 'Suivant' : 'Commencer'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (showNewGame) {
     return (
@@ -248,22 +411,22 @@ export function TitleScreen() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-        {/* Lueur rouge douce et diffuse */}
-        <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '80vw',
-            maxWidth: '600px',
-            height: '80vw',
-            maxHeight: '600px',
-            background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
-            borderRadius: '50%',
-            filter: 'blur(60px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-        }} />
+      {/* Lueur rouge douce et diffuse */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '80vw',
+        maxWidth: '600px',
+        height: '80vw',
+        maxHeight: '600px',
+        background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
       <div style={{ position: 'relative', textAlign: 'center' }}>
         {/* Logo */}
@@ -313,7 +476,7 @@ export function TitleScreen() {
           <Button
             variant={saveExists ? 'secondary' : 'primary'}
             size="lg"
-            onClick={() => setShowNewGame(true)}
+            onClick={() => setShowProfIntro(true)}
           >
             Nouvelle Partie
           </Button>
@@ -328,7 +491,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        <span id={"version"}>0.5.1</span>
+        <span id={"version"}>0.5.2</span>
       </div>
     </div>
   );
