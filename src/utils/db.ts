@@ -8,11 +8,7 @@ const DB_NAME = 'pokemon_game_db';
 const DB_VERSION = 1;
 const SYNC_KEY = 'last_sync_timestamp';
 // Bump this to force a re-sync on next app load (bypasses IndexedDB cache)
-<<<<<<< Updated upstream
-const LOCAL_DATA_VERSION = '0.4.2';
-=======
 const LOCAL_DATA_VERSION = '0.5.3';
->>>>>>> Stashed changes
 
 // ——————————————————————————————————————————————
 // 1. Raw DB types (snake_case, matching Supabase columns)
