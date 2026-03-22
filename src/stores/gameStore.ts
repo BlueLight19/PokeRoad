@@ -155,6 +155,72 @@ export interface GameState {
 
 const HM_MOVE_IDS: Record<string, number> = { surf: 57, strength: 70, cut: 15, fly: 19, flash: 148, waterfall: 127, whirlpool: 250, rock_smash: 249, dive: 291 };
 
+/**
+ * Cascade zone unlock check: loops until no more zones can be unlocked.
+ * Mutates newProgress.unlockedZones in place.
+ */
+function cascadeZoneUnlocks(
+  newProgress: { unlockedZones: string[]; defeatedTrainers: string[]; events: Record<string, boolean> },
+  getState: () => GameState
+) {
+  const allZones = getAllZones();
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const zone of allZones) {
+      const zoneId = zone.id;
+      if (newProgress.unlockedZones.includes(zoneId)) continue;
+      if (!zone.connectedZones.some(z => newProgress.unlockedZones.includes(z))) continue;
+
+      try {
+        const condition = (zone as any).unlockCondition;
+        if (!condition) {
+          newProgress.unlockedZones.push(zoneId);
+          changed = true;
+          continue;
+        }
+
+        if (condition.eventId && !newProgress.events[condition.eventId]) continue;
+        if (condition.itemId && !getState().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
+
+        let shouldUnlock = false;
+
+        if (condition.type === 'trainers' && condition.zones) {
+          shouldUnlock = condition.zones.every((z: string) => {
+            try {
+              const zoneData = getZoneData(z) as any;
+              const zoneTrainers: string[] = zoneData.trainers || [];
+              return zoneTrainers.every((t: string) => newProgress.defeatedTrainers.includes(t));
+            } catch { return true; }
+          });
+        }
+        if (condition.type === 'gym' && condition.gymId) {
+          const gym = getGymData(condition.gymId);
+          shouldUnlock = getState().player.badges.includes(gym.badge);
+        }
+        if (condition.type === 'badge' && condition.badge) {
+          shouldUnlock = getState().player.badges.includes(condition.badge);
+        }
+        if (condition.type === 'item' && condition.itemId) {
+          shouldUnlock = getState().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0);
+        }
+        if (condition.type === 'event' && condition.eventId) {
+          shouldUnlock = !!newProgress.events[condition.eventId];
+        }
+        if (condition.type === 'hm' && condition.hmMove) {
+          const moveId = HM_MOVE_IDS[condition.hmMove];
+          shouldUnlock = !!(moveId && getState().team.some(p => p.moves.some(m => m.moveId === moveId)));
+        }
+
+        if (shouldUnlock) {
+          newProgress.unlockedZones.push(zoneId);
+          changed = true;
+        }
+      } catch { /* skip */ }
+    }
+  }
+}
+
 // Helper: fire-and-forget save (non-blocking)
 function fireAndForgetSave(state: GameState) {
   saveGame({
@@ -476,39 +542,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().saveGameState();
 
     const newProgress = { ...get().progress };
-    const allZones = getAllZones();
-    let changed = false;
-    for (const zone of allZones) {
-      const zoneId = zone.id;
-      if (newProgress.unlockedZones.includes(zoneId)) continue;
-      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
-      if (!isConnected) continue;
-      try {
-        const condition = (zone as any).unlockCondition;
-        if (!condition) {
-          newProgress.unlockedZones.push(zoneId);
-          changed = true;
-          continue;
-        }
-        if (condition.type === 'item' && condition.itemId) {
-          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
-            newProgress.unlockedZones.push(zoneId);
-            changed = true;
-          }
-        }
-        if (condition.type === 'hm' && condition.hmMove) {
-          const moveId = HM_MOVE_IDS[condition.hmMove];
-          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId))) {
-            newProgress.unlockedZones.push(zoneId);
-            changed = true;
-          }
-        }
-      } catch { }
-    }
-    if (changed) {
-      set({ progress: newProgress });
-      get().saveGameState();
-    }
+    cascadeZoneUnlocks(newProgress, get);
+    set({ progress: newProgress });
+    get().saveGameState();
   },
 
   removeItem: (itemId: string, qty: number) => {
@@ -693,74 +729,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       defeatedTrainers: [...state.progress.defeatedTrainers, trainerId],
     };
 
-    const allZones = getAllZones();
-
-    for (const zone of allZones) {
-      const zoneId = zone.id;
-      if (newProgress.unlockedZones.includes(zoneId)) continue;
-
-      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
-      if (!isConnected) continue;
-
-      try {
-        const condition = (zone as any).unlockCondition;
-        if (!condition) {
-          if (!newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-          continue;
-        }
-
-        if (condition.eventId && !newProgress.events[condition.eventId]) continue;
-        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
-
-        if (condition.type === 'trainers' && condition.zones) {
-          const allDefeated = condition.zones.every((z: string) => {
-            try {
-              const zoneData = getZoneData(z) as any;
-              const zoneTrainers: string[] = zoneData.trainers || [];
-              return zoneTrainers.every((t: string) =>
-                newProgress.defeatedTrainers.includes(t)
-              );
-            } catch {
-              return true;
-            }
-          });
-          if (allDefeated && !newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-
-        if (condition.type === 'gym' && condition.gymId) {
-          const gym = getGymData(condition.gymId);
-          if (state.player.badges.includes(gym.badge) && !newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-
-        if (condition.type === 'badge' && condition.badge) {
-          if (state.player.badges.includes(condition.badge) && !newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-
-        if (condition.type === 'item' && condition.itemId) {
-          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0) && !newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-
-        if (condition.type === 'hm' && condition.hmMove) {
-          const moveId = HM_MOVE_IDS[condition.hmMove];
-          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId)) && !newProgress.unlockedZones.includes(zoneId)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-      } catch {
-        // Zone not found, skip
-      }
-    }
-
+    cascadeZoneUnlocks(newProgress, get);
     set({ progress: newProgress });
     get().saveGameState();
   },
@@ -778,67 +747,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const newProgress = { ...get().progress };
-    const allZonesData = getAllZones();
-
-    for (const zone of allZonesData) {
-      const zoneId = zone.id;
-      if (newProgress.unlockedZones.includes(zoneId)) continue;
-
-      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
-      if (!isConnected) continue;
-
-      try {
-        const condition = (zone as any).unlockCondition;
-        if (!condition) {
-          newProgress.unlockedZones.push(zoneId);
-          continue;
-        }
-
-        if (condition.eventId && !newProgress.events[condition.eventId]) continue;
-        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
-        if (condition.type === 'gym' && condition.gymId) {
-          const condGym = getGymData(condition.gymId);
-          if (get().player.badges.includes(condGym.badge)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-        if (condition.type === 'badge' && condition.badge) {
-          if (get().player.badges.includes(condition.badge)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-        if (condition.type === 'trainers' && condition.zones) {
-          const allDefeated = condition.zones.every((z: string) => {
-            try {
-              const zoneData = getZoneData(z) as any;
-              const zoneTrainers: string[] = zoneData.trainers || [];
-              return zoneTrainers.every((t: string) =>
-                newProgress.defeatedTrainers.includes(t)
-              );
-            } catch {
-              return true;
-            }
-          });
-          if (allDefeated) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-        if (condition.type === 'item' && condition.itemId) {
-          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-        if (condition.type === 'hm' && condition.hmMove) {
-          const moveId = HM_MOVE_IDS[condition.hmMove];
-          if (moveId && get().team.some(p => p.moves.some(m => m.moveId === moveId))) {
-            newProgress.unlockedZones.push(zoneId);
-          }
-        }
-      } catch {
-        // Skip
-      }
-    }
-
+    cascadeZoneUnlocks(newProgress, get);
     set({ progress: newProgress });
     get().saveGameState();
   },
