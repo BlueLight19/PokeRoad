@@ -52,7 +52,7 @@ const SHORT_NAMES: Record<string, string> = {
     'cerulean-cave': 'Grotte Azuree',
     'foret-jade': 'Foret de Jade',
     'mt-moon': 'Mont Selenite',
-    'rock-tunnel': 'Tunnel Taupiqueur',
+    'rock-tunnel': 'Grotte Sombre',
     'seafoam-islands': 'Iles Ecume',
     'pokemon-mansion': 'Manoir Pokemon',
     'power-plant': 'Centrale',
