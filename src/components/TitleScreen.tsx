@@ -55,10 +55,7 @@ export function TitleScreen() {
   }, [showProfIntro, profDialogueIndex]);
 
   const handleProfClick = () => {
-    if (isTyping) {
-      setDisplayedText(PROF_DIALOGUE[profDialogueIndex]);
-      setIsTyping(false);
-    } else if (profDialogueIndex < PROF_DIALOGUE.length - 1) {
+    if (profDialogueIndex < PROF_DIALOGUE.length - 1) {
       setProfDialogueIndex(i => i + 1);
     } else {
       setShowProfIntro(false);

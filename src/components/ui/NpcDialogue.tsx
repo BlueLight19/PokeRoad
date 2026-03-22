@@ -32,12 +32,7 @@ export function NpcDialogue({ npc, dialogueIndex, onAdvance }: NpcDialogueProps)
   }, [fullText, gameSpeed]);
 
   const handleClick = () => {
-    if (isTyping) {
-      setDisplayedText(fullText);
-      setIsTyping(false);
-    } else {
-      onAdvance();
-    }
+    onAdvance();
   };
 
   return (

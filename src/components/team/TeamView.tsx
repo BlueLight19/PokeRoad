@@ -25,9 +25,9 @@ export function TeamView() {
   const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null);
   const [showItemPicker, setShowItemPicker] = React.useState(false);
 
-  const HELD_CATEGORIES: ItemCategory[] = [
+  const HELD_CATEGORIES = [
     'held-items', 'type-enhancement', 'in-a-pinch', 'choice', 'bad-held-items', 'scarves',
-  ];
+  ] as ItemCategory[];
 
   // ===== DETAIL VIEW =====
   if (selected !== null) {
