@@ -700,13 +700,7 @@ const abilityHandlers: Record<string, Partial<Record<AbilityTrigger, AbilityHand
     },
   },
 
-  // ===== Anger Point: max attack on crit received =====
-  'anger-point': {
-    'after-hit': (ctx) => {
-      // This needs isCritical context — we'll check via a flag set in battleEngine
-      return { logs: [] };
-    },
-  },
+
 
   // ===== Leaf Guard: block status in sun =====
   'leaf-guard': {
@@ -747,13 +741,7 @@ const abilityHandlers: Record<string, Partial<Record<AbilityTrigger, AbilityHand
     'modify-damage': (_ctx) => ({ logs: [] }),
   },
 
-  // ===== Pressure: extra PP drain =====
-  'pressure': {
-    'switch-in': (ctx) => {
-      return { logs: [{ message: `${ctx.pokemonName} exerce une Pression !`, type: 'info' }] };
-    },
-    // PP drain checked inline in executeMove
-  },
+
 
   // ===== Arena Trap / Magnet Pull: trapping =====
   'arena-trap': {

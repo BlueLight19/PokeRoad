@@ -20,6 +20,7 @@ import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
 import { NotificationOverlay } from './components/ui/NotificationOverlay';
 import { NavBar } from './components/ui/NavBar';
+import { DevCustomPokemon } from './components/ui/DevCustomPokemon';
 
 // --- LOADING SCREEN ---
 function LoadingScreen({ progress, table }: { progress: number; table: string }) {
@@ -80,9 +81,6 @@ function LoadingScreen({ progress, table }: { progress: number; table: string })
 // --- COMPOSANT DEV TOOLS ---
 function DevTools() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [passwordInput, setPasswordInput] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
     const [itemId, setItemId] = useState('rare-candy');
@@ -99,6 +97,8 @@ function DevTools() {
     const gameSpeed = useGameStore(s => s.settings.gameSpeed);
     const devShinyRate = useGameStore(s => s.settings.devShinyRate);
     const setDevShinyRate = useGameStore(s => s.setDevShinyRate);
+    const devSkipBattle = useGameStore(s => s.settings.devSkipBattle);
+    const setDevSkipBattle = useGameStore(s => s.setDevSkipBattle);
 
     if (currentView === 'title') return null;
 
@@ -136,14 +136,14 @@ function DevTools() {
         cursor: 'pointer', borderRadius: '2px', width: '100%'
     };
 
-    const handleLogin = () => {
-        if (passwordInput.trim() === 'tomer') {
-            setIsAuthenticated(true);
-            setErrorMsg('');
-        } else {
-            setErrorMsg('Mot de passe incorrect, neuille');
-            setPasswordInput('');
-        }
+    const toggleStyle = {
+        ...btnStyle,
+        background: '#16213e',
+        borderColor: '#333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '6px 8px'
     };
 
     const handleReset = async () => {
@@ -181,34 +181,6 @@ function DevTools() {
         }
     };
 
-    if (!isAuthenticated) {
-        return (
-            <div style={{
-                position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
-                background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
-                padding: '10px', display: 'flex', flexDirection: 'column', width: '200px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
-            }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Accès Restreint</span>
-                    <button onClick={() => { soundManager.playClick(); setIsOpen(false); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
-                </div>
-
-                <input
-                    type="password"
-                    placeholder="Mot de passe"
-                    style={inputStyle}
-                    value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                />
-                <button style={btnStyle} onClick={() => { soundManager.playClick(); handleLogin(); }}>Déverrouiller</button>
-
-                {errorMsg && <span style={{ color: '#ff4444', fontSize: '7px', marginTop: '6px', textAlign: 'center' }}>{errorMsg}</span>}
-            </div>
-        );
-    }
-
     const sectionStyle = {
         marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #333'
     };
@@ -222,8 +194,10 @@ function DevTools() {
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>
                 <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Outils Dev</span>
-                <button onClick={() => { soundManager.playClick(); setIsOpen(false); setIsAuthenticated(false); setPasswordInput(''); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
+                <button onClick={() => { soundManager.playClick(); setIsOpen(false); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
             </div>
+
+            <DevCustomPokemon />
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Objet</span>
@@ -291,6 +265,16 @@ function DevTools() {
                         {devShinyRate ?? 'Défaut'}%
                     </span>
                 </div>
+            </div>
+
+            <div style={sectionStyle}>
+                <button
+                    style={{ ...toggleStyle, background: devSkipBattle ? '#1b5e20' : '#16213e', borderColor: devSkipBattle ? '#4caf50' : '#333' }}
+                    onClick={() => { soundManager.playClick(); setDevSkipBattle(!devSkipBattle); }}
+                >
+                    <span style={{ fontSize: '7px' }}>Passer Combat</span>
+                    <span style={{ fontSize: '9px' }}>{devSkipBattle ? 'ON' : 'OFF'}</span>
+                </button>
             </div>
 
             <div>
@@ -412,21 +396,48 @@ function App() {
                 <p style={{ color: '#888', fontSize: '8px', marginBottom: '20px', maxWidth: '400px', lineHeight: '1.8' }}>
                     {loadError}
                 </p>
-                <button
-                    onClick={() => window.location.reload()}
-                    style={{
-                        background: '#e94560',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '12px 24px',
-                        fontFamily: "'Press Start 2P', monospace",
-                        fontSize: '10px',
-                        cursor: 'pointer',
-                        borderRadius: '8px',
-                    }}
-                >
-                    Réessayer
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            background: '#e94560',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '12px 24px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            fontSize: '10px',
+                            cursor: 'pointer',
+                            borderRadius: '8px',
+                        }}
+                    >
+                        Réessayer
+                    </button>
+                    <button
+                        onClick={async () => {
+                            if (window.confirm("Cela va vider TOUTES les données locales (données de jeu + sauvegarde) pour réparer les erreurs de chargement. Continuer ?")) {
+                                try {
+                                    await forceFullSync();
+                                    await deleteSave();
+                                    window.location.reload();
+                                } catch (e) {
+                                    alert("Erreur lors de la réinitialisation : " + (e instanceof Error ? e.message : 'Inconnu'));
+                                }
+                            }
+                        }}
+                        style={{
+                            background: '#1a1a2e',
+                            color: '#ff4444',
+                            border: '1px solid #ff4444',
+                            padding: '8px 16px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            fontSize: '8px',
+                            cursor: 'pointer',
+                            borderRadius: '4px',
+                        }}
+                    >
+                        Réinitialiser TOUT (Fix Erreur)
+                    </button>
+                </div>
             </div>
         );
     }

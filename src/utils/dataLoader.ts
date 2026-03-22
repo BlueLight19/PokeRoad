@@ -347,6 +347,8 @@ function convertZone(
     name: npc.name as string,
     dialogue: (npc.dialogue as string[]) || [],
     givesItem: npc.givesItem as string | undefined,
+    givesItemQuantity: npc.givesItemQuantity as number | undefined,
+    givesItems: npc.givesItems as Array<{ itemId: string; quantity: number }> | undefined,
     givesPokemon: npc.givesPokemon as { pokemonId: number; level: number } | undefined,
     requiredEvent: npc.requiredEvent as string | undefined,
     setsEvent: npc.setsEvent as string | undefined,
@@ -450,9 +452,15 @@ export async function initializeData(): Promise<void> {
   }
 
   // Register Pokemon
+  const loadedIds: number[] = [];
   for (const raw of rawPokemon as DBPokemon[]) {
     const learnset = learnsetMap.get(raw.id) || [];
     pokemonRegistry.set(raw.id, convertPokemon(raw, learnset));
+    loadedIds.push(raw.id);
+  }
+  console.log(`[dataLoader] Registered IDs: ${loadedIds.slice(0, 10).join(', ')}... (Total: ${loadedIds.length})`);
+  if (loadedIds.length > 0 && !pokemonRegistry.has(1)) {
+    console.error("[dataLoader] CRITICAL: Pokemon ID 1 (Bulbasaur) is missing from synced data!");
   }
 
   // Register Moves
@@ -524,6 +532,12 @@ export async function initializeData(): Promise<void> {
   const foretJade = zoneRegistry.get('foret-jade');
   if (foretJade) {
     foretJade.unlockCondition = null; // Route 2 a pas de dresseurs dans la DB pour l'instant
+  }
+
+  // Patch: Remove second assistant from Bourg Palette
+  const bourgPalette = zoneRegistry.get('bourg-palette');
+  if (bourgPalette && bourgPalette.npcs) {
+    bourgPalette.npcs = bourgPalette.npcs.filter(npc => npc.id !== 'npc-oak-aide-2');
   }
   // ---------------------------------------------------------------
 

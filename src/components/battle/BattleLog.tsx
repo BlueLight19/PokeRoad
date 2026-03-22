@@ -14,6 +14,7 @@ const logColors: Record<BattleLogEntry['type'], string> = {
   critical: '#FFD600',
   catch: '#2196F3',
   xp: '#CE93D8',
+  heal: '#81C784',
 };
 
 const logIcons: Record<BattleLogEntry['type'], string> = {
@@ -24,6 +25,7 @@ const logIcons: Record<BattleLogEntry['type'], string> = {
   critical: '\u26A1',
   catch: '\u25CF',
   xp: '\u2605',
+  heal: '\u271A',
 };
 
 export function BattleLog({ logs }: BattleLogProps) {

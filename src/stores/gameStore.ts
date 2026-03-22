@@ -71,6 +71,7 @@ export interface GameState {
   settings: {
     gameSpeed: number;
     devShinyRate?: number;
+    devSkipBattle?: boolean;
   };
 
   // UI state
@@ -90,10 +91,12 @@ export interface GameState {
   quitSafari: () => void;
   setGameSpeed: (speed: number) => void;
   setDevShinyRate: (rate?: number) => void;
+  setDevSkipBattle: (skip: boolean) => void;
 
   // Team management
   addPokemonToTeam: (pokemon: PokemonInstance) => void;
   givePlayerPokemon: (pokemonId: number, level: number) => void;
+  giveCustomPokemon: (pokemon: PokemonInstance) => void;
   switchTeamOrder: (idx1: number, idx2: number) => void;
   setHeldItem: (pokemonIndex: number, itemId: string | null) => void;
   releasePokemon: (uid: string) => void;
@@ -213,7 +216,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
 
     const initialItems: InventoryItem[] = [
-      { itemId: 'poke-ball', quantity: 5 },
       { itemId: 'potion', quantity: 3 },
     ];
 
@@ -257,6 +259,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setGameSpeed: (speed: number) => set({ settings: { ...get().settings, gameSpeed: speed } }),
   setDevShinyRate: (rate?: number) => set({ settings: { ...get().settings, devShinyRate: rate } }),
+  setDevSkipBattle: (skip: boolean) => set({ settings: { ...get().settings, devSkipBattle: skip } }),
 
   addNotification: (notification) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -346,6 +349,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     if (!newProgress.caughtPokemon.includes(pokemonId)) {
       newProgress.caughtPokemon.push(pokemonId);
+    }
+    set({ progress: newProgress });
+
+    get().addPokemonToTeam(pokemon);
+  },
+
+  giveCustomPokemon: (pokemon: PokemonInstance) => {
+    const state = get();
+    const newProgress = { ...state.progress };
+    if (!newProgress.seenPokemon.includes(pokemon.dataId)) {
+      newProgress.seenPokemon.push(pokemon.dataId);
+    }
+    if (!newProgress.caughtPokemon.includes(pokemon.dataId)) {
+      newProgress.caughtPokemon.push(pokemon.dataId);
     }
     set({ progress: newProgress });
 

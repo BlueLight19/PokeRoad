@@ -2,7 +2,7 @@ import { PokemonInstance, MoveData, StatusCondition, MoveInstance, freshVolatile
 import { BattleLogEntry, BattleAction, SideConditions } from '../types/battle';
 import { calculateDamage, } from './damageCalculator';
 import { getEffectiveStat } from './statCalculator';
-import { getMoveData, getPokemonData, getTypeEffectiveness } from '../utils/dataLoader';
+import { getMoveData, getPokemonData, getTypeEffectiveness, getItemData } from '../utils/dataLoader';
 import { getEffectHandler, EffectContext } from './moveEffects';
 import {
   triggerAbility, abilityIsNoGuard, abilityIsCompoundEyes,
@@ -905,7 +905,7 @@ export function executeMove(
     }
 
     // Contact abilities: Static, Flame Body, Poison Point, Effect Spore, Cursed Body
-    if (totalDamage > 0 && defender.currentHp > 0 && defender.ability && move.category !== 'status') {
+    if (totalDamage > 0 && defender.currentHp > 0 && defender.ability && move.category === 'physical') {
       const contactResult = triggerAbility(defender.ability, 'after-hit', {
         pokemon: defender, opponent: attacker, trigger: 'after-hit',
         move, pokemonName: defenderName, opponentName: attackerName,

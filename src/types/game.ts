@@ -43,6 +43,11 @@ export interface NPCData {
   name: string;
   dialogue: string[]; // Sequential dialogue or just random strings, can just be one string.
   givesItem?: string;
+  givesItemQuantity?: number;
+  givesItems?: Array<{
+    itemId: string;
+    quantity: number;
+  }>;
   givesPokemon?: {
     pokemonId: number;
     level: number;

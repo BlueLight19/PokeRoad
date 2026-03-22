@@ -596,7 +596,7 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
     if (ctx.defender.status !== 'sleep') {
       return [{ message: `Mais cela échoue !`, type: 'info' }];
     }
-    const damage = simplifiedDamage(ctx.attacker, ctx.defender, ctx.move);
+    const damage = simplifiedDamage(ctx, ctx.move!);
     ctx.defender.currentHp = Math.max(0, ctx.defender.currentHp - damage);
     // Liquid Ooze check
     const healAmount = Math.max(1, Math.floor(damage / 2));
@@ -1088,7 +1088,7 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
   // Nature Power (Force Nature) — ID 267: becomes a move based on terrain (default: Tri Attack)
   if (moveId === 267 || moveName.includes('force nature') || moveName.includes('nature power')) {
     // In the absence of terrain tracking, defaults to Tri Attack (ID 161)
-    return executeRandomMove(ctx, 161);
+    return executeRandomMove(ctx, getMoveData(161), 'Force Nature');
   }
 
   // Trick (Tour de Magie) — ID 271: swap held items (same as Switcheroo/Passe-Passe)

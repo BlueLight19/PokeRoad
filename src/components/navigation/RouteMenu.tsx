@@ -216,7 +216,11 @@ export function RouteMenu() {
     } else {
       if (activeNpc.setsEvent && !progress.events[activeNpc.setsEvent]) {
         triggerEvent(activeNpc.setsEvent);
-        if (activeNpc.givesItem) { addItem(activeNpc.givesItem, 1); addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: 1 }); }
+        if (activeNpc.givesItem) {
+          const qty = activeNpc.givesItemQuantity || 1;
+          addItem(activeNpc.givesItem, qty);
+          addNotification({ type: 'item', itemId: activeNpc.givesItem, quantity: qty });
+        }
         if (activeNpc.givesPokemon) { givePlayerPokemon(activeNpc.givesPokemon.pokemonId, activeNpc.givesPokemon.level); addNotification({ type: 'pokemon', pokemonId: activeNpc.givesPokemon.pokemonId, level: activeNpc.givesPokemon.level }); }
       }
       setActiveNpc(null);
@@ -468,7 +472,7 @@ export function RouteMenu() {
                 title={`${trainer.trainerClass} ${trainer.name}`}
                 subtitle={locked ? (trainer.requireCondition?.label || 'Inaccessible') : defeated ? 'Vaincu' : `${trainer.team.length} Pokemon`}
                 accentColor={locked ? theme.colors.textMuted : theme.colors.primary}
-                onClick={locked ? undefined : () => handleTrainerBattle(trainer.id)}
+                onClick={locked ? () => {} : () => handleTrainerBattle(trainer.id)}
                 completed={defeated}
                 disabled={defeated || locked}
               />
