@@ -16,23 +16,27 @@ import { triggerHeldItem, heldItemBlocksHazards } from './heldItemEffects';
  * Stateless functions that operate on Pokémon instances.
  */
 
+/** Push a log entry, auto-injecting current HP/status state if not already set. */
+function pushLog(
+  logs: BattleLogEntry[],
+  entry: BattleLogEntry,
+  attacker: PokemonInstance,
+  defender?: PokemonInstance,
+): void {
+  if (!entry.state) {
+    entry.state = {
+      attackerHp: attacker.currentHp,
+      attackerStatus: attacker.status,
+      ...(defender ? { defenderHp: defender.currentHp, defenderStatus: defender.status } : {}),
+    };
+  }
+  logs.push(entry);
+}
+
 // ===== Status Effects =====
 
 export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonInstance): BattleLogEntry[] {
   const logs: BattleLogEntry[] = [];
-  const originalPush = logs.push.bind(logs);
-  logs.push = (...items: BattleLogEntry[]) => {
-    for (const item of items) {
-      if (!item.state) {
-        item.state = {
-          attackerHp: pokemon.currentHp,
-          attackerStatus: pokemon.status,
-        };
-      }
-      originalPush(item);
-    }
-    return logs.length;
-  };
 
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
 
@@ -42,7 +46,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.status === 'poison') {
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 8));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `${name} souffre du poison ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `${name} souffre du poison ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
   }
 
   // Toxic damage (escalating: 1/16 * counter per turn)
@@ -50,14 +54,14 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     pokemon.volatile.toxicCounter = Math.min(15, pokemon.volatile.toxicCounter + 1);
     const damage = Math.max(1, Math.floor(pokemon.maxHp * pokemon.volatile.toxicCounter / 16));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `${name} souffre gravement du poison ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `${name} souffre gravement du poison ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
   }
 
   // Burn damage (1/16 max HP)
   if (pokemon.status === 'burn') {
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 16));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `${name} souffre de sa brûlure ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `${name} souffre de sa brûlure ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
   }
 
   // Trap damage (Wrap/Bind/Fire Spin: 1/8 max HP per turn)
@@ -65,9 +69,9 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     pokemon.volatile.bound--;
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 8));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `${name} est blessé par l'étreinte ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `${name} est blessé par l'étreinte ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
     if (pokemon.volatile.bound <= 0) {
-      logs.push({ message: `${name} se libère !`, type: 'info' });
+      pushLog(logs, { message: `${name} se libère !`, type: 'info' }, pokemon, opponent);
     }
   }
 
@@ -75,7 +79,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.volatile.leechSeed && pokemon.currentHp > 0) {
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 8));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `Vampigraine draine ${name} ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `Vampigraine draine ${name} ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
     if (opponent && opponent.currentHp > 0) {
       opponent.currentHp = Math.min(opponent.maxHp, opponent.currentHp + damage);
     }
@@ -85,7 +89,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.volatile.cursed && pokemon.currentHp > 0) {
     const damage = Math.max(1, Math.floor(pokemon.maxHp / 4));
     pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-    logs.push({ message: `${name} est blessé par la malédiction ! (-${damage} PV)`, type: 'status' });
+    pushLog(logs, { message: `${name} est blessé par la malédiction ! (-${damage} PV)`, type: 'status' }, pokemon, opponent);
   }
 
   // Recharging state is consumed at the start of executeMove, not here
@@ -106,16 +110,16 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     pokemon.volatile.encoreTurns--;
     if (pokemon.volatile.encoreTurns <= 0) {
       pokemon.volatile.encoreMoveId = undefined;
-      logs.push({ message: `L'effet de Encore s'estompe !`, type: 'info' });
+      pushLog(logs, { message: `L'effet de Encore s'estompe !`, type: 'info' }, pokemon, opponent);
     }
   }
 
   // Perish Song countdown
   if (pokemon.volatile.perishTurns >= 0) {
-    logs.push({ message: `${name} : Requiem ${pokemon.volatile.perishTurns} !`, type: 'info' });
+    pushLog(logs, { message: `${name} : Requiem ${pokemon.volatile.perishTurns} !`, type: 'info' }, pokemon, opponent);
     if (pokemon.volatile.perishTurns === 0) {
       pokemon.currentHp = 0;
-      logs.push({ message: `${name} est K.O. par le Requiem !`, type: 'info' });
+      pushLog(logs, { message: `${name} est K.O. par le Requiem !`, type: 'info' }, pokemon, opponent);
     }
     pokemon.volatile.perishTurns--;
   }
@@ -126,7 +130,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     if (pokemon.volatile.futureAttack.turnsLeft <= 0) {
       const fa = pokemon.volatile.futureAttack;
       pokemon.currentHp = Math.max(0, pokemon.currentHp - fa.damage);
-      logs.push({ message: `${fa.moveName} frappe ${name} ! (-${fa.damage} PV)`, type: 'damage' });
+      pushLog(logs, { message: `${fa.moveName} frappe ${name} ! (-${fa.damage} PV)`, type: 'damage' }, pokemon, opponent);
       pokemon.volatile.futureAttack = undefined;
     }
   }
@@ -135,14 +139,14 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.volatile.ingrain && pokemon.currentHp > 0 && pokemon.currentHp < pokemon.maxHp) {
     const heal = Math.max(1, Math.floor(pokemon.maxHp / 16));
     pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + heal);
-    logs.push({ message: `${name} récupère des PV grâce à Enracinement ! (+${heal} PV)`, type: 'heal' });
+    pushLog(logs, { message: `${name} récupère des PV grâce à Enracinement ! (+${heal} PV)`, type: 'heal' }, pokemon, opponent);
   }
 
   // Aqua Ring: heal 1/16 max HP per turn
   if (pokemon.volatile.aquaRing && pokemon.currentHp > 0 && pokemon.currentHp < pokemon.maxHp) {
     const heal = Math.max(1, Math.floor(pokemon.maxHp / 16));
     pokemon.currentHp = Math.min(pokemon.maxHp, pokemon.currentHp + heal);
-    logs.push({ message: `${name} récupère des PV grâce à Anneau Hydro ! (+${heal} PV)`, type: 'heal' });
+    pushLog(logs, { message: `${name} récupère des PV grâce à Anneau Hydro ! (+${heal} PV)`, type: 'heal' }, pokemon, opponent);
   }
 
   // Yawn: fall asleep at end of the turn after being yawned
@@ -151,7 +155,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
     if (pokemon.status === null) {
       pokemon.status = 'sleep';
       pokemon.statusTurns = 1 + Math.floor(Math.random() * 3);
-      logs.push({ message: `${name} s'endort à cause du Bâillement !`, type: 'status' });
+      pushLog(logs, { message: `${name} s'endort à cause du Bâillement !`, type: 'status' }, pokemon, opponent);
     }
   }
 
@@ -159,7 +163,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.volatile.safeguardTurns > 0) {
     pokemon.volatile.safeguardTurns--;
     if (pokemon.volatile.safeguardTurns <= 0) {
-      logs.push({ message: `L'effet de Protection s'estompe !`, type: 'info' });
+      pushLog(logs, { message: `L'effet de Protection s'estompe !`, type: 'info' }, pokemon, opponent);
     }
   }
 
@@ -167,7 +171,7 @@ export function applyStatusDamage(pokemon: PokemonInstance, opponent?: PokemonIn
   if (pokemon.volatile.tauntTurns > 0) {
     pokemon.volatile.tauntTurns--;
     if (pokemon.volatile.tauntTurns <= 0) {
-      logs.push({ message: `L'effet de Provocation s'estompe !`, type: 'info' });
+      pushLog(logs, { message: `L'effet de Provocation s'estompe !`, type: 'info' }, pokemon, opponent);
     }
   }
 
@@ -190,47 +194,34 @@ const SLEEP_USABLE_MOVES = new Set([214, 173]);
 
 export function checkStatusBlock(pokemon: PokemonInstance, moveId?: number): { blocked: boolean; logs: BattleLogEntry[] } {
   const logs: BattleLogEntry[] = [];
-  const originalPush = logs.push.bind(logs);
-  logs.push = (...items: BattleLogEntry[]) => {
-    for (const item of items) {
-      if (!item.state) {
-        item.state = {
-          attackerHp: pokemon.currentHp,
-          attackerStatus: pokemon.status,
-        };
-      }
-      originalPush(item);
-    }
-    return logs.length;
-  };
 
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
 
   // Flinch (Peur)
   if (pokemon.volatile.flinch) {
     pokemon.volatile.flinch = false; // Consumed
-    logs.push({ message: `${name} a peur !`, type: 'status' });
+    pushLog(logs, { message: `${name} a peur !`, type: 'status' }, pokemon);
     return { blocked: true, logs };
   }
 
   // Confusion
   if (pokemon.volatile.confusion > 0) {
     pokemon.volatile.confusion--;
-    logs.push({ message: `${name} est confus !`, type: 'status' });
+    pushLog(logs, { message: `${name} est confus !`, type: 'status' }, pokemon);
     if (Math.random() < 0.5) {
       // Hurt self: Power 40 physical hit (uses effective stats for attack/defense)
       const confAtk = getEffectiveStat(pokemon, 'attack');
       const confDef = getEffectiveStat(pokemon, 'defense');
       const damage = Math.floor((((2 * pokemon.level / 5 + 2) * 40 * confAtk / confDef) / 50) + 2);
       pokemon.currentHp = Math.max(0, pokemon.currentHp - damage);
-      logs.push({ message: `Il se blesse dans sa confusion !`, type: 'damage' });
+      pushLog(logs, { message: `Il se blesse dans sa confusion !`, type: 'damage' }, pokemon);
       return { blocked: true, logs };
     }
   }
 
   if (pokemon.status === 'paralysis') {
     if (Math.random() < 0.25) {
-      logs.push({ message: `${name} est paralysé ! Il ne peut pas attaquer !`, type: 'status' });
+      pushLog(logs, { message: `${name} est paralysé ! Il ne peut pas attaquer !`, type: 'status' }, pokemon);
       return { blocked: true, logs };
     }
   }
@@ -240,15 +231,15 @@ export function checkStatusBlock(pokemon: PokemonInstance, moveId?: number): { b
     if (pokemon.statusTurns <= 0) {
       pokemon.status = null;
       pokemon.statusTurns = 0;
-      logs.push({ message: `${name} se réveille !`, type: 'status' });
+      pushLog(logs, { message: `${name} se réveille !`, type: 'status' }, pokemon);
       return { blocked: false, logs };
     }
     // Sleep Talk / Snore can be used while asleep
     if (moveId && SLEEP_USABLE_MOVES.has(moveId)) {
-      logs.push({ message: `${name} dort...`, type: 'status' });
+      pushLog(logs, { message: `${name} dort...`, type: 'status' }, pokemon);
       return { blocked: false, logs };
     }
-    logs.push({ message: `${name} dort profondément...`, type: 'status' });
+    pushLog(logs, { message: `${name} dort profondément...`, type: 'status' }, pokemon);
     return { blocked: true, logs };
   }
 
@@ -256,10 +247,10 @@ export function checkStatusBlock(pokemon: PokemonInstance, moveId?: number): { b
     if (Math.random() < 0.2) {
       pokemon.status = null;
       pokemon.statusTurns = 0;
-      logs.push({ message: `${name} a dégelé !`, type: 'status' });
+      pushLog(logs, { message: `${name} a dégelé !`, type: 'status' }, pokemon);
       return { blocked: false, logs };
     }
-    logs.push({ message: `${name} est gelé et ne peut pas bouger !`, type: 'status' });
+    pushLog(logs, { message: `${name} est gelé et ne peut pas bouger !`, type: 'status' }, pokemon);
     return { blocked: true, logs };
   }
 
@@ -447,21 +438,6 @@ export function executeMove(
   defenderSide?: SideConditions
 ): MoveExecutionResult {
   const logs: BattleLogEntry[] = [];
-  const originalPush = logs.push.bind(logs);
-  logs.push = (...items: BattleLogEntry[]) => {
-    for (const item of items) {
-      if (!item.state) {
-        item.state = {
-          attackerHp: attacker.currentHp,
-          defenderHp: defender.currentHp,
-          attackerStatus: attacker.status,
-          defenderStatus: defender.status,
-        };
-      }
-      originalPush(item);
-    }
-    return logs.length;
-  };
 
   const move = getMoveData(moveInstance.moveId);
   const attackerName = attacker.nickname || getPokemonData(attacker.dataId).name;
@@ -470,11 +446,11 @@ export function executeMove(
   // Recharge check: if recharging from a previous turn, skip this turn
   if (attacker.volatile.recharging) {
     attacker.volatile.recharging = false;
-    logs.push({ message: `${attackerName} doit se reposer !`, type: 'info' });
+    pushLog(logs, { message: `${attackerName} doit se reposer !`, type: 'info' }, attacker, defender);
     return { logs, defenderFainted: false };
   }
 
-  logs.push({ message: `${attackerName} utilise ${move.name} !`, type: 'info' });
+  pushLog(logs, { message: `${attackerName} utilise ${move.name} !`, type: 'info' }, attacker, defender);
 
   // Deduct PP
   moveInstance.currentPp = Math.max(0, moveInstance.currentPp - 1);
@@ -484,7 +460,7 @@ export function executeMove(
 
   // Protect check: if defender is protected, block the move
   if (defender.volatile.protected && move.target !== 'self') {
-    logs.push({ message: `${defenderName} se protège !`, type: 'info' });
+    pushLog(logs, { message: `${defenderName} se protège !`, type: 'info' }, attacker, defender);
     return { logs, defenderFainted: false };
   }
 
@@ -494,11 +470,11 @@ export function executeMove(
     const successChance = 1 / Math.pow(2, attacker.volatile.protectStreak);
     attacker.volatile.protectStreak++;
     if (Math.random() >= successChance) {
-      logs.push({ message: `Mais cela échoue !`, type: 'info' });
+      pushLog(logs, { message: `Mais cela échoue !`, type: 'info' }, attacker, defender);
       return { logs, defenderFainted: false };
     }
     attacker.volatile.protected = true;
-    logs.push({ message: `${attackerName} se protège !`, type: 'info' });
+    pushLog(logs, { message: `${attackerName} se protège !`, type: 'info' }, attacker, defender);
     return { logs, defenderFainted: false };
   }
 
@@ -509,7 +485,7 @@ export function executeMove(
   if (move.effect?.type === 'charge') {
     if (attacker.volatile.charging !== move.id) {
       attacker.volatile.charging = move.id;
-      logs.push({ message: `${attackerName} accumule de l'énergie !`, type: 'info' });
+      pushLog(logs, { message: `${attackerName} accumule de l'énergie !`, type: 'info' }, attacker, defender);
       return { logs, defenderFainted: false };
     } else {
       attacker.volatile.charging = undefined; // Unleash
@@ -527,7 +503,7 @@ export function executeMove(
       // Rampage ended, become confused
       attacker.volatile.rampageMoveId = undefined;
       attacker.volatile.confusion = 2 + Math.floor(Math.random() * 4);
-      logs.push({ message: `${attackerName} devient confus par fatigue !`, type: 'status' });
+      pushLog(logs, { message: `${attackerName} devient confus par fatigue !`, type: 'status' }, attacker, defender);
     }
   }
 
@@ -546,17 +522,17 @@ export function executeMove(
   // OHKO moves: special accuracy + instant KO
   if (move.effect?.type === 'ohko') {
     if (defender.level > attacker.level) {
-      logs.push({ message: `Mais cela échoue !`, type: 'info' });
+      pushLog(logs, { message: `Mais cela échoue !`, type: 'info' }, attacker, defender);
       return { logs, defenderFainted: false };
     }
     const hitChance = attacker.level - defender.level + 30;
     if (Math.random() * 100 >= hitChance) {
-      logs.push({ message: `${attackerName} rate son attaque !`, type: 'info' });
+      pushLog(logs, { message: `${attackerName} rate son attaque !`, type: 'info' }, attacker, defender);
       return { logs, defenderFainted: false };
     }
     defender.currentHp = 0;
-    logs.push({ message: `K.O. en un coup !`, type: 'damage' });
-    logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
+    pushLog(logs, { message: `K.O. en un coup !`, type: 'damage' }, attacker, defender);
+    pushLog(logs, { message: `${defenderName} est K.O. !`, type: 'info' }, attacker, defender);
     return { logs, defenderFainted: true };
   }
 
@@ -565,16 +541,16 @@ export function executeMove(
     // Still check accuracy
     if (move.accuracy !== null) {
       if (Math.random() * 100 > move.accuracy) {
-        logs.push({ message: `${attackerName} rate son attaque !`, type: 'info' });
+        pushLog(logs, { message: `${attackerName} rate son attaque !`, type: 'info' }, attacker, defender);
         return { logs, defenderFainted: false };
       }
     }
     const fixedAmount = move.effect.amount ?? 40;
     defender.currentHp = Math.max(0, defender.currentHp - fixedAmount);
-    logs.push({ message: `${defenderName} perd ${fixedAmount} PV !`, type: 'damage' });
+    pushLog(logs, { message: `${defenderName} perd ${fixedAmount} PV !`, type: 'damage' }, attacker, defender);
     const defenderFainted = defender.currentHp <= 0;
     if (defenderFainted) {
-      logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
+      pushLog(logs, { message: `${defenderName} est K.O. !`, type: 'info' }, attacker, defender);
     }
     return { logs, defenderFainted };
   }
@@ -583,7 +559,7 @@ export function executeMove(
   const FUTURE_MOVES = [248, 353];
   if (FUTURE_MOVES.includes(move.id)) {
     if (defender.volatile.futureAttack) {
-      logs.push({ message: `Mais cela échoue !`, type: 'info' });
+      pushLog(logs, { message: `Mais cela échoue !`, type: 'info' }, attacker, defender);
       return { logs, defenderFainted: false };
     }
     const result = calculateDamage(attacker, defender, move, attackerBadges, weather, defenderSide);
@@ -593,7 +569,7 @@ export function executeMove(
       turnsLeft: 2,
       moveName: move.name,
     };
-    logs.push({ message: `${attackerName} prévoit une attaque future !`, type: 'info' });
+    pushLog(logs, { message: `${attackerName} prévoit une attaque future !`, type: 'info' }, attacker, defender);
     return { logs, defenderFainted: false };
   }
 
@@ -621,13 +597,13 @@ export function executeMove(
     const effectiveAccuracy = baseAccuracy * accEvaStageMultiplier(accStage) / accEvaStageMultiplier(evaStage);
     const roll = Math.random() * 100;
     if (roll > effectiveAccuracy) {
-      logs.push({ message: `${attackerName} rate son attaque !`, type: 'info' });
+      pushLog(logs, { message: `${attackerName} rate son attaque !`, type: 'info' }, attacker, defender);
       attacker.volatile.charging = undefined;
       // Recoil on miss (Jump Kick, Hi Jump Kick)
       if (move.effect?.type === 'recoil_crash') {
         const crashDmg = Math.max(1, Math.floor(attacker.maxHp / 2));
         attacker.currentHp = Math.max(0, attacker.currentHp - crashDmg);
-        logs.push({ message: `${attackerName} s'écrase au sol ! (-${crashDmg} PV)`, type: 'damage' });
+        pushLog(logs, { message: `${attackerName} s'écrase au sol ! (-${crashDmg} PV)`, type: 'damage' }, attacker, defender);
       }
       return { logs, defenderFainted: false };
     }
@@ -647,14 +623,14 @@ export function executeMove(
       // Handle Rest specially: heal fully, cure status, apply 2-turn sleep
       if (move.effect?.type === 'status' && move.effect.status === 'sleep') {
         if (attacker.currentHp >= attacker.maxHp) {
-          logs.push({ message: `Mais cela échoue !`, type: 'info' });
+          pushLog(logs, { message: `Mais cela échoue !`, type: 'info' }, attacker, defender);
         } else {
           attacker.status = null;
           attacker.statusTurns = 0;
           attacker.currentHp = attacker.maxHp;
           attacker.status = 'sleep';
           attacker.statusTurns = 2;
-          logs.push({ message: `${attackerName} récupère tous ses PV et s'endort !`, type: 'info' });
+          pushLog(logs, { message: `${attackerName} récupère tous ses PV et s'endort !`, type: 'info' }, attacker, defender);
         }
       } else if (move.effect && getEffectHandler(move.effect.type)) {
         // Use registry for status moves with known handlers (heal_self, mist, disable, etc.)
@@ -726,12 +702,12 @@ export function executeMove(
           defender.volatile.substituteHp = 0;
         }
         if (result.isCritical) msg += ' Coup critique !';
-        logs.push({ message: msg, type: 'damage', state: {
+        pushLog(logs, { message: msg, type: 'damage', state: {
           attackerHp: attacker.currentHp, defenderHp: defender.currentHp,
           attackerStatus: attacker.status, defenderStatus: defender.status,
           isCritical: result.isCritical, effectiveness: i === 0 ? result.effectiveness : undefined,
           target: 'defender' as any
-        }});
+        }}, attacker, defender);
       } else {
         defender.currentHp = Math.max(0, defender.currentHp - result.damage);
         totalDamage += result.damage;
@@ -744,7 +720,7 @@ export function executeMove(
           if (result.effectiveness === 0) combinedMessage += ` Ça n'affecte pas ${defenderName}...`;
         }
 
-        logs.push({
+        pushLog(logs, {
           message: combinedMessage,
           type: 'damage',
           state: {
@@ -756,14 +732,14 @@ export function executeMove(
             effectiveness: i === 0 ? result.effectiveness : undefined,
             target: 'defender' as any
           }
-        });
+        }, attacker, defender);
       }
 
       if (defender.currentHp <= 0) break;
     }
 
     if (hits > 1) {
-      logs.push({ message: `Touché ${hitCount} fois !`, type: 'info' });
+      pushLog(logs, { message: `Touché ${hitCount} fois !`, type: 'info' }, attacker, defender);
     }
 
     // Track damage taken for Counter/Mirror Coat
@@ -806,13 +782,13 @@ export function executeMove(
     // Sturdy: survive with 1 HP from full HP
     if (defender.currentHp <= 0 && defenderHpBefore >= defender.maxHp && abilityIsSturdy(defender.ability) && !abilityIsMoldBreaker(attacker.ability)) {
       defender.currentHp = 1;
-      logs.push({ message: `${defenderName} résiste grâce à Fermeté !`, type: 'info' });
+      pushLog(logs, { message: `${defenderName} résiste grâce à Fermeté !`, type: 'info' }, attacker, defender);
     }
 
     // Endure: survive with 1 HP this turn
     if (defender.currentHp <= 0 && defender.volatile.endure) {
       defender.currentHp = 1;
-      logs.push({ message: `${defenderName} tient bon grâce à Ténacité !`, type: 'info' });
+      pushLog(logs, { message: `${defenderName} tient bon grâce à Ténacité !`, type: 'info' }, attacker, defender);
     }
 
     // Pinch berries: check if HP dropped below threshold
@@ -859,11 +835,11 @@ export function executeMove(
 
     defenderFainted = defender.currentHp <= 0;
     if (defenderFainted) {
-      logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
+      pushLog(logs, { message: `${defenderName} est K.O. !`, type: 'info' }, attacker, defender);
       // Destiny Bond: if the defender had it active, attacker faints too
       if (defender.volatile.destinyBond) {
         attacker.currentHp = 0;
-        logs.push({ message: `${attackerName} est emporté par le Lien du Destin !`, type: 'info' });
+        pushLog(logs, { message: `${attackerName} est emporté par le Lien du Destin !`, type: 'info' }, attacker, defender);
       }
     }
   }
@@ -1034,27 +1010,12 @@ export function executeStruggle(
   defender: PokemonInstance
 ): MoveExecutionResult {
   const logs: BattleLogEntry[] = [];
-  const originalPush = logs.push.bind(logs);
-  logs.push = (...items: BattleLogEntry[]) => {
-    for (const item of items) {
-      if (!item.state) {
-        item.state = {
-          attackerHp: attacker.currentHp,
-          defenderHp: defender.currentHp,
-          attackerStatus: attacker.status,
-          defenderStatus: defender.status,
-        };
-      }
-      originalPush(item);
-    }
-    return logs.length;
-  };
 
   const attackerName = attacker.nickname || getPokemonData(attacker.dataId).name;
   const defenderName = defender.nickname || getPokemonData(defender.dataId).name;
 
-  logs.push({ message: `${attackerName} n'a plus de PP !`, type: 'info' });
-  logs.push({ message: `${attackerName} utilise Lutte !`, type: 'info' });
+  pushLog(logs, { message: `${attackerName} n'a plus de PP !`, type: 'info' }, attacker, defender);
+  pushLog(logs, { message: `${attackerName} utilise Lutte !`, type: 'info' }, attacker, defender);
 
   // Struggle: 50 base power, typeless (neutral effectiveness), no STAB
   const atk = getEffectiveStat(attacker, 'attack');
@@ -1067,16 +1028,16 @@ export function executeStruggle(
   damage = Math.max(1, Math.floor(damage * randomFactor));
 
   defender.currentHp = Math.max(0, defender.currentHp - damage);
-  logs.push({ message: `${defenderName} perd ${damage} PV !`, type: 'damage' });
+  pushLog(logs, { message: `${defenderName} perd ${damage} PV !`, type: 'damage' }, attacker, defender);
 
   // 25% recoil of damage dealt
   const recoil = Math.max(1, Math.floor(damage / 4));
   attacker.currentHp = Math.max(0, attacker.currentHp - recoil);
-  logs.push({ message: `${attackerName} subit le contrecoup ! (-${recoil} PV)`, type: 'damage' });
+  pushLog(logs, { message: `${attackerName} subit le contrecoup ! (-${recoil} PV)`, type: 'damage' }, attacker, defender);
 
   const defenderFainted = defender.currentHp <= 0;
   if (defenderFainted) {
-    logs.push({ message: `${defenderName} est K.O. !`, type: 'info' });
+    pushLog(logs, { message: `${defenderName} est K.O. !`, type: 'info' }, attacker, defender);
   }
 
   return { logs, defenderFainted };
@@ -1098,7 +1059,7 @@ export function applyEntryHazards(
   const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
   const pokeData = getPokemonData(pokemon.dataId);
   const types = pokeData.types as string[];
-  const isGrounded = !types.includes('flying') && pokemon.volatile.magnetRise <= 0; // Flying, Magnet Rise = not grounded
+  const isGrounded = !types.includes('flying') && pokemon.volatile.magnetRise <= 0 && pokemon.ability !== 'levitate'; // Flying, Magnet Rise, Levitate = not grounded
 
   // Stealth Rock: type-effectiveness-based damage (Rock vs switch-in types)
   if (side.stealthRock) {

@@ -1,1 +1,0 @@
-claude --resume "refactor-battle-effect-registry"

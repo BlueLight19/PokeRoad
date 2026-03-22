@@ -548,15 +548,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
 
       if (pokemon.moves.length < 4) {
-        pokemon.moves.push({
-          moveId,
-          currentPp: moveData.pp,
-          maxPp: moveData.pp
-        });
-
         const name = pokemon.nickname || getPokemonData(pokemon.dataId).name;
+        const newTeam = [...state.team];
+        newTeam[idx] = {
+          ...newTeam[idx],
+          moves: [...newTeam[idx].moves, { moveId, currentPp: moveData.pp, maxPp: moveData.pp }],
+        };
         // TMs are reusable — don't consume them
-        set({ team: [...state.team] });
+        set({ team: newTeam });
         return { success: true, message: `${name} apprend ${moveData.name} !` };
       } else {
         set({
@@ -1099,12 +1098,13 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     if (forgetIndex !== null && forgetIndex >= 0 && forgetIndex < 4) {
       const moveData = getMoveData(pendingMoveLearn.moveId);
-      pokemon.moves[forgetIndex] = {
+      const newMoves = [...pokemon.moves];
+      newMoves[forgetIndex] = {
         moveId: pendingMoveLearn.moveId,
         currentPp: moveData.pp,
         maxPp: moveData.pp,
       };
-
+      newTeam[pendingMoveLearn.pokemonIndex] = { ...pokemon, moves: newMoves };
       // TMs are reusable — don't consume sourceItem for TM teaches
     }
 

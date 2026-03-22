@@ -69,18 +69,19 @@ export function BattleScreen() {
     }
 
     // Sync team HP/status/PP back from battle BEFORE XP processing
-    // (XP processing may add new moves from level-up, so sync must come first)
+    // Uses uid matching instead of index to handle team order changes (e.g. captures)
     const freshState = useGameStore.getState();
-    const syncedTeam = [...freshState.team];
-    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
-      syncedTeam[i] = {
-        ...syncedTeam[i],
-        currentHp: battle.playerTeam[i].currentHp,
-        status: battle.playerTeam[i].status,
-        statusTurns: battle.playerTeam[i].statusTurns,
+    const syncedTeam = freshState.team.map(gameMon => {
+      const battleMon = battle.playerTeam.find(bp => bp.uid === gameMon.uid);
+      if (!battleMon) return gameMon;
+      return {
+        ...gameMon,
+        currentHp: battleMon.currentHp,
+        status: battleMon.status,
+        statusTurns: battleMon.statusTurns,
+        moves: battleMon.moves.map(m => ({ ...m })),
       };
-      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
-    }
+    });
     useGameStore.setState({ team: syncedTeam });
 
     // Apply XP gains (may trigger level-up, move learning, evolution)
