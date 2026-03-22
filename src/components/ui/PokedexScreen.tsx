@@ -67,7 +67,7 @@ export function PokedexScreen() {
                 </div>
             </div>
 
-            {caughtCount >= 151 && !inventory.some(i => i.itemId === 'chroma-charm') && (
+            {caughtCount >= 151 && !inventory.some(i => i.itemId === 'shiny-charm') && (
                 <div style={{
                     textAlign: 'center',
                     marginBottom: `${theme.spacing.lg}px`,
@@ -76,8 +76,8 @@ export function PokedexScreen() {
                     border: theme.borders.thin(`${theme.colors.gold}44`),
                     borderRadius: `${theme.radius.md}px`,
                 }}>
-                    <Button variant="primary" onClick={() => addItem('chroma-charm', 1)}>
-                        Reclamer le Charme Chroma !
+                    <Button variant="primary" onClick={() => addItem('shiny-charm', 1)}>
+                        ⭐ Réclamer le Charme chroma ! ⭐
                     </Button>
                 </div>
             )}

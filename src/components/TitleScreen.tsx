@@ -411,22 +411,22 @@ export function TitleScreen() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-        {/* Lueur rouge douce et diffuse */}
-        <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '80vw',
-            maxWidth: '600px',
-            height: '80vw',
-            maxHeight: '600px',
-            background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
-            borderRadius: '50%',
-            filter: 'blur(60px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-        }} />
+      {/* Lueur rouge douce et diffuse */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '80vw',
+        maxWidth: '600px',
+        height: '80vw',
+        maxHeight: '600px',
+        background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
       <div style={{ position: 'relative', textAlign: 'center' }}>
         {/* Logo */}
@@ -491,7 +491,7 @@ export function TitleScreen() {
         fontFamily: "'Press Start 2P', monospace",
         letterSpacing: '1px',
       }}>
-        <span id={"version"}>0.3.0 - Supabase + IndexedDB</span>
+        <span id={"version"}>0.5.2</span>
       </div>
     </div>
   );

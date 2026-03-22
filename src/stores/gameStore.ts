@@ -474,7 +474,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             changed = true;
           }
         }
-      } catch {}
+      } catch { }
     }
     if (changed) {
       set({ progress: newProgress });
@@ -498,13 +498,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   sellItemAction: (itemId: string, qty: number) => {
     const itemData = getItemData(itemId);
     if (!itemData) return;
-    
+
     const currentQty = get().getItemQuantity(itemId);
     const sellQty = Math.min(qty, currentQty);
     if (sellQty <= 0) return;
 
     const sellPrice = Math.floor((itemData.price || 0) / 2) * sellQty;
-    
+
     get().removeItem(itemId, sellQty);
     get().addMoney(sellPrice);
     get().saveGameState();
@@ -570,7 +570,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     }
 
-    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost', 'full_restore', 'rare_candy', 'ev_boost', 'pp_restore'].includes(itemData.effect?.type || '');
+    const requiresTarget = ['heal', 'status', 'status_cure', 'revive', 'evolution', 'boost', 'full_restore', 'rare_candy', 'ev_boost', 'pp_restore', 'level_up'].includes(itemData.effect?.type || '');
 
     if (requiresTarget) {
       if (!pokemonUid) return { success: false, message: "Utiliser sur qui ?" };
@@ -1046,16 +1046,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       const pokemon = newTeam[pendingEvolution.pokemonIndex];
       if (pokemon) {
         const result = evolvePokemon(pokemon, pendingEvolution.targetId);
-        
+
         if (result.learnableMoves.length > 0) {
           const movesToQueue = result.learnableMoves.map(moveId => ({
             pokemonIndex: pendingEvolution.pokemonIndex,
             moveId
           }));
-          
+
           const existingQueue = get().pendingMoveQueue;
           const currentPending = get().pendingMoveLearn;
-          
+
           if (!currentPending) {
             set({
               pendingMoveLearn: movesToQueue[0],

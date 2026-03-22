@@ -29,7 +29,12 @@ export function NotificationOverlay() {
   if (activeNotification.type === 'item' && activeNotification.itemId) {
     try {
       const itemData = getItemData(activeNotification.itemId);
-      iconSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${itemData.sprite || activeNotification.itemId}.png`;
+      if (itemData.sprite && itemData.sprite.startsWith('http')) {
+        iconSrc = itemData.sprite;
+      } else {
+        const spriteName = (itemData.sprite || activeNotification.itemId).replace(/^(tm|hm)-(\d+)$/, '$1$2');
+        iconSrc = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${spriteName}.png`;
+      }
       title = `Vous avez obtenu ${activeNotification.quantity || 1}x ${itemData.name} !`;
       subText = itemData.description;
     } catch (e) {
@@ -82,7 +87,7 @@ export function NotificationOverlay() {
           animation: 'slideUpNotif 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         }}
       >
-        <div 
+        <div
           style={{
             width: '64px',
             height: '64px',

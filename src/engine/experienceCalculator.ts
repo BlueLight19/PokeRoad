@@ -130,7 +130,7 @@ export function processLevelUp(pokemon: PokemonInstance): LevelUpResult | null {
   // Find moves learnable up to new level that aren't already known
   const learnableMoves: number[] = [];
   for (const entry of data.learnset) {
-    if (entry.level <= newLevel) {
+    if (entry.level > pokemon.level && entry.level <= newLevel) {
       // If it's a move the pokemon should know by now but doesn't
       if (!pokemon.moves.some(m => m.moveId === entry.moveId)) {
         learnableMoves.push(entry.moveId);

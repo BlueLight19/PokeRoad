@@ -13,7 +13,7 @@ export type ItemCategory =
     | 'unused' | 'potion' | 'revive' | 'status_heal' | 'pokeball' | 'key' | 'misc' | 'battle' | 'vitamin' | 'drink' | 'sellable' | 'pp_restore' | 'candy';
 
 export interface ItemEffect {
-    type: 'heal' | 'revive' | 'status_cure' | 'cure' | 'catch' | 'evolution' | 'boost' | 'repel' | 'escape_rope' | 'teach' | 'pp_restore' | 'rare_candy' | 'ev_boost' | 'battle_stat' | 'full_restore';
+    type: 'heal' | 'revive' | 'status_cure' | 'cure' | 'catch' | 'evolution' | 'boost' | 'repel' | 'escape_rope' | 'teach' | 'pp_restore' | 'rare_candy' | 'level_up' | 'ev_boost' | 'battle_stat' | 'full_restore';
     value?: number; // Healing amount or general value
     hpPercent?: number; // For revives
     target?: string; // For status cures or specific targets

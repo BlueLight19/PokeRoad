@@ -85,7 +85,7 @@ function DevTools() {
     const [errorMsg, setErrorMsg] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const [itemId, setItemId] = useState('super-bonbon');
+    const [itemId, setItemId] = useState('rare-candy');
     const [itemQty, setItemQty] = useState(1);
     const [pokeId, setPokeId] = useState(150);
     const [pokeLevel, setPokeLevel] = useState(100);
@@ -167,7 +167,7 @@ function DevTools() {
                         console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);
                     }
 
-                    await new Promise(r => setTimeout(r, 50));
+                    await new Promise(r => setTimeout(r, 10));
                 }
 
                 console.log("Génération terminée !");
@@ -227,55 +227,55 @@ function DevTools() {
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Objet</span>
                 <input style={inputStyle} type="text" placeholder="ID de l'objet (ex: potion)" value={itemId} onChange={e => setItemId(e.target.value)} />
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, width: '60px', marginBottom: 0}} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
-                    <button style={{...btnStyle, flex: 1}} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
+                    <input style={{ ...inputStyle, width: '60px', marginBottom: 0 }} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
+                    <button style={{ ...btnStyle, flex: 1 }} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Pokémon</span>
                 <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
                 </div>
                 <button style={btnStyle} onClick={() => { soundManager.playClick(); givePlayerPokemon(pokeId, pokeLevel); }}>Donner Pokémon</button>
             </div>
 
-        <div style={sectionStyle}>
-            <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
-            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
-                {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
-            </button>
-        </div>
+            <div style={sectionStyle}>
+                <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
+                <button style={{ ...btnStyle, opacity: isGenerating ? 0.5 : 1 }} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
+                    {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
+                </button>
+            </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
-                    <button style={{...btnStyle, width: 'auto'}} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
+                    <button style={{ ...btnStyle, width: 'auto' }} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Vitesse du Jeu (Combat & Dialogues)</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
                 </div>
             </div>
 
             <div>
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
-                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px'}}
+                    style={{ ...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px' }}
                     onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const items = getAllItems();
                             if (items.length === 0) {
@@ -291,8 +291,8 @@ function DevTools() {
                     Lister Ids Recus
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const ball = getItemData('poke-ball');
                             const pot = getItemData('potion');
@@ -305,8 +305,8 @@ function DevTools() {
                     Tester Registre Items
                 </button>
                 <button
-                    style={{...btnStyle, background: '#4a148c', borderColor: '#7c43bd'}}
-                    onClick={async () => { 
+                    style={{ ...btnStyle, background: '#4a148c', borderColor: '#7c43bd' }}
+                    onClick={async () => {
                         if (window.confirm("Cela va vider TOUTE la base de données locale (incluant les données de jeu) et forcer un rechargement depuis Supabase. Continuer ?")) {
                             await forceFullSync();
                             window.location.reload();
