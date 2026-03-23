@@ -264,6 +264,23 @@ export function CityMenu() {
         if (condition.type === 'badge' && condition.badge) {
           if (!player.badges.includes(condition.badge)) { gymLocked = true; gymLockReason = 'Badge requis manquant'; }
         }
+        if (condition.type === 'hm' && condition.hmMove) {
+          const hmMoveIds: Record<string, number> = { surf: 57, strength: 70, cut: 15, fly: 19, flash: 148 };
+          const moveId = hmMoveIds[condition.hmMove as string];
+          if (!moveId || !team.some(p => p.moves.some(m => m.moveId === moveId))) {
+            gymLocked = true; gymLockReason = `${(condition.hmMove as string).charAt(0).toUpperCase() + (condition.hmMove as string).slice(1)} requis`;
+          }
+        }
+        if (condition.type === 'item' && condition.itemId) {
+          if (!useGameStore.getState().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) {
+            gymLocked = true; gymLockReason = 'Objet requis manquant';
+          }
+        }
+        if (condition.type === 'event' && condition.eventId) {
+          if (!progress.events[condition.eventId as string]) {
+            gymLocked = true; gymLockReason = 'Explorez les zones environnantes';
+          }
+        }
       }
     } catch { gym = null; }
   }

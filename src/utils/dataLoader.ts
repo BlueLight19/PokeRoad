@@ -313,7 +313,9 @@ function convertGym(raw: DBGym): GymData {
       level: t.level,
       moves: t.moves,
     })),
-    unlockCondition: null,
+    unlockCondition: raw.unlock_condition
+      ? (raw.unlock_condition as any as GymData['unlockCondition'])
+      : null,
   };
 }
 
@@ -358,6 +360,16 @@ function convertZone(
     ? (raw.unlock_condition as any as RouteData['unlockCondition'])
     : null;
 
+  const staticEncounters = (raw.static_encounters || []).map((se: Record<string, unknown>) => ({
+    id: se.id as string,
+    pokemonId: se.pokemonId as number,
+    level: se.level as number,
+    name: se.name as string,
+    requiredItem: se.requiredItem as string | undefined,
+    isGift: se.isGift as boolean | undefined,
+    dialogue: se.dialogue as string | undefined,
+  }));
+
   const connectedZones = raw.connected_zones || [];
 
   if (raw.type === 'city' || raw.type === 'building' || raw.type === 'dungeon') {
@@ -375,6 +387,7 @@ function convertZone(
       wildEncounters: grassEncounters.length > 0 ? grassEncounters : undefined,
       waterEncounters: waterEnc.length > 0 ? waterEnc : undefined,
       fishingEncounters: fishingEnc.length > 0 ? fishingEnc : undefined,
+      staticEncounters: staticEncounters.length > 0 ? staticEncounters : undefined,
       npcs: npcs.length > 0 ? npcs : undefined,
       connectedZones,
       unlockCondition: unlockCondition ?? undefined,
@@ -394,6 +407,7 @@ function convertZone(
     wildEncounters: grassEncounters,
     waterEncounters: waterEnc.length > 0 ? waterEnc : undefined,
     fishingEncounters: fishingEnc.length > 0 ? fishingEnc : undefined,
+    staticEncounters: staticEncounters.length > 0 ? staticEncounters : undefined,
     npcs: npcs.length > 0 ? npcs : undefined,
     trainers: trainerIds,
     connectedZones,
@@ -515,6 +529,9 @@ export async function initializeData(): Promise<void> {
   for (const raw of rawZones as DBZone[]) {
     const encounters = encounterMap.get(raw.id) || [];
     const trainerIds = trainersByZone.get(raw.id) || [];
+    if (raw.id === 'route-12' || raw.id === 'route-16') {
+      console.log(`[DEBUG] ${raw.id} static_encounters from IDB:`, raw.static_encounters);
+    }
     zoneRegistry.set(raw.id, convertZone(raw, encounters, trainerIds));
   }
 
@@ -524,10 +541,7 @@ export async function initializeData(): Promise<void> {
     route2.unlockCondition = { type: 'trainers', zones: ['route-1'] };
   }
 
-  const viridianGym = gymRegistry.get('viridian-gym');
-  if (viridianGym) {
-    viridianGym.unlockCondition = { type: 'gym', gymId: 'cinnabar-gym' };
-  }
+  // viridian-gym unlock_condition now loaded from DB
   
   const foretJade = zoneRegistry.get('foret-jade');
   if (foretJade) {

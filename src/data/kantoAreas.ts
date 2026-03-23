@@ -12,9 +12,9 @@ export const KANTO_AREAS: KantoArea[] = [
   { id: 'jadielle', name: 'Jadielle & Foret de Jade', zoneIds: ['jadielle', 'route-22', 'route-2', 'foret-jade'] },
   { id: 'argenta', name: 'Argenta & Mont Selenite', zoneIds: ['argenta', 'route-3', 'mt-moon', 'route-4'] },
   { id: 'azuria', name: 'Azuria & Ponts', zoneIds: ['azuria', 'route-24', 'route-25'] },
-  { id: 'carmin', name: 'Carmin sur Mer & Environs', zoneIds: ['route-5', 'route-6', 'carmin', 'route-11', 'cave-diglett'] },
+  { id: 'carmin', name: 'Carmin sur Mer & Environs', zoneIds: ['route-5', 'route-6', 'carmin', 'oceane', 'route-11', 'cave-diglett'] },
   { id: 'lavanville', name: 'Lavanville & Tour Pokémon', zoneIds: ['route-9', 'route-10', 'rock-tunnel', 'lavanville', 'pokemon-tower'] },
-  { id: 'safrania', name: 'Safrania & Celadopole', zoneIds: ['route-8', 'safrania', 'route-7', 'celadopole'] },
+  { id: 'safrania', name: 'Safrania & Celadopole', zoneIds: ['route-8', 'safrania', 'silph-co', 'route-7', 'celadopole', 'rocket-hideout'] },
   { id: 'parmanie', name: 'Parmanie & Piste Cyclable', zoneIds: ['route-16', 'route-17', 'route-18', 'parmanie', 'route-15', 'route-14', 'route-13', 'route-12'] },
   { id: 'iles', name: "Iles Ecume & Cramois'Ile", zoneIds: ['route-19', 'route-20', 'seafoam-islands', 'cramois-ile', 'pokemon-mansion', 'route-21'] },
   { id: 'ligue', name: 'Route Victoire & Ligue', zoneIds: ['power-plant', 'route-23', 'victory-road', 'plateau-indigo', 'league-hall'] },
@@ -57,8 +57,10 @@ export const ZONE_COORDS: Record<string, { x: number; y: number }> = {
   'route-22': { x: 18, y: 42 },
   'jadielle': { x: 23, y: 42 },
   'celadopole': { x: 41, y: 48 },
+  'rocket-hideout': { x: 41, y: 41 },
   'route-7': { x: 49, y: 48 },
   'safrania': { x: 58, y: 44 },
+  'silph-co': { x: 54, y: 40 },
   'route-8': { x: 66, y: 44 },
   'lavanville': { x: 76, y: 45 },
   'pokemon-tower': { x: 82, y: 45 },
@@ -70,8 +72,9 @@ export const ZONE_COORDS: Record<string, { x: number; y: number }> = {
 
   // ---- Saffron south → Vermilion ----
   'route-5': { x: 58, y: 32 },
-  'route-6': { x: 64, y: 56 },
+  'route-6': { x: 64, y: 54 },
   'carmin': { x: 63, y: 64 },
+  'oceane': { x: 59, y: 63 },
   'route-11': { x: 68, y: 61 },
   'cave-diglett': { x: 73, y: 60 },
 
@@ -124,26 +127,29 @@ export const ZONE_CONNECTIONS: [string, string][] = [
   ['azuria', 'route-9'],
   ['azuria', 'cerulean-cave'],
 
-  // Cerulean south → Vermilion
+  // Cerulean south → Vermilion (underground paths bypass Saffron)
   ['route-5', 'safrania'],
+  ['route-6', 'safrania'],
   ['route-6', 'carmin'],
+  ['carmin', 'oceane'],
   ['carmin', 'route-11'],
   ['route-11', 'cave-diglett'],
 
-  // Route 9 → Rock Tunnel → Lavender
-  ['route-9', 'rock-tunnel'],
-  ['rock-tunnel', 'route-10'],
+  // Route 9 → Route 10 → Rock Tunnel → Lavender
+  ['route-9', 'route-10'],
   ['route-10', 'lavanville'],
   ['route-10', 'power-plant'],
 
   // Lavender → Pokemon Tower
   ['lavanville', 'pokemon-tower'],
 
-  // Lavender → Saffron → Celadon
+  // Lavender → Saffron → Celadon (underground path route-8 ↔ route-7)
   ['lavanville', 'route-8'],
   ['route-8', 'safrania'],
   ['safrania', 'route-7'],
+  ['safrania', 'silph-co'],
   ['route-7', 'celadopole'],
+  ['celadopole', 'rocket-hideout'],
   ['safrania', 'route-6'],
 
   // Cycling Road

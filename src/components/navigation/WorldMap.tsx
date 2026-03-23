@@ -10,9 +10,9 @@ import kantoMapImg from '../../assets/kantoMap.png';
 const ZONE_ORDER = [
     'bourg-palette', 'route-1', 'jadielle', 'route-22', 'route-2', 'foret-jade',
     'argenta', 'route-3', 'mt-moon', 'route-4', 'azuria', 'route-24', 'route-25',
-    'route-5', 'route-6', 'carmin', 'route-11', 'cave-diglett',
+    'route-5', 'route-6', 'carmin', 'oceane', 'route-11', 'cave-diglett',
     'route-9', 'route-10', 'rock-tunnel', 'lavanville', 'pokemon-tower',
-    'route-8', 'safrania', 'route-7', 'celadopole',
+    'route-8', 'safrania', 'silph-co', 'route-7', 'celadopole', 'rocket-hideout',
     'route-16', 'route-17', 'route-18', 'parmanie', 'route-15', 'route-14', 'route-13', 'route-12',
     'route-19', 'route-20', 'seafoam-islands', 'cramois-ile', 'pokemon-mansion', 'route-21',
     'power-plant', 'route-23', 'victory-road', 'plateau-indigo', 'league-hall',
