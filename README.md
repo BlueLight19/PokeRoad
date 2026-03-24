@@ -1,6 +1,6 @@
 # 🌟 PokeRoad
 
-![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.5.2-blue.svg)
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?logo=supabase&logoColor=white)
@@ -51,6 +51,14 @@ Le système de combat est conçu pour être compétitif et précis :
 | **Audio** | Web Audio API (Sons synthétisés) |
 
 **Flux des données :** `Supabase` ➡️ `IndexedDB` ➡️ `Mémoire RAM (Map)` ➡️ `React (Zustand)`.
+
+---
+
+## ⚠️ Problèmes connus (En cours de résolution)
+
+- Le combat contre Ronflex est assez buggué.
+- La Route 23 est actuellement bloquée.
+- L'ordre des badges est incorrect.
 
 ---
 
