@@ -281,6 +281,11 @@ export function CityMenu() {
             gymLocked = true; gymLockReason = 'Explorez les zones environnantes';
           }
         }
+        if (condition.type === 'badgeCount' && condition.count) {
+          if (player.badges.length < (condition.count as number)) {
+            gymLocked = true; gymLockReason = `${condition.count} badges requis`;
+          }
+        }
       }
     } catch { gym = null; }
   }

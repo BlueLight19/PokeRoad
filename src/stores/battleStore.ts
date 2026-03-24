@@ -301,13 +301,13 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
     set({
       active: true,
-      type: isSafari ? 'safari' : 'wild',
+      type: isSafari ? 'safari' : encounterId ? 'static' : 'wild',
       phase: 'choosing',
       playerTeam: playerTeam.map(deepCopyPokemon),
       activePlayerIndex: activeIdx >= 0 ? activeIdx : 0,
       enemyTeam: [wildPokemon],
       activeEnemyIndex: 0,
-      logs: [{ message: `Un ${wildName} sauvage apparaît !`, type: 'info' }],
+      logs: [{ message: encounterId ? `${wildName} vous bloque le passage !` : `Un ${wildName} sauvage apparaît !`, type: 'info' }],
       turnNumber: 1,
       trainerId: null,
       trainerName: null,
@@ -878,6 +878,12 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
             phase: 'fled' as BattlePhase,
           }));
           return;
+        } else if (fsState.type === 'static') {
+          // Static encounter: Roar/Whirlwind has no effect (boss-like)
+          set(s => ({
+            logs: [...s.logs, { message: 'Cela n\'a aucun effet !', type: 'info' }],
+          }));
+          return;
         } else if (fsState.type === 'trainer' || fsState.type === 'gym') {
           // Trainer battle: force random switch of the defender
           // Determine who was the defender (whose pokemon was forced to switch)
@@ -1076,7 +1082,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           }
           finalNewState.moneyGained = currentState.trainerReward;
           finalNewState.logs = [...get().logs, {
-            message: currentState.type === 'wild' ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
+            message: (currentState.type === 'wild' || currentState.type === 'static') ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
             type: 'info',
           }];
           if (currentState.trainerReward > 0) {
@@ -1112,7 +1118,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
           finalNewState.xpGained = [...currentState.xpGained, xpEntry];
           finalNewState.moneyGained = currentState.trainerReward;
           finalNewState.logs = [...get().logs, {
-            message: currentState.type === 'wild' ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
+            message: (currentState.type === 'wild' || currentState.type === 'static') ? 'Vous avez gagné le combat !' : `Vous avez battu ${currentState.trainerName} !`,
             type: 'info',
           }];
           if (currentState.trainerReward > 0) {
@@ -1392,7 +1398,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
   attemptFlee: async () => {
     const state = get();
     if (state.type !== 'wild' && state.type !== 'safari') {
-      set(s => ({ logs: [...s.logs, { message: 'Impossible de fuir un combat de dresseur !', type: 'info' }] }));
+      set(s => ({ logs: [...s.logs, { message: state.type === 'static' ? 'Impossible de fuir !' : 'Impossible de fuir un combat de dresseur !', type: 'info' }] }));
       return;
     }
 
@@ -1438,7 +1444,7 @@ export const useBattleStore = create<BattleStore>((set, get) => ({
 
   attemptCapture: async (ballId: string) => {
     const state = get();
-    if (state.type !== 'wild') {
+    if (state.type !== 'wild' && state.type !== 'static') {
       set(s => ({ logs: [...s.logs, { message: 'Impossible de capturer un Pokémon dresseur !', type: 'info' }] }));
       return;
     }

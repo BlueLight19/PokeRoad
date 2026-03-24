@@ -60,7 +60,7 @@ export const ZONE_COORDS: Record<string, { x: number; y: number }> = {
   'rocket-hideout': { x: 41, y: 41 },
   'route-7': { x: 49, y: 48 },
   'safrania': { x: 58, y: 44 },
-  'silph-co': { x: 54, y: 40 },
+  'silph-co': { x: 52, y: 38 },
   'route-8': { x: 66, y: 44 },
   'lavanville': { x: 76, y: 45 },
   'pokemon-tower': { x: 82, y: 45 },

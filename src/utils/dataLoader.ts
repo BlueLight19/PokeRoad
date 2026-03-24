@@ -671,7 +671,7 @@ const RIVAL_STARTER_MAP: Record<number, number[]> = {
   7: [1, 2, 3],     // Player Squirtle → rival Bulbasaur line
 };
 
-function isRivalMatchingStarter(trainer: TrainerData, playerStarter: number): boolean {
+export function isRivalMatchingStarter(trainer: TrainerData, playerStarter: number): boolean {
   const rivalLine = RIVAL_STARTER_MAP[playerStarter];
   if (!rivalLine) return true; // Unknown starter, show all
 

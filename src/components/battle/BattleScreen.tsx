@@ -220,8 +220,8 @@ export function BattleScreen() {
               </Button>
             )}
 
-            <Button variant={battle.type === 'wild' ? "ghost" : "primary"} onClick={() => handleEndBattle(false)}>
-              {battle.type === 'wild' ? 'Retour Carte' : 'Continuer'}
+            <Button variant={(battle.type === 'wild') ? "ghost" : "primary"} onClick={() => handleEndBattle(false)}>
+              {(battle.type === 'wild' || battle.type === 'static') ? 'Retour Carte' : 'Continuer'}
             </Button>
           </div>
         </div>

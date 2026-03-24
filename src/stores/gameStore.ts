@@ -20,6 +20,7 @@ import {
   getAllZones,
   getPokemonData,
   getZoneTrainers,
+  isRivalMatchingStarter,
 } from '../utils/dataLoader';
 import {
   createPokemonInstance,
@@ -194,6 +195,11 @@ function cascadeZoneUnlocks(
               const requiredTrainers = zoneTrainers.filter((t: string) => {
                 try {
                   const td = getTrainerData(t);
+                  // Filter rival trainers by player's starter
+                  if (td.category === 'rival') {
+                    const starter = getState().player.starter;
+                    if (starter && !isRivalMatchingStarter(td, starter)) return false;
+                  }
                   if (!td.requireCondition) return true;
                   const rc = td.requireCondition;
                   if (rc.type === 'badge') return getState().player.badges.includes(rc.value);
@@ -337,7 +343,15 @@ export const useGameStore = create<GameState>((set, get) => ({
     get().saveGameState();
   },
 
-  setView: (view: GameView) => set({ currentView: view }),
+  setView: (view: GameView) => {
+    // Clear safari state when navigating away from the safari zone
+    const state = get();
+    if (state.safariState && view !== 'battle') {
+      set({ currentView: view, safariState: null });
+      return;
+    }
+    set({ currentView: view });
+  },
 
   setGameSpeed: (speed: number) => set({ settings: { ...get().settings, gameSpeed: speed } }),
   setDevShinyRate: (rate?: number) => set({ settings: { ...get().settings, devShinyRate: rate } }),
@@ -361,10 +375,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       view = 'league';
     }
 
+    // Clear safari state when selecting a non-safari zone
+    const safariUpdate = (get().safariState && zoneId !== 'parc-safari') ? { safariState: null } : {};
+
     set({
       selectedZone: zoneId,
       currentView: view,
       progress: { ...get().progress, currentZone: zoneId },
+      ...safariUpdate,
     });
   },
 
@@ -801,43 +819,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const newEvents = { ...state.progress.events, [eventId]: true };
     const newProgress = { ...state.progress, events: newEvents };
 
-    const allZones = getAllZones();
-    for (const zone of allZones) {
-      const zoneId = zone.id;
-      if (newProgress.unlockedZones.includes(zoneId)) continue;
-
-      const isConnected = zone.connectedZones.some(z => newProgress.unlockedZones.includes(z));
-      if (!isConnected) continue;
-
-      try {
-        const condition = (zone as any).unlockCondition;
-        if (!condition) {
-          newProgress.unlockedZones.push(zoneId);
-          continue;
-        }
-
-        if (condition.eventId && !newEvents[condition.eventId]) continue;
-        if (condition.itemId && !get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) continue;
-
-        if (condition.type === 'trainers' && condition.zones) {
-          const allDefeated = condition.zones.every((z: string) => {
-            try {
-              const zoneData = getZoneData(z) as any;
-              const zoneTrainers: string[] = zoneData.trainers || [];
-              return zoneTrainers.every((t: string) => newProgress.defeatedTrainers.includes(t));
-            } catch { return true; }
-          });
-          if (allDefeated) newProgress.unlockedZones.push(zoneId);
-        } else if (condition.type === 'gym' && condition.gymId) {
-          if (get().player.badges.includes(getGymData(condition.gymId).badge)) newProgress.unlockedZones.push(zoneId);
-        } else if (condition.type === 'badge' && condition.badge) {
-          if (get().player.badges.includes(condition.badge)) newProgress.unlockedZones.push(zoneId);
-        } else if (condition.type === 'item' && condition.itemId) {
-          if (get().inventory.some(i => i.itemId === condition.itemId && i.quantity > 0)) newProgress.unlockedZones.push(zoneId);
-        }
-      } catch { }
-    }
-
+    cascadeZoneUnlocks(newProgress, get);
     set({ progress: newProgress });
     get().saveGameState();
   },
