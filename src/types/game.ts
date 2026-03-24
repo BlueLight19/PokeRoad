@@ -43,6 +43,11 @@ export interface NPCData {
   name: string;
   dialogue: string[]; // Sequential dialogue or just random strings, can just be one string.
   givesItem?: string;
+  givesItemQuantity?: number;
+  givesItems?: Array<{
+    itemId: string;
+    quantity: number;
+  }>;
   givesPokemon?: {
     pokemonId: number;
     level: number;
@@ -88,6 +93,12 @@ export interface GymPokemon {
   moves: number[];
 }
 
+export interface TrainerCondition {
+  type: 'hm' | 'item' | 'event' | 'badge';
+  value: string; // e.g. 'surf', 'champion-defeated', 'badge-cascade'
+  label?: string; // Display label, e.g. 'Surf requis'
+}
+
 export interface TrainerData {
   id: string;
   name: string;
@@ -97,6 +108,7 @@ export interface TrainerData {
   zone: string;
   category: string; // 'route' | 'gym' | 'rival' | 'elite4'
   floor: number;
+  requireCondition?: TrainerCondition;
 }
 
 export interface TrainerPokemon {
@@ -106,13 +118,14 @@ export interface TrainerPokemon {
 }
 
 export interface UnlockCondition {
-  type: 'trainers' | 'badge' | 'gym' | 'item' | 'event';
+  type: 'trainers' | 'badge' | 'gym' | 'item' | 'event' | 'hm';
   defeatedTrainers?: string[];
   badge?: string;
   gymId?: string;
   zones?: string[];
   itemId?: string; // Require a specific item in absolute inventory (e.g. silph-scope)
   eventId?: string; // Require a specific story event flag
+  hmMove?: string; // Require a team member knowing this HM move (e.g. 'surf')
 }
 
 // ===== Save Data =====

@@ -35,7 +35,7 @@ export function evolvePokemon(pokemon: PokemonInstance, targetId: number): Evolu
   // Check for moves learned at current level by new form
   const learnableMoves: number[] = [];
   for (const entry of newData.learnset) {
-    if (entry.level <= pokemon.level) {
+    if (entry.level === pokemon.level) {
       // Check if already knows it
       if (!pokemon.moves.some(m => m.moveId === entry.moveId)) {
         learnableMoves.push(entry.moveId);

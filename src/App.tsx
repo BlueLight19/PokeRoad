@@ -19,6 +19,8 @@ import { EvolutionModal, MoveLearnModal } from './components/EvolutionModal';
 import { HallOfFame } from './components/scenes/HallOfFame';
 import { soundManager } from './utils/SoundManager';
 import { NotificationOverlay } from './components/ui/NotificationOverlay';
+import { NavBar } from './components/ui/NavBar';
+import { DevCustomPokemon } from './components/ui/DevCustomPokemon';
 
 // --- LOADING SCREEN ---
 function LoadingScreen({ progress, table }: { progress: number; table: string }) {
@@ -79,12 +81,9 @@ function LoadingScreen({ progress, table }: { progress: number; table: string })
 // --- COMPOSANT DEV TOOLS ---
 function DevTools() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [passwordInput, setPasswordInput] = useState('');
-    const [errorMsg, setErrorMsg] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const [itemId, setItemId] = useState('super-bonbon');
+    const [itemId, setItemId] = useState('rare-candy');
     const [itemQty, setItemQty] = useState(1);
     const [pokeId, setPokeId] = useState(150);
     const [pokeLevel, setPokeLevel] = useState(100);
@@ -96,8 +95,15 @@ function DevTools() {
     const currentView = useGameStore(s => s.currentView);
     const setGameSpeed = useGameStore(s => s.setGameSpeed);
     const gameSpeed = useGameStore(s => s.settings.gameSpeed);
+    const devShinyRate = useGameStore(s => s.settings.devShinyRate);
+    const setDevShinyRate = useGameStore(s => s.setDevShinyRate);
+    const devSkipBattle = useGameStore(s => s.settings.devSkipBattle);
+    const setDevSkipBattle = useGameStore(s => s.setDevSkipBattle);
 
     if (currentView === 'title') return null;
+
+    const hasNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+    const devBottom = hasNavBar ? '70px' : '10px';
 
     if (!isOpen) {
         return (
@@ -107,7 +113,7 @@ function DevTools() {
                     setIsOpen(true);
                 }}
                 style={{
-                    position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+                    position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
                     background: '#e94560', color: '#fff', border: '2px solid #fff',
                     padding: '6px 10px', fontFamily: "'Press Start 2P', monospace", fontSize: '8px',
                     cursor: 'pointer', borderRadius: '4px', boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
@@ -130,14 +136,14 @@ function DevTools() {
         cursor: 'pointer', borderRadius: '2px', width: '100%'
     };
 
-    const handleLogin = () => {
-        if (passwordInput.trim() === 'tomer') {
-            setIsAuthenticated(true);
-            setErrorMsg('');
-        } else {
-            setErrorMsg('Mot de passe incorrect, neuille');
-            setPasswordInput('');
-        }
+    const toggleStyle = {
+        ...btnStyle,
+        background: '#16213e',
+        borderColor: '#333',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '6px 8px'
     };
 
     const handleReset = async () => {
@@ -163,7 +169,7 @@ function DevTools() {
                         console.error(`Impossible de générer le Pokémon #${i}. Il sera ignoré.`, e);
                     }
 
-                    await new Promise(r => setTimeout(r, 50));
+                    await new Promise(r => setTimeout(r, 10));
                 }
 
                 console.log("Génération terminée !");
@@ -175,103 +181,113 @@ function DevTools() {
         }
     };
 
-    if (!isAuthenticated) {
-        return (
-            <div style={{
-                position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
-                background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
-                padding: '10px', display: 'flex', flexDirection: 'column', width: '200px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.5)'
-            }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Accès Restreint</span>
-                    <button onClick={() => { soundManager.playClick(); setIsOpen(false); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
-                </div>
-
-                <input
-                    type="password"
-                    placeholder="Mot de passe"
-                    style={inputStyle}
-                    value={passwordInput}
-                    onChange={(e) => setPasswordInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                />
-                <button style={btnStyle} onClick={() => { soundManager.playClick(); handleLogin(); }}>Déverrouiller</button>
-
-                {errorMsg && <span style={{ color: '#ff4444', fontSize: '7px', marginTop: '6px', textAlign: 'center' }}>{errorMsg}</span>}
-            </div>
-        );
-    }
-
     const sectionStyle = {
         marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #333'
     };
 
     return (
         <div style={{
-            position: 'fixed', bottom: '10px', left: '10px', zIndex: 9999,
+            position: 'fixed', bottom: devBottom, left: '10px', zIndex: 9999,
             background: '#0f172a', border: '2px solid #e94560', borderRadius: '8px',
             padding: '10px', display: 'flex', flexDirection: 'column',
             boxShadow: '0 4px 10px rgba(0,0,0,0.5)', width: '240px', maxHeight: '80vh', overflowY: 'auto'
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', borderBottom: '1px solid #333', paddingBottom: '4px' }}>
                 <span style={{ color: '#FFD600', fontSize: '9px', fontFamily: "'Press Start 2P', monospace" }}>Outils Dev</span>
-                <button onClick={() => { soundManager.playClick(); setIsOpen(false); setIsAuthenticated(false); setPasswordInput(''); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
+                <button onClick={() => { soundManager.playClick(); setIsOpen(false); }} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>✖</button>
             </div>
+
+            <DevCustomPokemon />
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Objet</span>
                 <input style={inputStyle} type="text" placeholder="ID de l'objet (ex: potion)" value={itemId} onChange={e => setItemId(e.target.value)} />
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, width: '60px', marginBottom: 0}} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
-                    <button style={{...btnStyle, flex: 1}} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
+                    <input style={{ ...inputStyle, width: '60px', marginBottom: 0 }} type="number" min="1" value={itemQty} onChange={e => setItemQty(parseInt(e.target.value) || 1)} />
+                    <button style={{ ...btnStyle, flex: 1 }} onClick={() => { soundManager.playClick(); addItem(itemId, itemQty); }}>Donner</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer un Pokémon</span>
                 <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Num. Pokédex" value={pokeId} onChange={e => setPokeId(parseInt(e.target.value) || 1)} />
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" placeholder="Niveau" value={pokeLevel} onChange={e => setPokeLevel(parseInt(e.target.value) || 1)} />
                 </div>
                 <button style={btnStyle} onClick={() => { soundManager.playClick(); givePlayerPokemon(pokeId, pokeLevel); }}>Donner Pokémon</button>
             </div>
 
-        <div style={sectionStyle}>
-            <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
-            <button style={{...btnStyle, opacity: isGenerating ? 0.5 : 1}} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
-                {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
-            </button>
-        </div>
+            <div style={sectionStyle}>
+                <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Générer le Pokédex</span>
+                <button style={{ ...btnStyle, opacity: isGenerating ? 0.5 : 1 }} onClick={() => { soundManager.playClick(); handleGiveAllPokemon(); }} disabled={isGenerating}>
+                    {isGenerating ? "Génération en cours..." : "Give tout les pokémon"}
+                </button>
+            </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Ajouter des Pokédollars</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <input style={{...inputStyle, flex: 1, marginBottom: 0}} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
-                    <button style={{...btnStyle, width: 'auto'}} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
+                    <input style={{ ...inputStyle, flex: 1, marginBottom: 0 }} type="number" value={moneyAmount} onChange={e => setMoneyAmount(parseInt(e.target.value) || 0)} />
+                    <button style={{ ...btnStyle, width: 'auto' }} onClick={() => { soundManager.playClick(); addMoney(moneyAmount); }}>+ P</button>
                 </div>
             </div>
 
             <div style={sectionStyle}>
                 <span style={{ color: '#aaa', fontSize: '7px', display: 'block', marginBottom: '4px' }}>Vitesse du Jeu (Combat & Dialogues)</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
-                    <button style={{...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e'}} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 1 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(1); }}>1x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 2 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(2); }}>2x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 4 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(4); }}>4x</button>
+                    <button style={{ ...btnStyle, flex: 1, background: gameSpeed === 16 ? '#e94560' : '#16213e' }} onClick={() => { soundManager.playClick(); setGameSpeed(16); }}>16x</button>
                 </div>
+            </div>
+
+            <div style={sectionStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#aaa', fontSize: '7px' }}>Taux de Shiny (Rencontres sauvages)</span>
+                    <button 
+                        style={{ background: 'none', border: 'none', color: '#e94560', fontSize: '7px', cursor: 'pointer', fontFamily: "'Press Start 2P', monospace" }}
+                        onClick={() => setDevShinyRate(undefined)}
+                    >
+                        Reset
+                    </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input 
+                        type="range" 
+                        min="0" 
+                        max="100" 
+                        value={devShinyRate ?? 0} 
+                        onChange={e => setDevShinyRate(parseInt(e.target.value))} 
+                        style={{ flex: 1 }} 
+                    />
+                    <span style={{ color: '#fff', fontSize: '7px', minWidth: '24px', textAlign: 'right' }}>
+                        {devShinyRate ?? 'Défaut'}%
+                    </span>
+                </div>
+            </div>
+
+            <div style={sectionStyle}>
+                <button
+                    style={{ ...toggleStyle, background: devSkipBattle ? '#1b5e20' : '#16213e', borderColor: devSkipBattle ? '#4caf50' : '#333' }}
+                    onClick={() => { soundManager.playClick(); setDevSkipBattle(!devSkipBattle); }}
+                >
+                    <span style={{ fontSize: '7px' }}>Passer Combat</span>
+                    <span style={{ fontSize: '9px' }}>{devSkipBattle ? 'ON' : 'OFF'}</span>
+                </button>
             </div>
 
             <div>
                 <span style={{ color: '#ff4444', fontSize: '7px', display: 'block', marginBottom: '4px' }}></span>
                 <button
-                    style={{...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px'}}
+                    style={{ ...btnStyle, background: '#8b0000', borderColor: '#ff0000', marginBottom: '8px' }}
                     onClick={() => { soundManager.playClick(); handleReset(); }}
                 >
                     Réinitialiser la Sauvegarde
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const items = getAllItems();
                             if (items.length === 0) {
@@ -287,8 +303,8 @@ function DevTools() {
                     Lister Ids Recus
                 </button>
                 <button
-                    style={{...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px'}}
-                    onClick={() => { 
+                    style={{ ...btnStyle, background: '#1b5e20', borderColor: '#4caf50', marginBottom: '8px' }}
+                    onClick={() => {
                         try {
                             const ball = getItemData('poke-ball');
                             const pot = getItemData('potion');
@@ -301,8 +317,8 @@ function DevTools() {
                     Tester Registre Items
                 </button>
                 <button
-                    style={{...btnStyle, background: '#4a148c', borderColor: '#7c43bd'}}
-                    onClick={async () => { 
+                    style={{ ...btnStyle, background: '#4a148c', borderColor: '#7c43bd' }}
+                    onClick={async () => {
                         if (window.confirm("Cela va vider TOUTE la base de données locale (incluant les données de jeu) et forcer un rechargement depuis Supabase. Continuer ?")) {
                             await forceFullSync();
                             window.location.reload();
@@ -380,21 +396,48 @@ function App() {
                 <p style={{ color: '#888', fontSize: '8px', marginBottom: '20px', maxWidth: '400px', lineHeight: '1.8' }}>
                     {loadError}
                 </p>
-                <button
-                    onClick={() => window.location.reload()}
-                    style={{
-                        background: '#e94560',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '12px 24px',
-                        fontFamily: "'Press Start 2P', monospace",
-                        fontSize: '10px',
-                        cursor: 'pointer',
-                        borderRadius: '8px',
-                    }}
-                >
-                    Réessayer
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <button
+                        onClick={() => window.location.reload()}
+                        style={{
+                            background: '#e94560',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '12px 24px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            fontSize: '10px',
+                            cursor: 'pointer',
+                            borderRadius: '8px',
+                        }}
+                    >
+                        Réessayer
+                    </button>
+                    <button
+                        onClick={async () => {
+                            if (window.confirm("Cela va vider TOUTES les données locales (données de jeu + sauvegarde) pour réparer les erreurs de chargement. Continuer ?")) {
+                                try {
+                                    await forceFullSync();
+                                    await deleteSave();
+                                    window.location.reload();
+                                } catch (e) {
+                                    alert("Erreur lors de la réinitialisation : " + (e instanceof Error ? e.message : 'Inconnu'));
+                                }
+                            }
+                        }}
+                        style={{
+                            background: '#1a1a2e',
+                            color: '#ff4444',
+                            border: '1px solid #ff4444',
+                            padding: '8px 16px',
+                            fontFamily: "'Press Start 2P', monospace",
+                            fontSize: '8px',
+                            cursor: 'pointer',
+                            borderRadius: '4px',
+                        }}
+                    >
+                        Réinitialiser TOUT (Fix Erreur)
+                    </button>
+                </div>
             </div>
         );
     }
@@ -434,6 +477,8 @@ function App() {
         }
     };
 
+    const showNavBar = !['title', 'battle', 'hall_of_fame'].includes(currentView);
+
     return (
         <div
             style={{
@@ -444,13 +489,16 @@ function App() {
                 maxWidth: '900px',
                 margin: '0 auto',
                 padding: '0 8px',
+                paddingBottom: showNavBar ? '66px' : '0',
             }}
         >
-            {renderView()}
+            <div key={currentView} className="view-enter">
+                {renderView()}
+            </div>
             {pendingEvolution && <EvolutionModal />}
             {pendingMoveLearn && <MoveLearnModal />}
             <NotificationOverlay />
-
+            <NavBar />
             <DevTools />
         </div>
     );

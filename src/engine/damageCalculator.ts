@@ -2,7 +2,7 @@ import { PokemonInstance, MoveData, PokemonType } from '../types/pokemon';
 import { DamageResult, SideConditions } from '../types/battle';
 import { getPokemonData, getTypeEffectiveness } from '../utils/dataLoader';
 import { getEffectiveStat } from './statCalculator';
-import { abilityBlocksCrit, triggerAbility, abilityIsMoldBreaker } from './abilityEffects';
+import { abilityBlocksCrit, triggerAbility, abilityIsMoldBreaker, abilityIsScrappy } from './abilityEffects';
 import { triggerHeldItem } from './heldItemEffects';
 
 /**
@@ -86,12 +86,17 @@ export function calculateDamage(
   }
 
   // Type effectiveness
-  const effectiveness = getTypeEffectiveness(move.type, defenderData.types as PokemonType[]);
+  let effectiveness = getTypeEffectiveness(move.type, defenderData.types as PokemonType[]);
+  // Scrappy: Normal/Fighting moves hit Ghost types (remove Ghost immunity)
+  if (effectiveness === 0 && abilityIsScrappy(attacker.ability) && (move.type === 'normal' || move.type === 'fighting') && defenderData.types.includes('ghost' as PokemonType)) {
+    effectiveness = 1;
+  }
   baseDamage = Math.floor(baseDamage * effectiveness);
 
-  // Critical hit multiplier (Gen 9: 1.5x)
+  // Critical hit multiplier (Gen 9: 1.5x, Sniper: 2.25x)
   if (isCritical) {
-    baseDamage = Math.floor(baseDamage * 1.5);
+    const critMult = attacker.ability === 'sniper' ? 2.25 : 1.5;
+    baseDamage = Math.floor(baseDamage * critMult);
   }
 
   // Screen damage reduction (Gen 9: 0.5x, ignored by crits)

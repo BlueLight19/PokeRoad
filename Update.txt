@@ -1,0 +1,3 @@
+- Combat contre ronflex est assez buggué
+- Route 23 bloquée
+- Mauvais ordre des badges

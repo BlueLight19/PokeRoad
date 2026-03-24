@@ -100,6 +100,32 @@ const effectHandlers: Record<string, EffectHandler> = {
       if (ctx.attacker.volatile.leechSeed) { ctx.attacker.volatile.leechSeed = false; logs.push({ message: `${ctx.attackerName} se libère de Vampigraine !`, type: 'info' }); }
     }
 
+    // Defog (ID 432): clear hazards from BOTH sides + screens from defender's side
+    if (ctx.move.id === 432) {
+      if (ctx.defenderSide) {
+        const clearedDef = ctx.defenderSide.stealthRock || ctx.defenderSide.spikes > 0 ||
+          ctx.defenderSide.toxicSpikes > 0 || ctx.defenderSide.stickyWeb ||
+          ctx.defenderSide.reflect > 0 || ctx.defenderSide.lightScreen > 0 || ctx.defenderSide.auroraVeil > 0;
+        ctx.defenderSide.stealthRock = false;
+        ctx.defenderSide.spikes = 0;
+        ctx.defenderSide.toxicSpikes = 0;
+        ctx.defenderSide.stickyWeb = false;
+        ctx.defenderSide.reflect = 0;
+        ctx.defenderSide.lightScreen = 0;
+        ctx.defenderSide.auroraVeil = 0;
+        if (clearedDef) logs.push({ message: `Les pièges et écrans adverses sont dissipés !`, type: 'info' });
+      }
+      if (ctx.attackerSide) {
+        const clearedAtk = ctx.attackerSide.stealthRock || ctx.attackerSide.spikes > 0 ||
+          ctx.attackerSide.toxicSpikes > 0 || ctx.attackerSide.stickyWeb;
+        ctx.attackerSide.stealthRock = false;
+        ctx.attackerSide.spikes = 0;
+        ctx.attackerSide.toxicSpikes = 0;
+        ctx.attackerSide.stickyWeb = false;
+        if (clearedAtk) logs.push({ message: `Les pièges de votre côté sont dissipés !`, type: 'info' });
+      }
+    }
+
     return logs;
   },
 
@@ -108,6 +134,11 @@ const effectHandlers: Record<string, EffectHandler> = {
     const amount = ctx.move.effect.drainPercent ?? ctx.move.effect.amount ?? 50;
     const actualHpLost = ctx.defenderHpBefore - ctx.defender.currentHp;
     const healAmount = Math.max(1, Math.floor(actualHpLost * amount / 100));
+    // Liquid Ooze: drain damages the attacker instead of healing
+    if (ctx.defender.ability === 'liquid-ooze') {
+      ctx.attacker.currentHp = Math.max(0, ctx.attacker.currentHp - healAmount);
+      return [{ message: `${ctx.attackerName} est blessé par Suintement ! (-${healAmount} PV)`, type: 'damage' }];
+    }
     ctx.attacker.currentHp = Math.min(ctx.attacker.maxHp, ctx.attacker.currentHp + healAmount);
     return [{ message: `${ctx.attackerName} récupère ${healAmount} PV !`, type: 'info' }];
   },
@@ -208,8 +239,12 @@ const effectHandlers: Record<string, EffectHandler> = {
   },
 
   force_switch: (ctx) => {
-    // Roar/Whirlwind: actual switch logic handled in battleStore
-    // This handler just returns the message; battleStore checks for force_switch after execution
+    // Pivot moves (U-Turn 369, Volt Switch 521, Flip Turn 812): damaging + attacker switches out
+    const PIVOT_MOVES = [369, 521, 812];
+    if (PIVOT_MOVES.includes(ctx.move.id)) {
+      return [{ message: `${ctx.attackerName} revient !`, type: 'pivot' as any }];
+    }
+    // Phaze moves (Roar/Whirlwind/Dragon Tail): defender is forced out
     return [{ message: `${ctx.defenderName} est forcé de reculer !`, type: 'force_switch' as any }];
   },
 
@@ -556,6 +591,29 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
     return [{ message: `${ctx.attackerName} récupère tous ses PV et s'endort !`, type: 'info' }];
   }
 
+  // Dream Eater (Dévorêve) — ID 138: only works on sleeping targets, drains 50%
+  if (moveId === 138 || moveName.includes('dévorêve') || moveName.includes('dream eater')) {
+    if (ctx.defender.status !== 'sleep') {
+      return [{ message: `Mais cela échoue !`, type: 'info' }];
+    }
+    const damage = simplifiedDamage(ctx, ctx.move!);
+    ctx.defender.currentHp = Math.max(0, ctx.defender.currentHp - damage);
+    // Liquid Ooze check
+    const healAmount = Math.max(1, Math.floor(damage / 2));
+    if (ctx.defender.ability === 'liquid-ooze') {
+      ctx.attacker.currentHp = Math.max(0, ctx.attacker.currentHp - healAmount);
+      return [
+        { message: `${ctx.defenderName} perd ${damage} PV !`, type: 'damage' },
+        { message: `${ctx.attackerName} est blessé par Suintement ! (-${healAmount} PV)`, type: 'damage' },
+      ];
+    }
+    ctx.attacker.currentHp = Math.min(ctx.attacker.maxHp, ctx.attacker.currentHp + healAmount);
+    return [
+      { message: `${ctx.defenderName} perd ${damage} PV !`, type: 'damage' },
+      { message: `${ctx.attackerName} récupère ${healAmount} PV !`, type: 'info' },
+    ];
+  }
+
   // Aromatherapy (Aromathérapie) — ID 312 / Heal Bell (Glas de Soin) — ID 215
   if (moveId === 312 || moveId === 215 || moveName.includes('aromathérapie') || moveName.includes('glas de soin') || moveName.includes('aromatherapy') || moveName.includes('heal bell')) {
     ctx.attacker.status = null;
@@ -750,23 +808,31 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
 
   // Baton Pass (Relais) — ID 226
   if (moveId === 226 || moveName.includes('relais') || moveName.includes('baton pass')) {
-    // In singles, simplified: just signals a switch keeping stat changes
-    // The actual switch is handled by force_switch logic in battleStore
-    return [{ message: `${ctx.attackerName} passe le relais !`, type: 'info' }];
+    return [{ message: `${ctx.attackerName} passe le relais !`, type: 'baton_pass' as any }];
   }
 
   // ===== Type / Ability Manipulation =====
 
-  // Conversion — ID 160
+  // Conversion — ID 160: change type to first move's type
   if (moveId === 160 || moveName === 'conversion') {
     if (ctx.attacker.moves.length === 0) return [{ message: `Mais cela échoue !`, type: 'info' }];
     const firstMove = getMoveData(ctx.attacker.moves[0].moveId);
-    return [{ message: `${ctx.attackerName} change de type en type ${firstMove.type} !`, type: 'info' }];
+    const attackerData = getPokemonData(ctx.attacker.dataId);
+    (attackerData as any).types = [firstMove.type];
+    const typeNames: Record<string, string> = { normal: 'Normal', fire: 'Feu', water: 'Eau', grass: 'Plante', electric: 'Électrik', ice: 'Glace', fighting: 'Combat', poison: 'Poison', ground: 'Sol', flying: 'Vol', psychic: 'Psy', bug: 'Insecte', rock: 'Roche', ghost: 'Spectre', dragon: 'Dragon', dark: 'Ténèbres', steel: 'Acier', fairy: 'Fée' };
+    return [{ message: `${ctx.attackerName} devient type ${typeNames[firstMove.type] || firstMove.type} !`, type: 'info' }];
   }
 
-  // Conversion 2 — ID 176
+  // Conversion 2 — ID 176: change type to resist last hit received
   if (moveId === 176 || moveName.includes('conversion 2')) {
-    return [{ message: `${ctx.attackerName} change de type pour résister !`, type: 'info' }];
+    if (!ctx.defender.volatile.lastMoveUsed) return [{ message: `Mais cela échoue !`, type: 'info' }];
+    const lastMove = getMoveData(ctx.defender.volatile.lastMoveUsed);
+    const resistTypes: Record<string, string> = { normal: 'rock', fire: 'water', water: 'grass', grass: 'fire', electric: 'ground', ice: 'fire', fighting: 'flying', poison: 'ground', ground: 'grass', flying: 'rock', psychic: 'dark', bug: 'fire', rock: 'fighting', ghost: 'normal', dragon: 'steel', dark: 'fighting', steel: 'fire', fairy: 'steel' };
+    const newType = resistTypes[lastMove.type] || 'normal';
+    const attackerData = getPokemonData(ctx.attacker.dataId);
+    (attackerData as any).types = [newType];
+    const typeNames: Record<string, string> = { normal: 'Normal', fire: 'Feu', water: 'Eau', grass: 'Plante', electric: 'Électrik', ice: 'Glace', fighting: 'Combat', poison: 'Poison', ground: 'Sol', flying: 'Vol', psychic: 'Psy', bug: 'Insecte', rock: 'Roche', ghost: 'Spectre', dragon: 'Dragon', dark: 'Ténèbres', steel: 'Acier', fairy: 'Fée' };
+    return [{ message: `${ctx.attackerName} devient type ${typeNames[newType] || newType} !`, type: 'info' }];
   }
 
   // Soak (Détrempage) — ID 487
@@ -1022,7 +1088,7 @@ function handleOverrideMove(ctx: EffectContext): BattleLogEntry[] {
   // Nature Power (Force Nature) — ID 267: becomes a move based on terrain (default: Tri Attack)
   if (moveId === 267 || moveName.includes('force nature') || moveName.includes('nature power')) {
     // In the absence of terrain tracking, defaults to Tri Attack (ID 161)
-    return executeRandomMove(ctx, 161);
+    return executeRandomMove(ctx, getMoveData(161), 'Force Nature');
   }
 
   // Trick (Tour de Magie) — ID 271: swap held items (same as Switcheroo/Passe-Passe)

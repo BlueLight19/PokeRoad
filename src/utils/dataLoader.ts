@@ -1,5 +1,5 @@
 import { PokemonData, MoveData } from '../types/pokemon';
-import { RouteData, CityData, GymData, TrainerData, WildEncounter } from '../types/game';
+import { RouteData, CityData, GymData, TrainerData, TrainerCondition, WildEncounter } from '../types/game';
 import { ItemData } from '../types/inventory';
 import { PokemonType } from '../types/pokemon';
 import {
@@ -264,8 +264,20 @@ function convertItem(raw: DBItem): ItemData {
   };
 }
 
+/**
+ * Trainer access conditions — keyed by trainer ID.
+ * Trainers with conditions appear locked in the UI until the condition is met.
+ * Locked trainers are NOT required to progress to the next zone.
+ *
+ * Condition types:
+ *   hm    — player team has a Pokemon that knows the HM move (e.g. 'surf', 'strength')
+ *   item  — player inventory contains the item (e.g. 'silph-scope')
+ *   event — player has triggered the event (e.g. 'champion-defeated')
+ *   badge — player has the badge (e.g. 'badge-cascade')
+ */
+
 function convertTrainer(raw: DBTrainer): TrainerData {
-  return {
+  const data: TrainerData = {
     id: raw.id,
     name: raw.name,
     trainerClass: raw.trainer_class,
@@ -279,6 +291,14 @@ function convertTrainer(raw: DBTrainer): TrainerData {
       moves: t.moves,
     })),
   };
+  if (raw.require_condition) {
+    data.requireCondition = {
+      type: raw.require_condition.type as TrainerCondition['type'],
+      value: raw.require_condition.value,
+      label: raw.require_condition.label,
+    };
+  }
+  return data;
 }
 
 function convertGym(raw: DBGym): GymData {
@@ -293,7 +313,9 @@ function convertGym(raw: DBGym): GymData {
       level: t.level,
       moves: t.moves,
     })),
-    unlockCondition: null,
+    unlockCondition: raw.unlock_condition
+      ? (raw.unlock_condition as any as GymData['unlockCondition'])
+      : null,
   };
 }
 
@@ -327,6 +349,8 @@ function convertZone(
     name: npc.name as string,
     dialogue: (npc.dialogue as string[]) || [],
     givesItem: npc.givesItem as string | undefined,
+    givesItemQuantity: npc.givesItemQuantity as number | undefined,
+    givesItems: npc.givesItems as Array<{ itemId: string; quantity: number }> | undefined,
     givesPokemon: npc.givesPokemon as { pokemonId: number; level: number } | undefined,
     requiredEvent: npc.requiredEvent as string | undefined,
     setsEvent: npc.setsEvent as string | undefined,
@@ -335,6 +359,16 @@ function convertZone(
   const unlockCondition = raw.unlock_condition
     ? (raw.unlock_condition as any as RouteData['unlockCondition'])
     : null;
+
+  const staticEncounters = (raw.static_encounters || []).map((se: Record<string, unknown>) => ({
+    id: se.id as string,
+    pokemonId: se.pokemonId as number,
+    level: se.level as number,
+    name: se.name as string,
+    requiredItem: se.requiredItem as string | undefined,
+    isGift: se.isGift as boolean | undefined,
+    dialogue: se.dialogue as string | undefined,
+  }));
 
   const connectedZones = raw.connected_zones || [];
 
@@ -353,6 +387,7 @@ function convertZone(
       wildEncounters: grassEncounters.length > 0 ? grassEncounters : undefined,
       waterEncounters: waterEnc.length > 0 ? waterEnc : undefined,
       fishingEncounters: fishingEnc.length > 0 ? fishingEnc : undefined,
+      staticEncounters: staticEncounters.length > 0 ? staticEncounters : undefined,
       npcs: npcs.length > 0 ? npcs : undefined,
       connectedZones,
       unlockCondition: unlockCondition ?? undefined,
@@ -372,6 +407,7 @@ function convertZone(
     wildEncounters: grassEncounters,
     waterEncounters: waterEnc.length > 0 ? waterEnc : undefined,
     fishingEncounters: fishingEnc.length > 0 ? fishingEnc : undefined,
+    staticEncounters: staticEncounters.length > 0 ? staticEncounters : undefined,
     npcs: npcs.length > 0 ? npcs : undefined,
     trainers: trainerIds,
     connectedZones,
@@ -430,9 +466,15 @@ export async function initializeData(): Promise<void> {
   }
 
   // Register Pokemon
+  const loadedIds: number[] = [];
   for (const raw of rawPokemon as DBPokemon[]) {
     const learnset = learnsetMap.get(raw.id) || [];
     pokemonRegistry.set(raw.id, convertPokemon(raw, learnset));
+    loadedIds.push(raw.id);
+  }
+  console.log(`[dataLoader] Registered IDs: ${loadedIds.slice(0, 10).join(', ')}... (Total: ${loadedIds.length})`);
+  if (loadedIds.length > 0 && !pokemonRegistry.has(1)) {
+    console.error("[dataLoader] CRITICAL: Pokemon ID 1 (Bulbasaur) is missing from synced data!");
   }
 
   // Register Moves
@@ -487,6 +529,9 @@ export async function initializeData(): Promise<void> {
   for (const raw of rawZones as DBZone[]) {
     const encounters = encounterMap.get(raw.id) || [];
     const trainerIds = trainersByZone.get(raw.id) || [];
+    if (raw.id === 'route-12' || raw.id === 'route-16') {
+      console.log(`[DEBUG] ${raw.id} static_encounters from IDB:`, raw.static_encounters);
+    }
     zoneRegistry.set(raw.id, convertZone(raw, encounters, trainerIds));
   }
 
@@ -496,14 +541,17 @@ export async function initializeData(): Promise<void> {
     route2.unlockCondition = { type: 'trainers', zones: ['route-1'] };
   }
 
-  const viridianGym = gymRegistry.get('viridian-gym');
-  if (viridianGym) {
-    viridianGym.unlockCondition = { type: 'gym', gymId: 'cinnabar-gym' };
-  }
+  // viridian-gym unlock_condition now loaded from DB
   
   const foretJade = zoneRegistry.get('foret-jade');
   if (foretJade) {
     foretJade.unlockCondition = null; // Route 2 a pas de dresseurs dans la DB pour l'instant
+  }
+
+  // Patch: Remove second assistant from Bourg Palette
+  const bourgPalette = zoneRegistry.get('bourg-palette');
+  if (bourgPalette && bourgPalette.npcs) {
+    bourgPalette.npcs = bourgPalette.npcs.filter(npc => npc.id !== 'npc-oak-aide-2');
   }
   // ---------------------------------------------------------------
 
@@ -562,6 +610,29 @@ export function getAllMoveIds(): number[] {
   return Array.from(moveRegistry.keys());
 }
 
+/** Check if a trainer's access condition is met. Returns true if accessible. */
+export function isTrainerAccessible(trainer: TrainerData, team: { moves: { moveId: number }[] }[], inventory: { itemId: string }[], progress: { events: Record<string, boolean>; badges: string[] }): boolean {
+  const cond = trainer.requireCondition;
+  if (!cond) return true;
+  switch (cond.type) {
+    case 'hm': {
+      // Check if any team member knows a move matching the HM name
+      const hmMoveIds: Record<string, number> = { surf: 57, strength: 70, cut: 15, fly: 19, flash: 148, waterfall: 127, whirlpool: 250, rock_smash: 249, dive: 291 };
+      const targetMoveId = hmMoveIds[cond.value];
+      if (!targetMoveId) return false;
+      return team.some(p => p.moves.some(m => m.moveId === targetMoveId));
+    }
+    case 'item':
+      return inventory.some(i => i.itemId === cond.value);
+    case 'event':
+      return !!progress.events[cond.value];
+    case 'badge':
+      return progress.badges.includes(cond.value);
+    default:
+      return true;
+  }
+}
+
 export function getTrainerData(id: string): TrainerData {
   const data = trainerRegistry.get(id);
   if (!data) throw new Error(`Trainer ${id} not found`);
@@ -600,7 +671,7 @@ const RIVAL_STARTER_MAP: Record<number, number[]> = {
   7: [1, 2, 3],     // Player Squirtle → rival Bulbasaur line
 };
 
-function isRivalMatchingStarter(trainer: TrainerData, playerStarter: number): boolean {
+export function isRivalMatchingStarter(trainer: TrainerData, playerStarter: number): boolean {
   const rivalLine = RIVAL_STARTER_MAP[playerStarter];
   if (!rivalLine) return true; // Unknown starter, show all
 

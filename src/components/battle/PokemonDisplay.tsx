@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PokemonInstance } from '../../types/pokemon';
 import { getPokemonData, getItemData } from '../../utils/dataLoader';
 import { HealthBar } from '../ui/HealthBar';
 import { StatusIcon } from '../ui/StatusIcon';
 import { typeColors } from '../../utils/typeColors';
+import { soundManager } from '../../utils/SoundManager';
 
 interface PokemonDisplayProps {
   pokemon: PokemonInstance;
@@ -12,6 +13,13 @@ interface PokemonDisplayProps {
 
 export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
   const [showStats, setShowStats] = useState(false);
+
+  useEffect(() => {
+    if (pokemon.isShiny) {
+      soundManager.playShiny();
+    }
+  }, [pokemon.uid, pokemon.isShiny]);
+
   const data = getPokemonData(pokemon.dataId);
   const name = pokemon.nickname || data.name;
   const isFainted = pokemon.currentHp <= 0;
@@ -66,16 +74,6 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
         animation: isPlayer ? 'slideInRight 0.4s ease' : 'slideInLeft 0.4s ease',
       }}
     >
-      {/* Top accent line */}
-      <div style={{
-        position: 'absolute',
-        [isPlayer ? 'right' : 'left']: 0,
-        top: 0,
-        width: '60px',
-        height: '3px',
-        background: `linear-gradient(${isPlayer ? '270deg' : '90deg'}, ${borderColor}, transparent)`,
-      }} />
-
       {/* Sprite */}
       <div style={{
         width: '96px',
@@ -111,24 +109,20 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
         {pokemon.isShiny && (
           <div style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: '-20px',
             pointerEvents: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '32px',
-            animation: 'pulse 1s infinite alternate',
-            textShadow: '0 0 10px gold',
             zIndex: 10
-          }}>✨</div>
+          }}>
+            <div className="shiny-star" style={{ top: '10%', left: '10%', animationDelay: '0s' }}>✨</div>
+            <div className="shiny-star" style={{ top: '20%', right: '10%', animationDelay: '0.4s' }}>✨</div>
+            <div className="shiny-star" style={{ bottom: '15%', left: '15%', animationDelay: '0.8s' }}>✨</div>
+            <div className="shiny-star" style={{ bottom: '10%', right: '20%', animationDelay: '1.2s' }}>✨</div>
+          </div>
         )}
       </div>
 
       {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <span style={{
             color: '#fff',
@@ -140,6 +134,11 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
           }}>
             {name}
           </span>
+          {pokemon.isShiny && (
+            <span style={{ color: '#FFD700', fontSize: '8px', fontFamily: "'Press Start 2P', monospace", textShadow: '1px 1px 0px #000', animation: 'pulse 2s infinite' }}>
+              Shiny !
+            </span>
+          )}
           <StatusIcon status={pokemon.status} />
         </div>
 
@@ -185,7 +184,7 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
                 fontSize: '7px',
                 fontFamily: "'Press Start 2P', monospace",
                 color: '#fff',
-                background: `${statButtonColor}44`,
+                background: '#1a1a2e',
                 border: `1px solid ${statButtonColor}`,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
@@ -215,107 +214,107 @@ export function PokemonDisplay({ pokemon, isPlayer }: PokemonDisplayProps) {
             );
           } catch { return null; }
         })()}
-      </div>
 
-      {/* Stat changes popup */}
-      {showStats && hasStatChanges && (
-        <>
-          {/* Backdrop */}
-          <div
-            onClick={() => setShowStats(false)}
-            style={{
-              position: 'fixed',
-              top: 0, left: 0, right: 0, bottom: 0,
-              zIndex: 99,
-            }}
-          />
-          <div style={{
-            position: 'absolute',
-            [isPlayer ? 'left' : 'right']: '0',
-            top: '100%',
-            marginTop: '4px',
-            background: '#1a1a2e',
-            border: '2px solid #444',
-            borderRadius: '8px',
-            padding: '10px 12px',
-            zIndex: 100,
-            minWidth: '160px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
-          }}>
-            {boosts.length > 0 && (
-              <>
-                <div style={{
-                  color: '#aaa',
-                  fontSize: '7px',
-                  fontFamily: "'Press Start 2P', monospace",
-                  marginBottom: '6px',
-                  textTransform: 'uppercase',
-                }}>
-                  Statistiques
-                </div>
-                {boosts.map((b, i) => (
-                  <div key={i} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '3px 0',
+        {/* Stat changes popup (Moved inside Info div for better positioning) */}
+        {showStats && hasStatChanges && (
+          <>
+            {/* Backdrop */}
+            <div
+              onClick={() => setShowStats(false)}
+              style={{
+                position: 'fixed',
+                top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 99,
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              right: '0',
+              top: '100%',
+              marginTop: '4px',
+              background: '#1a1a2e',
+              border: '2px solid #444',
+              borderRadius: '8px',
+              padding: '10px 12px',
+              zIndex: 100,
+              minWidth: '160px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+            }}>
+              {boosts.length > 0 && (
+                <>
+                  <div style={{
+                    color: '#aaa',
+                    fontSize: '7px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    marginBottom: '6px',
+                    textTransform: 'uppercase',
                   }}>
-                    <span style={{
-                      color: '#ccc',
-                      fontSize: '7px',
-                      fontFamily: "'Press Start 2P', monospace",
-                    }}>
-                      {b.label}
-                    </span>
-                    <span style={{
-                      fontSize: '8px',
-                      fontFamily: "'Press Start 2P', monospace",
-                      fontWeight: 'bold',
-                      color: b.stage > 0 ? '#4CAF50' : '#e94560',
-                    }}>
-                      {b.stage > 0 ? `+${b.stage}` : b.stage}
-                    </span>
+                    Statistiques
                   </div>
-                ))}
-              </>
-            )}
-
-            {volatiles.length > 0 && (
-              <>
-                <div style={{
-                  color: '#aaa',
-                  fontSize: '7px',
-                  fontFamily: "'Press Start 2P', monospace",
-                  marginTop: boosts.length > 0 ? '8px' : '0',
-                  marginBottom: '6px',
-                  textTransform: 'uppercase',
-                }}>
-                  Effets
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                  {volatiles.map((vs, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        display: 'inline-block',
-                        padding: '2px 6px',
-                        borderRadius: '6px',
+                  {boosts.map((b, i) => (
+                    <div key={i} style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '3px 0',
+                    }}>
+                      <span style={{
+                        color: '#ccc',
                         fontSize: '7px',
                         fontFamily: "'Press Start 2P', monospace",
-                        color: '#fff',
-                        background: `${vs.color}88`,
-                        border: `1px solid ${vs.color}`,
-                      }}
-                    >
-                      {vs.label}
-                    </span>
+                      }}>
+                        {b.label}
+                      </span>
+                      <span style={{
+                        fontSize: '8px',
+                        fontFamily: "'Press Start 2P', monospace",
+                        fontWeight: 'bold',
+                        color: b.stage > 0 ? '#4CAF50' : '#e94560',
+                      }}>
+                        {b.stage > 0 ? `+${b.stage}` : b.stage}
+                      </span>
+                    </div>
                   ))}
-                </div>
-              </>
-            )}
-          </div>
-        </>
-      )}
+                </>
+              )}
+
+              {volatiles.length > 0 && (
+                <>
+                  <div style={{
+                    color: '#aaa',
+                    fontSize: '7px',
+                    fontFamily: "'Press Start 2P', monospace",
+                    marginTop: boosts.length > 0 ? '8px' : '0',
+                    marginBottom: '6px',
+                    textTransform: 'uppercase',
+                  }}>
+                    Effets
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                    {volatiles.map((vs, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          fontSize: '7px',
+                          fontFamily: "'Press Start 2P', monospace",
+                          color: '#fff',
+                          background: `${vs.color}88`,
+                          border: `1px solid ${vs.color}`,
+                        }}
+                      >
+                        {vs.label}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

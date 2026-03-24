@@ -4,6 +4,9 @@ import { getPokemonData, getMoveData } from '../../utils/dataLoader';
 import { Button } from '../ui/Button';
 import { PokemonInstance } from '../../types/pokemon';
 import { BOX_CAPACITY } from '../../engine/pcStorage';
+import { theme } from '../../theme';
+import { getHpColor } from '../ui/HealthBar';
+import { typeColors } from '../../utils/typeColors';
 
 type DragSource = { type: 'team'; index: number } | { type: 'pc'; uid: string; boxId: number; slotId: number };
 type SelectedSource = { type: 'team'; index: number } | { type: 'pc'; uid: string };
@@ -54,14 +57,23 @@ export function PCStorage() {
   };
 
   return (
-    <div style={{ padding: '16px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2 style={{ color: '#9C27B0', fontSize: '14px', fontFamily: "'Press Start 2P', monospace", marginBottom: '16px', textAlign: 'center' }}>
-        PC de Léo
-      </h2>
+    <div style={{ padding: `${theme.spacing.lg}px`, maxWidth: '600px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: `${theme.spacing.lg}px` }}>
+        <h2 style={{ color: theme.colors.purple, fontSize: theme.font.xxl, fontFamily: theme.font.family, margin: 0 }}>
+          PC de Leo
+        </h2>
+        <div style={{
+          width: '40px',
+          height: '2px',
+          background: `linear-gradient(90deg, transparent, ${theme.colors.purple}, transparent)`,
+          margin: '8px auto 0',
+        }} />
+      </div>
 
       {/* Team section */}
-      <div 
-        style={{ marginBottom: '16px' }}
+      <div
+        style={{ marginBottom: `${theme.spacing.lg}px` }}
         onDragOver={(e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
@@ -75,30 +87,40 @@ export function PCStorage() {
           setDragOverTeamIndex(null);
         }}
       >
-        <div style={{ color: '#aaa', fontSize: '9px', fontFamily: "'Press Start 2P', monospace", marginBottom: '8px' }}>
-          Équipe ({team.length}/6)
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: `${theme.spacing.sm}px`,
+        }}>
+          <span style={{ color: theme.colors.textMuted, fontSize: theme.font.sm, fontFamily: theme.font.family }}>
+            Equipe
+          </span>
+          <span style={{ color: theme.colors.textDimmer, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
+            {team.length}/6
+          </span>
         </div>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '6px',
-          background: 'rgba(26, 42, 58, 0.8)',
-          padding: '8px',
-          borderRadius: '8px',
-          border: '2px solid #333',
+          background: `linear-gradient(180deg, ${theme.colors.navyBg}cc, ${theme.colors.deepBg}cc)`,
+          padding: `${theme.spacing.sm}px`,
+          borderRadius: `${theme.radius.md}px`,
+          border: theme.borders.medium(theme.colors.borderDark),
         }}>
           {Array.from({ length: 6 }).map((_, idx) => {
             const pokemon = team[idx];
             const isDragOver = dragOverTeamIndex === idx && dragSource?.type === 'team' && dragSource.index !== idx;
-            
+
             if (!pokemon) {
               return (
                 <div key={`team-empty-${idx}`} style={{
-                  background: 'rgba(15, 23, 42, 0.5)',
-                  borderRadius: '6px',
+                  background: 'rgba(15, 23, 42, 0.4)',
+                  borderRadius: `${theme.radius.sm}px`,
                   aspectRatio: '1',
-                  opacity: 0.2,
-                  border: '2px solid transparent',
+                  opacity: 0.3,
+                  border: '2px dashed rgba(255,255,255,0.05)',
                 }} />
               );
             }
@@ -106,8 +128,10 @@ export function PCStorage() {
             const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
             const isSelected = selected?.type === 'team' && selected.index === idx;
             const hpRatio = pokemon.currentHp / pokemon.maxHp;
-            const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+            const hpColor = getHpColor(hpRatio);
             const isDragging = dragSource?.type === 'team' && dragSource.index === idx;
+            const primaryType = data.types[0];
+            const typeColor = typeColors[primaryType] || theme.colors.textDim;
 
             return (
               <div
@@ -141,8 +165,10 @@ export function PCStorage() {
                 }}
                 onClick={() => setSelected(isSelected ? null : { type: 'team', index: idx })}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.7)',
-                  borderRadius: '6px',
+                  background: isSelected
+                    ? `linear-gradient(180deg, ${theme.colors.purple}18 0%, rgba(15,23,42,0.8) 100%)`
+                    : `linear-gradient(180deg, ${typeColor}0a 0%, rgba(15,23,42,0.7) 100%)`,
+                  borderRadius: `${theme.radius.sm}px`,
                   aspectRatio: '1',
                   display: 'flex',
                   flexDirection: 'column',
@@ -150,9 +176,13 @@ export function PCStorage() {
                   justifyContent: 'center',
                   cursor: 'grab',
                   position: 'relative',
-                  border: isDragOver ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                  border: isDragOver
+                    ? `2px solid ${theme.colors.info}`
+                    : isSelected
+                      ? `2px solid ${theme.colors.purple}`
+                      : `2px solid ${typeColor}22`,
                   opacity: isDragging ? 0.5 : 1,
-                  transition: 'border-color 0.2s, opacity 0.2s',
+                  transition: 'border-color 0.2s, opacity 0.2s, background 0.2s',
                 }}
               >
                 <img
@@ -161,25 +191,27 @@ export function PCStorage() {
                   style={{ width: '80%', height: '80%', imageRendering: 'pixelated' }}
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
+                {/* HP bar */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '2px',
-                  left: '2px',
-                  right: '2px',
+                  bottom: '3px',
+                  left: '4px',
+                  right: '4px',
                   height: '3px',
-                  background: '#333',
+                  background: theme.colors.borderDark,
                   borderRadius: '2px',
                   overflow: 'hidden',
                 }}>
-                  <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor }} />
+                  <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '2px' }} />
                 </div>
+                {/* Level */}
                 <div style={{
                   position: 'absolute',
                   top: '1px',
-                  right: '2px',
-                  fontSize: '7px',
-                  color: '#aaa',
-                  fontFamily: "'Press Start 2P', monospace",
+                  right: '3px',
+                  fontSize: theme.font.micro,
+                  color: theme.colors.textMuted,
+                  fontFamily: theme.font.family,
                 }}>
                   {pokemon.level}
                 </div>
@@ -201,16 +233,54 @@ export function PCStorage() {
         />
       )}
 
-      {/* Box section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <Button variant="secondary" size="sm" onClick={handlePrevBox}>&lt;</Button>
-        <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: '10px', color: '#ccc' }}>
-          {currentBox.name} ({boxCount}/{BOX_CAPACITY})
+      {/* Box header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: `${theme.spacing.sm}px`,
+        padding: `${theme.spacing.xs}px 0`,
+      }}>
+        <button
+          onClick={handlePrevBox}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: theme.colors.purple,
+            fontSize: theme.font.lg,
+            fontFamily: theme.font.family,
+            cursor: 'pointer',
+            padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
+          }}
+        >
+          ◀
+        </button>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontFamily: theme.font.family, fontSize: theme.font.md, color: theme.colors.textSecondary }}>
+            {currentBox.name}
+          </div>
+          <div style={{ fontFamily: theme.font.family, fontSize: theme.font.micro, color: theme.colors.textDimmer, marginTop: '2px' }}>
+            {boxCount}/{BOX_CAPACITY}
+          </div>
         </div>
-        <Button variant="secondary" size="sm" onClick={handleNextBox}>&gt;</Button>
+        <button
+          onClick={handleNextBox}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: theme.colors.purple,
+            fontSize: theme.font.lg,
+            fontFamily: theme.font.family,
+            cursor: 'pointer',
+            padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
+          }}
+        >
+          ▶
+        </button>
       </div>
 
-      <div 
+      {/* Box grid */}
+      <div
         onDragOver={(e) => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
@@ -233,11 +303,13 @@ export function PCStorage() {
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gap: '6px',
-          background: 'rgba(22, 33, 62, 0.8)',
-          padding: '8px',
-          borderRadius: '8px',
+          background: `linear-gradient(180deg, ${theme.colors.navyBg}cc, ${theme.colors.deepBg}cc)`,
+          padding: `${theme.spacing.sm}px`,
+          borderRadius: `${theme.radius.md}px`,
           minHeight: '200px',
-          border: isDragOverPc && dragSource?.type === 'team' ? '2px solid #2196F3' : '2px solid #333',
+          border: isDragOverPc && dragSource?.type === 'team'
+            ? `2px solid ${theme.colors.info}`
+            : theme.borders.medium(theme.colors.borderDark),
           transition: 'border-color 0.2s',
         }}
       >
@@ -267,11 +339,11 @@ export function PCStorage() {
                   setDragOverPcSlot(null);
                 }}
                 style={{
-                  background: 'rgba(15, 23, 42, 0.5)',
-                  borderRadius: '4px',
+                  background: 'rgba(15, 23, 42, 0.4)',
+                  borderRadius: `${theme.radius.sm}px`,
                   aspectRatio: '1',
                   opacity: isDragOver ? 0.6 : 0.2,
-                  border: isDragOver ? '2px solid #2196F3' : '2px solid transparent',
+                  border: isDragOver ? `2px solid ${theme.colors.info}` : '2px dashed rgba(255,255,255,0.04)',
                   transition: 'border-color 0.2s, opacity 0.2s',
                 }}
               />
@@ -282,8 +354,10 @@ export function PCStorage() {
           const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
           const isSelected = selected?.type === 'pc' && selected.uid === pokemon.uid;
           const hpRatio = pokemon.currentHp / pokemon.maxHp;
-          const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
+          const hpColor = getHpColor(hpRatio);
           const isDragging = dragSource?.type === 'pc' && dragSource.uid === pokemon.uid;
+          const primaryType = data.types[0];
+          const typeColor = typeColors[primaryType] || theme.colors.textDim;
 
           return (
             <div
@@ -317,8 +391,10 @@ export function PCStorage() {
               }}
               onClick={() => setSelected(isSelected ? null : { type: 'pc', uid: pokemon.uid })}
               style={{
-                background: 'rgba(15, 23, 42, 0.7)',
-                borderRadius: '4px',
+                background: isSelected
+                  ? `linear-gradient(180deg, ${theme.colors.purple}18 0%, rgba(15,23,42,0.8) 100%)`
+                  : `linear-gradient(180deg, ${typeColor}0a 0%, rgba(15,23,42,0.7) 100%)`,
+                borderRadius: `${theme.radius.sm}px`,
                 aspectRatio: '1',
                 display: 'flex',
                 flexDirection: 'column',
@@ -326,9 +402,13 @@ export function PCStorage() {
                 justifyContent: 'center',
                 cursor: 'grab',
                 position: 'relative',
-                border: isDragOver && !isDragging ? '2px solid #2196F3' : isSelected ? '2px solid #9C27B0' : '2px solid #333',
+                border: isDragOver && !isDragging
+                  ? `2px solid ${theme.colors.info}`
+                  : isSelected
+                    ? `2px solid ${theme.colors.purple}`
+                    : `2px solid ${typeColor}22`,
                 opacity: isDragging ? 0.5 : 1,
-                transition: 'border-color 0.2s, opacity 0.2s',
+                transition: 'border-color 0.2s, opacity 0.2s, background 0.2s',
               }}
             >
               <img
@@ -339,36 +419,40 @@ export function PCStorage() {
               />
               <div style={{
                 position: 'absolute',
-                bottom: '2px',
-                left: '2px',
-                right: '2px',
+                bottom: '3px',
+                left: '4px',
+                right: '4px',
                 height: '3px',
-                background: '#333',
+                background: theme.colors.borderDark,
                 borderRadius: '2px',
                 overflow: 'hidden',
               }}>
-                <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor }} />
+                <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '2px' }} />
               </div>
               <div style={{
                 position: 'absolute',
                 top: '1px',
-                right: '2px',
-                fontSize: '7px',
-                color: '#aaa',
-                fontFamily: "'Press Start 2P', monospace",
+                right: '3px',
+                fontSize: theme.font.micro,
+                color: theme.colors.textMuted,
+                fontFamily: theme.font.family,
               }}>
                 {pokemon.level}
               </div>
+              {pokemon.isShiny && (
+                <div style={{
+                  position: 'absolute',
+                  top: '1px',
+                  left: '3px',
+                  fontSize: '6px',
+                  color: theme.colors.gold,
+                }}>★</div>
+              )}
             </div>
           );
         })}
       </div>
 
-      <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-        <Button variant="ghost" onClick={() => setView('world_map')}>
-          Quitter
-        </Button>
-      </div>
     </div>
   );
 }
@@ -391,47 +475,71 @@ function DetailPanel({
   const data = getPokemonData(pokemon.dataId);
   const spriteUrl = pokemon.isShiny ? data.spriteUrl.replace('pokemon', 'pokemon/shiny') : data.spriteUrl;
   const hpRatio = pokemon.currentHp / pokemon.maxHp;
-  const hpColor = hpRatio > 0.5 ? '#4CAF50' : hpRatio > 0.2 ? '#FF9800' : '#f44336';
-  const font = "'Press Start 2P', monospace";
+  const hpColor = getHpColor(hpRatio);
+  const primaryType = data.types[0];
+  const typeColor = typeColors[primaryType] || theme.colors.textDim;
 
   const canDeposit = source.type === 'team' && teamLength > 1;
   const canWithdraw = source.type === 'pc' && teamLength < 6;
 
   return (
     <div style={{
-      background: 'rgba(15, 25, 35, 0.9)',
-      border: '2px solid #9C27B0',
-      borderRadius: '10px',
-      padding: '12px',
-      marginBottom: '16px',
+      background: `linear-gradient(135deg, ${typeColor}0a 0%, ${theme.colors.deepBg}e6 40%)`,
+      border: `2px solid ${theme.colors.purple}66`,
+      borderRadius: `${theme.radius.lg}px`,
+      padding: `${theme.spacing.md}px`,
+      marginBottom: `${theme.spacing.lg}px`,
       animation: 'fadeIn 0.2s ease',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-        <img
-          src={spriteUrl}
-          alt={data.name}
-          style={{ width: '64px', height: '64px', imageRendering: 'pixelated' }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', gap: `${theme.spacing.md}px`, marginBottom: '10px' }}>
+        <div style={{
+          background: `radial-gradient(circle, ${typeColor}12 0%, transparent 70%)`,
+          borderRadius: `${theme.radius.sm}px`,
+          padding: '2px',
+          flexShrink: 0,
+        }}>
+          <img
+            src={spriteUrl}
+            alt={data.name}
+            style={{ width: '72px', height: '72px', imageRendering: 'pixelated' }}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        </div>
         <div style={{ flex: 1 }}>
-          <div style={{ color: '#fff', fontSize: '11px', fontFamily: font }}>
-            {pokemon.nickname || data.name}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.lg, fontFamily: theme.font.family }}>
+              {pokemon.nickname || data.name}
+            </span>
+            {pokemon.isShiny && <span style={{ color: theme.colors.gold, fontSize: theme.font.xs }}>★</span>}
           </div>
-          <div style={{ color: '#888', fontSize: '8px', fontFamily: font, marginTop: '4px' }}>
-            Nv.{pokemon.level}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: `${theme.spacing.xs}px` }}>
+            <span style={{ color: typeColor, fontSize: theme.font.xs, fontFamily: theme.font.family }}>
+              Nv.{pokemon.level}
+            </span>
+            {data.types.map(t => (
+              <span key={t} style={{
+                padding: '1px 5px',
+                borderRadius: '3px',
+                fontSize: '6px',
+                fontFamily: theme.font.family,
+                color: theme.colors.textPrimary,
+                background: typeColors[t] || theme.colors.textDim,
+                textTransform: 'uppercase',
+              }}>{t}</span>
+            ))}
             {pokemon.status !== null && (
-              <span style={{ color: '#e94560', marginLeft: '8px' }}>
+              <span style={{ color: theme.colors.primary, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
                 [{pokemon.status.toUpperCase()}]
               </span>
             )}
           </div>
           {/* HP bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
-            <div style={{ flex: 1, height: '6px', background: '#333', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ flex: 1, height: '5px', background: theme.colors.borderDark, borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{ width: `${hpRatio * 100}%`, height: '100%', background: hpColor, borderRadius: '3px' }} />
             </div>
-            <span style={{ color: '#aaa', fontSize: '7px', fontFamily: font }}>
+            <span style={{ color: theme.colors.textMuted, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
               {pokemon.currentHp}/{pokemon.maxHp}
             </span>
           </div>
@@ -442,7 +550,7 @@ function DetailPanel({
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '4px',
+        gap: `${theme.spacing.xs}px`,
         marginBottom: '10px',
       }}>
         {([
@@ -454,37 +562,40 @@ function DetailPanel({
           ['PV', pokemon.maxHp],
         ] as [string, number][]).map(([label, value]) => (
           <div key={label} style={{
-            background: 'rgba(26, 42, 58, 0.7)',
-            borderRadius: '4px',
-            padding: '4px 6px',
+            background: 'rgba(26, 42, 58, 0.6)',
+            borderRadius: `${theme.radius.sm}px`,
+            padding: `${theme.spacing.xs}px 6px`,
             display: 'flex',
             justifyContent: 'space-between',
+            border: theme.borders.thin('rgba(255,255,255,0.03)'),
           }}>
-            <span style={{ color: '#888', fontSize: '7px', fontFamily: font }}>{label}</span>
-            <span style={{ color: '#fff', fontSize: '7px', fontFamily: font }}>{value}</span>
+            <span style={{ color: theme.colors.textDim, fontSize: theme.font.micro, fontFamily: theme.font.family }}>{label}</span>
+            <span style={{ color: theme.colors.textPrimary, fontSize: theme.font.micro, fontFamily: theme.font.family }}>{value}</span>
           </div>
         ))}
       </div>
 
       {/* Moves */}
       <div style={{ marginBottom: '10px' }}>
-        <div style={{ color: '#888', fontSize: '7px', fontFamily: font, marginBottom: '4px' }}>
+        <div style={{ color: theme.colors.textDim, fontSize: theme.font.micro, fontFamily: theme.font.family, marginBottom: `${theme.spacing.xs}px`, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           Capacites
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: `${theme.spacing.xs}px` }}>
           {pokemon.moves.map((move, i) => {
             let moveData;
             try { moveData = getMoveData(move.moveId); } catch { return null; }
+            const moveTypeColor = typeColors[moveData.type] || theme.colors.textDim;
             return (
               <div key={i} style={{
-                background: 'rgba(26, 42, 58, 0.7)',
-                borderRadius: '4px',
-                padding: '4px 6px',
+                background: `${moveTypeColor}08`,
+                borderRadius: `${theme.radius.sm}px`,
+                borderLeft: `2px solid ${moveTypeColor}`,
+                padding: `${theme.spacing.xs}px 6px`,
               }}>
-                <div style={{ color: '#fff', fontSize: '7px', fontFamily: font }}>
+                <div style={{ color: theme.colors.textPrimary, fontSize: theme.font.micro, fontFamily: theme.font.family }}>
                   {moveData.name}
                 </div>
-                <div style={{ color: '#666', fontSize: '6px', fontFamily: font, marginTop: '2px' }}>
+                <div style={{ color: theme.colors.textDimmer, fontSize: '6px', fontFamily: theme.font.family, marginTop: '2px' }}>
                   PP {move.currentPp}/{move.maxPp}
                 </div>
               </div>
@@ -494,7 +605,7 @@ function DetailPanel({
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: `${theme.spacing.sm}px`, justifyContent: 'center' }}>
         {source.type === 'team' && (
           <Button
             variant="danger"

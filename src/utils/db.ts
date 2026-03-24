@@ -8,7 +8,7 @@ const DB_NAME = 'pokemon_game_db';
 const DB_VERSION = 1;
 const SYNC_KEY = 'last_sync_timestamp';
 // Bump this to force a re-sync on next app load (bypasses IndexedDB cache)
-const LOCAL_DATA_VERSION = '0.4.0';
+const LOCAL_DATA_VERSION = '0.6.2';
 
 // ——————————————————————————————————————————————
 // 1. Raw DB types (snake_case, matching Supabase columns)
@@ -78,6 +78,7 @@ export interface DBZone {
   npcs: Array<Record<string, unknown>> | null;
   shop_items?: string[];
   total_floors?: number;
+  static_encounters?: Array<Record<string, unknown>> | null;
 }
 
 export interface DBWildEncounter {
@@ -101,6 +102,7 @@ export interface DBGym {
   zone_id: string;
   team?: Array<{ pokemonId: number; level: number; moves: number[] }>;
   reward?: number;
+  unlock_condition?: Record<string, unknown> | null;
 }
 
 export interface DBTrainer {
@@ -112,6 +114,7 @@ export interface DBTrainer {
   team: Array<{ pokemonId: number; level: number; moves: number[] }>;
   category?: string; // 'route' | 'gym' | 'rival' | 'elite4'
   floor?: number;
+  require_condition?: { type: string; value: string; label?: string } | null;
 }
 
 // Player stores
@@ -240,10 +243,10 @@ export async function getDB(): Promise<IDBPDatabase<GameDB>> {
 const JSON_COLUMNS: Record<string, string[]> = {
   pokemon: ['types', 'base_stats', 'ev_yield', 'tm_learnset', 'evolutions'],
   items: ['effect'],
-  zones: ['connected_zones', 'unlock_condition', 'npcs', 'shop_items'],
+  zones: ['connected_zones', 'unlock_condition', 'npcs', 'shop_items', 'static_encounters'],
   trainers: ['team'],
   moves: ['effect'],
-  gyms: ['team'],
+  gyms: ['team', 'unlock_condition'],
 };
 
 function parseJsonCols(row: Record<string, unknown>, table: string): Record<string, unknown> {
@@ -318,6 +321,14 @@ export async function syncFromSupabase(
 
     // Parse JSON columns
     const parsed = (data || []).map((row: any) => parseJsonCols(row, table));
+
+    // Debug: check static_encounters for route-12/16 during sync
+    if (table === 'zones') {
+      const debugZones = parsed.filter((z: any) => z.id === 'route-12' || z.id === 'route-16');
+      for (const dz of debugZones) {
+        console.log(`[sync DEBUG] ${(dz as any).id} static_encounters:`, (dz as any).static_encounters);
+      }
+    }
 
     // Write to IndexedDB in a single transaction
     const tx = db.transaction(table, 'readwrite');

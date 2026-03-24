@@ -29,7 +29,7 @@ export function BattleScreen() {
       for (const log of newLogs) {
         if (log.type === 'damage') {
           soundManager.playDamage();
-          
+
           if (log.state?.target === 'enemy') {
             setShakeEnemy(true);
             setTimeout(() => setShakeEnemy(false), 500);
@@ -69,18 +69,19 @@ export function BattleScreen() {
     }
 
     // Sync team HP/status/PP back from battle BEFORE XP processing
-    // (XP processing may add new moves from level-up, so sync must come first)
+    // Uses uid matching instead of index to handle team order changes (e.g. captures)
     const freshState = useGameStore.getState();
-    const syncedTeam = [...freshState.team];
-    for (let i = 0; i < syncedTeam.length && i < battle.playerTeam.length; i++) {
-      syncedTeam[i] = {
-        ...syncedTeam[i],
-        currentHp: battle.playerTeam[i].currentHp,
-        status: battle.playerTeam[i].status,
-        statusTurns: battle.playerTeam[i].statusTurns,
+    const syncedTeam = freshState.team.map(gameMon => {
+      const battleMon = battle.playerTeam.find(bp => bp.uid === gameMon.uid);
+      if (!battleMon) return gameMon;
+      return {
+        ...gameMon,
+        currentHp: battleMon.currentHp,
+        status: battleMon.status,
+        statusTurns: battleMon.statusTurns,
+        moves: battleMon.moves.map(m => ({ ...m })),
       };
-      syncedTeam[i].moves = battle.playerTeam[i].moves.map(m => ({ ...m }));
-    }
+    });
     useGameStore.setState({ team: syncedTeam });
 
     // Apply XP gains (may trigger level-up, move learning, evolution)
@@ -117,6 +118,9 @@ export function BattleScreen() {
     // Check if player just became champion
     if (useGameStore.getState().progress.leagueProgress >= 5) {
       useGameStore.getState().setView('hall_of_fame');
+    } else if (gameStore.selectedZone) {
+      // Return to the zone where the battle started
+      useGameStore.getState().selectZone(gameStore.selectedZone);
     } else {
       useGameStore.getState().setView('world_map');
     }
@@ -216,8 +220,8 @@ export function BattleScreen() {
               </Button>
             )}
 
-            <Button variant={battle.type === 'wild' ? "ghost" : "primary"} onClick={() => handleEndBattle(false)}>
-              {battle.type === 'wild' ? 'Retour Carte' : 'Continuer'}
+            <Button variant={(battle.type === 'wild') ? "ghost" : "primary"} onClick={() => handleEndBattle(false)}>
+              {(battle.type === 'wild' || battle.type === 'static') ? 'Retour Carte' : 'Continuer'}
             </Button>
           </div>
         </div>
@@ -279,7 +283,7 @@ export function BattleScreen() {
         <div className="battle-frame" style={frameStyle}>
           <BattleLog logs={battle.logs} />
           <div style={{ marginTop: '16px', textAlign: 'center' }}>
-            <Button variant="ghost" onClick={() => { battle.clearBattle(); gameStore.setView('world_map'); }}>
+            <Button variant="ghost" onClick={() => { battle.clearBattle(); gameStore.selectedZone ? gameStore.selectZone(gameStore.selectedZone) : gameStore.setView('world_map'); }}>
               Continuer
             </Button>
           </div>
@@ -396,8 +400,13 @@ export function BattleScreen() {
     });
 
     // Group items by category
-    const balls = inventory.filter(i => { try { return getItemData(i.itemId).category === 'pokeball'; } catch { return false; } });
-    const healing = inventory.filter(i => { try { const d = getItemData(i.itemId); return d.category === 'potion' || d.category === 'revive' || d.category === 'status_heal'; } catch { return false; } });
+    const balls = inventory.filter(i => {
+      try {
+        const d = getItemData(i.itemId);
+        return ['standard-balls', 'special-balls', 'apricorn-balls', 'pokeball'].includes(d.category) || d.effect?.type === 'catch';
+      } catch { return false; }
+    });
+    const healing = inventory.filter(i => !balls.includes(i));
 
     const renderItemButton = (item: typeof inventory[0]) => {
       let itemData;
@@ -450,11 +459,11 @@ export function BattleScreen() {
             flexShrink: 0,
             border: itemData.category === 'pokeball' ? '1px solid rgba(233, 69, 96, 0.5)' : '1px solid rgba(76, 175, 80, 0.5)',
           }}>
-            <img 
+            <img
               src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${itemData.id.replace('super-potion', 'super-potion').replace('hyper-potion', 'hyper-potion').replace('max-potion', 'max-potion')}.png`}
               alt={itemData.name}
               style={{ width: '22px', height: '22px', imageRendering: 'pixelated' }}
-              onError={(e) => { 
+              onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
                 if ((e.target as HTMLImageElement).parentElement) {
                   const span = document.createElement('span');

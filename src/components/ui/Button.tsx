@@ -1,5 +1,6 @@
 import React from 'react';
 import { soundManager } from '../../utils/SoundManager';
+import { theme } from '../../theme';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -16,10 +17,10 @@ export function Button({
 }: ButtonProps) {
   const baseStyle: React.CSSProperties = {
     border: 'none',
-    borderRadius: '8px',
+    borderRadius: `${theme.radius.md}px`,
     cursor: disabled ? 'not-allowed' : 'pointer',
-    fontFamily: "'Press Start 2P', monospace",
-    fontSize: size === 'sm' ? '10px' : size === 'lg' ? '14px' : '12px',
+    fontFamily: theme.font.family,
+    fontSize: size === 'sm' ? theme.font.md : size === 'lg' ? theme.font.xxl : theme.font.xl,
     padding: size === 'sm' ? '6px 12px' : size === 'lg' ? '14px 24px' : '10px 18px',
     transition: 'all 0.15s ease',
     opacity: disabled ? 0.5 : 1,
@@ -28,29 +29,29 @@ export function Button({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: `${theme.spacing.sm}px`,
   };
 
   const variantStyles: Record<string, React.CSSProperties> = {
     primary: {
-      background: 'linear-gradient(180deg, #4CAF50, #388E3C)',
-      color: '#fff',
-      boxShadow: '0 3px 0 #2E7D32, 0 4px 8px rgba(0,0,0,0.3)',
+      background: `linear-gradient(180deg, ${theme.colors.success}, ${theme.colors.successDark})`,
+      color: theme.colors.textPrimary,
+      boxShadow: theme.shadows.button3d(theme.colors.successDarker),
     },
     secondary: {
-      background: 'linear-gradient(180deg, #2196F3, #1976D2)',
-      color: '#fff',
-      boxShadow: '0 3px 0 #1565C0, 0 4px 8px rgba(0,0,0,0.3)',
+      background: `linear-gradient(180deg, ${theme.colors.info}, ${theme.colors.infoDark})`,
+      color: theme.colors.textPrimary,
+      boxShadow: theme.shadows.button3d(theme.colors.infoDarker),
     },
     danger: {
-      background: 'linear-gradient(180deg, #f44336, #d32f2f)',
-      color: '#fff',
-      boxShadow: '0 3px 0 #c62828, 0 4px 8px rgba(0,0,0,0.3)',
+      background: `linear-gradient(180deg, ${theme.colors.danger}, ${theme.colors.dangerDark})`,
+      color: theme.colors.textPrimary,
+      boxShadow: theme.shadows.button3d(theme.colors.dangerDarker),
     },
     ghost: {
       background: 'transparent',
-      color: '#ddd',
-      border: '2px solid #555',
+      color: theme.colors.textSecondary,
+      border: theme.borders.medium(theme.colors.borderMid),
       boxShadow: 'none',
     },
   };

@@ -88,6 +88,13 @@ class SoundManager {
         this.playTone(300, 'sawtooth', 0.3, 0.2);
     }
 
+    playShiny() {
+        const now = 0;
+        this.playTone(1200, 'sine', 0.1, now);
+        this.playTone(1600, 'sine', 0.1, now + 0.1);
+        this.playTone(2000, 'sine', 0.3, now + 0.2);
+    }
+
     playVictory() {
         const now = 0;
         this.playTone(523.25, 'square', 0.1, now);     // C5
